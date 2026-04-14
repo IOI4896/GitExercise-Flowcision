@@ -2,6 +2,7 @@
 #request = browser to server
 from flask import Flask, render_template, request
 from simulation import *
+from visualization import get_performance_chart
 
 app = Flask(__name__)
 
@@ -40,13 +41,21 @@ def result():
 
     recs = get_recommendation(score, analysis, recommendation)
 
+    # 计算图表 (Zi_Yan 加的部分)
+    plot_url = get_performance_chart(
+        study_score(study)*100, 
+        sleep_score(sleep)*sleep_penalty(sleep)*100, 
+        focus_score(focus)*100, 
+        stress_score(stress)*100
+)
     return render_template(
         'result.html',
         score = score,
         analysis = analysis,
         recommendation = recommendation,
         main_issue = main_issue,
-        recs = recs
+        recs = recs , 
+        plot_url=plot_url #Zi_Yan 加的部分
     )
 
 if __name__ == "__main__":
