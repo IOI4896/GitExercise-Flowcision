@@ -34,19 +34,19 @@ def result():
     analysis, recommendation = analyze_factors(study, sleep, focus, stress)
     score = calculate_score(study, sleep, focus, stress)
 
-    if score == 100:
+    if score >= 90:
         main_issue = "None"
     else:
         main_issue = get_main_issue(study, sleep, focus, stress)
 
     recs = get_recommendation(score, analysis, recommendation)
 
-    # 计算图表 (Zi_Yan 加的部分)
+    #Calculation Graph
     plot_url = get_performance_chart(
-        study_score(study)*100, 
-        sleep_score(sleep)*sleep_penalty(sleep)*100, 
-        focus_score(focus)*100, 
-        stress_score(stress)*100
+        study_score(study) * study_penalty(study) * 100, 
+        sleep_score(sleep) * sleep_penalty(sleep) * 100, 
+        focus_score(focus) * 100, 
+        stress_score(stress) * 100
 )
     return render_template(
         'result.html',
@@ -55,7 +55,7 @@ def result():
         recommendation = recommendation,
         main_issue = main_issue,
         recs = recs , 
-        plot_url=plot_url #Zi_Yan 加的部分
+        plot_url = plot_url
     )
 
 if __name__ == "__main__":
