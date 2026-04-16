@@ -47,7 +47,8 @@ def result():
         sleep_score(sleep) * sleep_penalty(sleep) * 100, 
         focus_score(focus) * 100, 
         stress_score(stress) * 100
-)
+    )
+    
     return render_template(
         'result.html',
         score = score,
