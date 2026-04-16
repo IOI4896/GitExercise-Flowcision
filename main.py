@@ -12,6 +12,8 @@ def index():
 
 @app.route('/result', methods = ['POST'])
 def result():
+    student_type = request.form['student_type']
+
     try:
         study = int(request.form['study'])
         sleep = int(request.form['sleep'])
@@ -22,40 +24,31 @@ def result():
     except KeyError:
         return "Invalid input"
     
-    #Double check input
-    #24 hours invalid
-    if study + sleep > 24:
-        return "Nice try, more than 24 hours a day?"
-    if focus > 10:
-        return "May the force be with you :)"
-    if stress > 10:
-        return "I really envy your strong liver"
-
+    if not check_valid_input(study, sleep, focus, sleep):
+        return "Invalid input"
+    
     analysis, recommendation = analyze_factors(study, sleep, focus, stress)
+    recommendation = apply_scenario_context(student_type, recommendation)
+
     score = calculate_score(study, sleep, focus, stress)
 
-    if score >= 90:
-        main_issue = "None"
-    else:
-        main_issue = get_main_issue(study, sleep, focus, stress)
-
+    main_issue = get_main_issue(score, study, sleep, focus, stress)
     recs = get_recommendation(score, analysis, recommendation)
 
-    #Calculation Graph
     plot_url = get_performance_chart(
-        study_score(study) * study_penalty(study) * 100, 
-        sleep_score(sleep) * sleep_penalty(sleep) * 100, 
-        focus_score(focus) * 100, 
-        stress_score(stress) * 100
+        s_study(study),
+        s_sleep(sleep),
+        s_focus(focus),
+        s_stress(stress)
     )
-    
+
     return render_template(
         'result.html',
         score = score,
         analysis = analysis,
         recommendation = recommendation,
         main_issue = main_issue,
-        recs = recs , 
+        recs = recs,
         plot_url = plot_url
     )
 
