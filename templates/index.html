@@ -1,14 +1,27 @@
 <!DOCTYPE html>
 <html>
+
     <head>
         <title>Study Analyzer</title>
     </head>
 
     <body>
 
-        <h2>Enter Your Daily Data</h2>
-
         <form action = "/result" method = "post">
+            <h1>Scenario Context</h1>
+
+            <label>Student Type: </label>
+            <select name = "student_type">
+                <option value = "default">Default</option>
+
+                <option value = "foundation">Foundation</option>
+
+                <option value = "diploma">Diploma</option>
+
+                <option value = "degree">Degree</option>
+            </select>
+
+            <h2>Enter Your Daily Data</h2>
             Study Hours: <input type = "number" name = "study"><br><br>
 
             Sleep Hours: <input type = "number" name = "sleep"><br><br>
