@@ -36,9 +36,15 @@ def calculate_score(study, sleep, focus ,stress):
     s4 = stress_score(stress)
 
     base = (s1 * 0.3) + (s2 * 0.3) + (s3 * 0.2) + (s4 * 0.2)
-    penalty = sleep_penalty(sleep) * study_penalty(study)
+    penalty = study_penalty(study) * sleep_penalty(sleep)
 
     return round(base * penalty * 100, 2)
+
+#Double check input
+def check_valid_input(study, sleep, focus, stress):
+    if study + sleep > 24 or focus > 10 or stress > 10:
+        return False
+    return True
 
 #Analysis Data
 def analyze_factors(study, sleep, focus, stress):
@@ -78,7 +84,7 @@ def analyze_factors(study, sleep, focus, stress):
 
     return analysis, recommendation
 
-def get_main_issue(study, sleep, focus, stress):
+def get_main_issue(score, study, sleep, focus, stress):
     scores = {
         "Study" : study_score(study),
         "Sleep" : sleep_score(sleep) * sleep_penalty(sleep),
@@ -87,7 +93,11 @@ def get_main_issue(study, sleep, focus, stress):
     }
 
     main_issue = min(scores, key = scores.get)
-    return issue_message(main_issue)
+
+    if score < 90:
+        return issue_message(main_issue)
+    
+    return "None"
 
 #Explain result to user
 def issue_message(issue):
@@ -99,6 +109,20 @@ def issue_message(issue):
     }
 
     return messages.get(issue, "")
+
+def apply_scenario_context(student_type, recommendation):
+    context_recs = []
+
+    if student_type == "foundation":
+        context_recs.append("As a foundation student, focus on building strong fundamentals as they will impact future subjects.")
+    
+    elif student_type == "diploma":
+        context_recs.append("As a diploma student, balancing coursework and practical skills is important for consistent performance.")
+    
+    elif student_type == "degree":
+        context_recs.append("As a degree student, deeper understanding and independent learning are critical for success.")
+
+    return context_recs + recommendation
 
 def get_recommendation(score, analysis, recommendation):
     print("\nAnalysis: ")
@@ -114,5 +138,18 @@ def get_recommendation(score, analysis, recommendation):
         return "Your study pattern is ineffective. Consider reducing stress and improving focus."
     elif score < 70:
         return "You are doing great, try to optimize study consistency."
-    else:
-        return "Excellent performance, keep it up!"
+    
+    return "Excellent performance, keep it up!"
+
+#Calculate Graph
+def s_study(study):
+    return study_score(study) * study_penalty(study) * 100
+
+def s_sleep(sleep):
+    return sleep_score(sleep) * sleep_penalty(sleep) * 100
+
+def s_focus(focus):
+    return focus_score(focus) * 100
+
+def s_stress(stress):
+    return stress_score(stress) * 100
