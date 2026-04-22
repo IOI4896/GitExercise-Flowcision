@@ -1,0 +1,73 @@
+Market Research
+
+1. Forest
+
+ Features
+
+* Focus timer based on Pomodoro technique
+* Gamified tree-growing system to encourage productivity
+* Tracks focus sessions over time
+
+ Strengths
+
+* Simple and intuitive interface
+* Strong motivation through gamification
+* Encourages users to avoid distractions
+
+ Weaknesses
+
+* Focuses only on time management
+* Does not consider other factors such as stress or sleep
+* No personalized recommendations
+
+
+
+2. Notion
+
+ Features
+
+* Task and project management
+* Customizable dashboards
+* Note-taking and planning tools
+
+ Strengths
+
+* Highly flexible and customizable
+* Suitable for organizing complex workflows
+* Supports long-term planning
+
+ Weaknesses
+
+* Steep learning curve for beginners
+* No built-in decision-making or evaluation system
+* Does not provide performance analysis
+
+
+
+3. Habitica
+
+ Features
+
+* Habit tracking with RPG-style gamification
+* Daily tasks and rewards system
+* Progress tracking over time
+
+ Strengths
+
+* Engaging and interactive design
+* Encourages habit formation
+* Visual progress system
+
+ Weaknesses
+
+* Focuses on habit tracking rather than evaluation
+* Does not analyze multiple lifestyle factors
+* Limited personalization in recommendations
+
+
+
+Conclusion
+
+From the analysis above, most existing applications focus on specific aspects such as time management, task organization, or habit tracking. However, they do not integrate multiple factors such as study time, sleep, focus, and stress into a unified evaluation system.
+
+Our project aims to address this gap by developing a decision-based simulation system that evaluates multiple factors and provides personalized recommendations for improving study routines.
