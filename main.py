@@ -1,15 +1,121 @@
 #render_template = server to browser
 #request = browser to server
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, session
+import sqlite3
+import os
 from simulation import *
 from visualization import get_performance_chart
 
 app = Flask(__name__)
+app.secret_key = "secret123"
 
+print("DB PATH: ", os.path.abspath("users.db"))
+
+#Database
+def init_db():
+    print("DB Maintenance Check: INIT DB START")
+
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT,
+        password TEXT
+    )
+    """)
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT,
+        study INTEGER,
+        sleep INTEGER,
+        focus INTEGER,
+        stress INTEGER,
+        score REAL
+    )
+    """)
+
+    print("DB Maintenance Check: INIT DB DONE")
+
+init_db()
+
+#Home
 @app.route('/')
+def home():
+    return render_template("home.html")
+
+#Register
+@app.route('/register', methods = ['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        conn = sqlite3.connect("users.db")
+        c = conn.cursor()
+        c.execute("INSERT INTO users (username, password) VALUES (?,?)", (username, password))
+        conn.commit()
+        conn.close()
+
+        return redirect('/login')
+    
+    return render_template('register.html')
+
+#Login
+@app.route('/login', methods = ['GET', 'POST'])
+def login():
+    if request.method == "POST":
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        conn = sqlite3.connect("users.db")
+        c = conn.cursor()
+        c.execute("SELECT * FROM users WHERE username=? and password=?", (username, password))
+        user = c.fetchone()
+        conn.close()
+
+        if user:
+            session['user'] = username
+            return redirect('/')
+        else:
+            return "Login Failed"
+        
+    return render_template('login.html')
+
+#Logout
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+
+#Simulation
+@app.route('/index')
 def index():
     return render_template("index.html")
 
+#History
+@app.route('/history')
+def history():
+    if 'user' not in session:
+        return redirect('/login')
+    
+    conn = sqlite3.connect("users.db")
+    c = conn.cursor()
+
+    c.execute("SELECT study, sleep, focus, stress, score FROM history WHERE username=?", (session['user'],))
+    data = c.fetchall()
+
+    conn.close()
+
+    return render_template('history.html', data = data)
+
+#Market Research
+@app.route('/market_research')
+def market_research():
+    return render_template("market_research.html")
+
+#Result
 @app.route('/result', methods = ['POST'])
 def result():
     student_type = request.form['student_type']
@@ -24,7 +130,7 @@ def result():
     except KeyError:
         return "Invalid input"
     
-    if not check_valid_input(study, sleep, focus, sleep):
+    if not check_valid_input(study, sleep, focus, stress):
         return "Invalid input"
     
     analysis, recommendation = analyze_factors(study, sleep, focus, stress)
@@ -41,6 +147,18 @@ def result():
         s_focus(focus),
         s_stress(stress)
     )
+
+    #Save history if user had registered
+    if 'user' in session:
+        conn = sqlite3.connect("users.db")
+        c = conn.cursor()
+
+        c.execute("""
+            INSERT INTO history (username, study, sleep, focus, stress, score) VALUES (?,?,?,?,?,?)
+        """, (session['user'], study, sleep, focus, stress, score))
+
+        conn.commit()
+        conn.close()
 
     return render_template(
         'result.html',
