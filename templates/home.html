@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Home Page - Flowcision</title>
+        <style>
+        
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                margin: 0;
+                color: #333;
+            }
+            .container {
+                background: white;
+                padding: 40px;
+                border-radius: 20px;
+                box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+                width: 100%;
+                max-width: 500px;
+            }
+            h1 { color: #4a4a4a; font-size: 24px; text-align: center; margin-bottom: 10px; }
+            b { color: #667eea; font-size: 18px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; margin-top: 20px; }
+            p { font-size: 30px; }
+
+            button {
+            width: 100%;
+            padding: 15px;
+            background-color: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 25px;
+            transition: 0.3s;
+        }
+            button:hover { background-color: #5a67d8; transform: translateY(-2px); }
+        </style>
+    </head>
+
+    <body>
+
+        <div class="container">
+            <h1>Flowcision</h1>
+
+            <p></p>
+            <b>A decision-based system for evaluating study routines.</b>
+            <p></p>
+
+            <nav>
+
+            {% if user %}
+                <b>Welcome, {{user}}</b>
+                <a href = "/logout">
+                    <button>Logout</button>
+                </a>
+            
+            {% else %}
+                <a href = "/login">
+                    <button>Login</button>
+                </a>
+                <a href = "/register">
+                    <button>Register</button>
+                </a>
+            
+            {% endif %}
+
+                <a href = "/index">
+                    <button>Start Simulation</button>
+                </a>
+
+                <a href = "/history">
+                    <button>View History</button>
+                </a>
+
+                <a href = "/market_research">
+                    <button>Market Research</button>
+                </a>
+            </nav>
+        </div>
+
+    </body>
+</html>
