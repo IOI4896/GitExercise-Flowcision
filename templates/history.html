@@ -3,26 +3,36 @@
     <head>
         <title>Flowcision - History</title>
     </head>
+    
+    <body>
+        <div style="text-align: center;">
+            <h2>Your History</h2>
 
-    <h2>Your History</h2>
+            {% if trend_chart_url %}
+                <div style="margin: 20px 0;">
+                    <img src="data:image/png;base64,{{ trend_chart_url }}" alt="History Trend Chart" style="max-width: 80%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                </div>
+            {% endif %}
+            
+            <table border="1" style="margin: 0 auto; width: 80%; text-align: center;">
+                <tr>
+                    <th>Study</th>
+                    <th>Sleep</th>
+                    <th>Focus</th>
+                    <th>Stress</th>
+                    <th>Score</th>
+                </tr>
 
-    <table border = "1">
-        <tr>
-            <th>Study</th>
-            <th>Sleep</th>
-            <th>Focus</th>
-            <th>Stress</th>
-            <th>Score</th>
-        </tr>
-
-        {% for row in data %}
-        <tr>
-            <td>{{ row[0] }}</td>
-            <td>{{ row[1] }}</td>
-            <td>{{ row[2] }}</td>
-            <td>{{ row[3] }}</td>
-            <td>{{ row[4] }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+                {% for row in data %}
+                <tr>
+                    <td>{{ row[0] }}</td>
+                    <td>{{ row[1] }}</td>
+                    <td>{{ row[2] }}</td>
+                    <td>{{ row[3] }}</td>
+                    <td>{{ row[4] }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </body>
 </html>
