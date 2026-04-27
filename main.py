@@ -5,6 +5,7 @@ import sqlite3
 import os
 from simulation import *
 from visualization import get_performance_chart
+from visualization import create_history_trend_chart
 
 app = Flask(__name__)
 app.secret_key = "secret123"
@@ -108,8 +109,6 @@ def history():
 
     conn.close()
 
-    # --- 这里是你新增的画图逻辑 ---
-    # 1. 把数据库里拿到的原始数据，转换成我们图表能看懂的格式
     history_records = []
     for row in data:
         history_records.append({
@@ -118,13 +117,10 @@ def history():
             'focus_level': row[2],
             'stress_level': row[3]
         })
-    
-    # 2. 调用你刚才写的画图代码，生成折线图
-    from visualization import create_history_trend_chart # 确保引入了你的模块
-    trend_chart_url = create_history_trend_chart(history_records)
-    # ------------------------------
 
-    return render_template('history.html', data = data , trend_chart_url=trend_chart_url)
+    trend_chart_url = create_history_trend_chart(history_records)
+
+    return render_template('history.html', data = data, trend_chart_url = trend_chart_url)
 
 #Market Research
 @app.route('/market_research')
