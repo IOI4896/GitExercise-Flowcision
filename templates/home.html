@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Home Page - Flowcision</title>
+        <title>Flowcision - Home Page</title>
         <style>
         
             body {
@@ -53,22 +53,21 @@
             <p></p>
 
             <nav>
-
-            {% if user %}
-                <b>Welcome, {{user}}</b>
-                <a href = "/logout">
+            
+            <a href = "/auth">
+                {% if user %}
                     <button>Logout</button>
-                </a>
             
-            {% else %}
-                <a href = "/login">
+                {% else %}
                     <button>Login</button>
-                </a>
-                <a href = "/register">
-                    <button>Register</button>
-                </a>
+
+                {% endif %}
+            </a>
+                
+            <a href = "/register">
+                <button>Register</button>
+            </a>
             
-            {% endif %}
 
                 <a href = "/index">
                     <button>Start Simulation</button>
