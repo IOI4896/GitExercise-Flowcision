@@ -6,6 +6,8 @@ import os
 from simulation import *
 from visualization import get_performance_chart
 from visualization import create_history_trend_chart
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 
 app = Flask(__name__)
 app.secret_key = "secret123"
@@ -22,7 +24,8 @@ def init_db():
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT,
-        password TEXT
+        password TEXT,
+        timezone TEXT DEFAULT 'Asia/Kuala_Lumpur'
     )
     """)
 
@@ -34,7 +37,8 @@ def init_db():
         sleep INTEGER,
         focus INTEGER,
         stress INTEGER,
-        score REAL
+        score REAL,
+        timestamp_utc TEXT
     )
     """)
 
@@ -64,6 +68,16 @@ def register():
     
     return render_template('register.html')
 
+@app.route('/auth')
+def auth():
+    if 'user' in session:
+        return redirect('/logout_confirm')
+    return redirect('/login')
+
+@app.context_processor
+def inject_user():
+    return dict(user = session.get('user'))
+
 #Login
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
@@ -86,9 +100,14 @@ def login():
     return render_template('login.html')
 
 #Logout
+@app.route('/logout_confirm')
+def logout_confirm():
+    return render_template("logout_confirm.html")
+
 @app.route('/logout')
 def logout():
     session.pop('user', None)
+    return redirect('/')
 
 #Simulation
 @app.route('/index')
@@ -102,25 +121,51 @@ def history():
         return redirect('/login')
     
     conn = sqlite3.connect("users.db")
+    conn.row_factory = sqlite3.Row
     c = conn.cursor()
 
-    c.execute("SELECT study, sleep, focus, stress, score FROM history WHERE username=?", (session['user'],))
-    data = c.fetchall()
+    c.execute('SELECT timezone FROM users WHERE username=?',(session['user'],))
+    user = c.fetchone()
+    user_timezone = user['timezone'] if user else 'UTC'
 
+    c.execute("""
+        SELECT study, sleep, focus, stress, score, timestamp_utc
+        FROM history WHERE username=?
+        ORDER BY timestamp_utc DESC
+    """, (session['user'],))
+
+    data = c.fetchall()
     conn.close()
 
+    #trend chart record
     history_records = []
-    for row in data:
+    #showcase table record
+    history_data = []
+    for record in data:
+        utc_dt = datetime.strptime(record['timestamp_utc'], "%Y-%m-%d %H:%M:%S")
+        utc_dt = utc_dt.replace(tzinfo = timezone.utc)
+
+        local_dt = utc_dt.astimezone(ZoneInfo(user_timezone))
+
         history_records.append({
-            'study_hours': row[0],
-            'sleep_hours': row[1],
-            'focus_level': row[2],
-            'stress_level': row[3]
+            'study_hours': record[0],
+            'sleep_hours': record[1],
+            'focus_level': record[2],
+            'stress_level': record[3],
+        })
+
+        history_data.append({
+            'study' : record['study'],
+            'sleep' : record['sleep'],
+            'focus' : record['focus'],
+            'stress' : record['stress'],
+            'score' : record['score'],
+            'timestamp' : local_dt.strftime("%Y-%m-%d %H:%M:%S")
         })
 
     trend_chart_url = create_history_trend_chart(history_records)
 
-    return render_template('history.html', data = data, trend_chart_url = trend_chart_url)
+    return render_template('history.html', data = history_data, trend_chart_url = trend_chart_url)
 
 #Market Research
 @app.route('/market_research')
@@ -160,14 +205,17 @@ def result():
         s_stress(stress)
     )
 
+    #timestamp_utc = Change time record to UTC (EX: Malaysia is UTC +8)
+    timestamp_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+
     #Save history if user had registered
     if 'user' in session:
         conn = sqlite3.connect("users.db")
         c = conn.cursor()
 
         c.execute("""
-            INSERT INTO history (username, study, sleep, focus, stress, score) VALUES (?,?,?,?,?,?)
-        """, (session['user'], study, sleep, focus, stress, score))
+            INSERT INTO history (username, study, sleep, focus, stress, score, timestamp_utc) VALUES (?,?,?,?,?,?,?)
+        """, (session['user'], study, sleep, focus, stress, score, timestamp_utc))
 
         conn.commit()
         conn.close()
