@@ -3,7 +3,6 @@
     <head>
         <title>Flowcision - History</title>
     </head>
-    
     <body>
         <div style="text-align: center;">
             <h2>Your History</h2>
@@ -21,15 +20,17 @@
                     <th>Focus</th>
                     <th>Stress</th>
                     <th>Score</th>
+                    <th>Date & Time</th>
                 </tr>
 
-                {% for row in data %}
+                {% for record in data %}
                 <tr>
-                    <td>{{ row[0] }}</td>
-                    <td>{{ row[1] }}</td>
-                    <td>{{ row[2] }}</td>
-                    <td>{{ row[3] }}</td>
-                    <td>{{ row[4] }}</td>
+                    <td>{{ record.study }}</td>
+                    <td>{{ record.sleep }}</td>
+                    <td>{{ record.focus }}</td>
+                    <td>{{ record.stress }}</td>
+                    <td>{{ record.score }}</td>
+                    <td>{{ record.timestamp }}</td>
                 </tr>
                 {% endfor %}
             </table>
