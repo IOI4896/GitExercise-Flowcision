@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flowcision - Logout</title>
+    <style>
+    
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .logout-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            width: 350px;
+            text-align: center;
+        }
+        h2 { color: #4a4a4a; margin-bottom: 5px; }
+        b { color: #4a4a4a; margin-bottom: 5px; }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        button:hover { background-color: #5a67d8; }
+    </style>
+</head>
+<body>
+    <div class="logout-card">
+        <h2>FLowcision - Logout</h2>
+        <b>Are you sure you want to log out?</b>
+        <nav>
+            <a href = "/logout">
+                <button>Confirm Logout</button>
+            </a>
+            <a href = "/">
+                <button>Cancel</button>
+            </a>
+        </nav>
+    </div>
+</body>
+</html>
