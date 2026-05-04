@@ -2,43 +2,86 @@
 <html>
     <head>
         <title>Flowcision - Result</title>
+        <style>
+        
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                margin: 0;
+                color: #333;
+            }
+            .container {
+                background: white;
+                padding: 40px;
+                border-radius: 20px;
+                box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+                width: 100%;
+                max-width: 900px;
+            }
+            h2 { color: #4a4a4a; font-size: 30px; text-align: center; margin-bottom: 10px; }
+            h3 { color: #667eea; font-size: 24px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; margin-top: 20px; }
+            b { color: #667eea; font-size: 24px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; margin-top: 20px; }
+            p { font-size: 20px; }
+            li { font-size: 20px; }
+        
+            button {
+                width: 100%;
+                padding: 15px;
+                background-color: #667eea;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: bold;
+                margin-top: 25px;
+                transition: 0.3s;
+            }
+            button:hover { background-color: #5a67d8; transform: translateY(-2px); }
+        </style>
     </head>
 
     <body>
 
-        <h2>Result</h2>
+        <div class = "container">
+            <h2>Result</h2>
 
-        <div style="text-align: center;">
-            <img src="data:image/png;base64,{{ plot_url }}" style="max-width: 100%; border-radius: 8px;">
-        </div>
+            <div style="text-align: center;">
+                <img src="data:image/png;base64,{{ plot_url }}" style="max-width: 100%; border-radius: 8px;">
+            </div>
 
-        <p><b>Score: </b>{{score}}</p>
-        <p><b>Main Issue: </b>{{main_issue}}</p>
+            <p><b>Score: </b>{{score}}</p>
+            <p><b>Main Issue: </b>{{main_issue}}</p>
 
-        <h3>Analysis: </h3>
-        <ul>
-            {% for a in analysis %}
-                <li>{{a}}</li>
-            {% endfor %}
-        </ul>
+            <h3>Analysis: </h3>
+            <ul>
+                {% for a in analysis %}
+                    <li>{{a}}</li>
+                {% endfor %}
+            </ul>
 
-        <h3>Recommendation: </h3>
-        <ul>
-            {% for r in recommendation %}
-                <li>{{r}}</li>
-            {% endfor %}
-        </ul>
+            <h3>Recommendation: </h3>
+            <ul>
+                {% for r in recommendation %}
+                    <li>{{r}}</li>
+                {% endfor %}
+            </ul>
 
-        <h3>Finalize: </h3>
-        <ul>
-            <li>{{recs}}</li>
-        </ul>
+            <h3>Finalize: </h3>
+            <ul>
+                <li>{{recs}}</li>
+            </ul>
         
-        <nav>
-            <a href ="/index">
-                <button>Go Back</button>
-            </a>
-        </nav>
+            <nav>
+                <a href ="/index">
+                    <button>Go Back</button>
+                </a>
+            </nav>
+        </div>
         
     </body>
 </html>
