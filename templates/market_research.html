@@ -2,86 +2,127 @@
 <html>
     <head>
         <title>Flowcision - Market Reserch</title>
+        <style>
+        
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                margin: 0;
+                color: #333;
+            }
+            .container {
+                background: white;
+                padding: 40px;
+                border-radius: 20px;
+                box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+                width: 100%;
+                max-width: 700px;
+            }
+            h2 { color: #4a4a4a; font-size: 30px; text-align: center; margin-bottom: 10px; }
+            b { color: #667eea; font-size: 24px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; margin-top: 20px; }
+            p { font-size: 20px; }
+            li { font-size: 20px; }
+        
+            button {
+                width: 100%;
+                padding: 15px;
+                background-color: #667eea;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: bold;
+                margin-top: 25px;
+                transition: 0.3s;
+            }
+            button:hover { background-color: #5a67d8; transform: translateY(-2px); }
+        </style>
     </head>
 
     <body>
-        <h1>Market Research</h1>
+        <div class = "container">
+            <h1>Market Research</h1>
 
-        <h2>1. Forest</h2>
-            <b>Features</b>
-            <ul>
-                <li>Focus timer based on Pomodoro technique</li>
-                <li>Gamified tree-growing system to encourage productivity</li>
-                <li>Tracks focus sessions over time</li>
-            </ul>
+            <h2>1. Forest</h2>
+                <b>Features</b>
+                <ul>
+                    <li>Focus timer based on Pomodoro technique</li>
+                    <li>Gamified tree-growing system to encourage productivity</li>
+                    <li>Tracks focus sessions over time</li>
+                </ul>
 
-            <b>Strengths</b>
-            <ul>
-                <li>Simple and intuitive interface</li>
-                <li>Strong motivation through gamification</li>
-                <li>Encourage users to avoid distractions</li>
-            </ul>
+                <b>Strengths</b>
+                <ul>
+                    <li>Simple and intuitive interface</li>
+                    <li>Strong motivation through gamification</li>
+                    <li>Encourage users to avoid distractions</li>
+                </ul>
 
-            <b>Weaknesses</b>
-            <ul>
-                <li>Focuses only on time management</li>
-                <li>Does not consider other factors such as stress or sleep</li>
-                <li>No personalized recommendations</li>
-            </ul>
+                <b>Weaknesses</b>
+                <ul>
+                    <li>Focuses only on time management</li>
+                    <li>Does not consider other factors such as stress or sleep</li>
+                    <li>No personalized recommendations</li>
+                </ul>
 
-        <h2>2. Notion</h2>
-            <b>Features</b>
-            <ul>
-                <li>Task and project management</li>
-                <li>Customizable dashboards</li>
-                <li>Note-taking and planning tools</li>
-            </ul>
+            <h2>2. Notion</h2>
+                <b>Features</b>
+                <ul>
+                    <li>Task and project management</li>
+                    <li>Customizable dashboards</li>
+                    <li>Note-taking and planning tools</li>
+                </ul>
 
-            <b>Strengths</b>
-            <ul>
-                <li>Highly flexible and customizable</li>
-                <li>Suitable for organizing complex workflows</li>
-                <li>Supports long-term planning</li>
-            </ul>
+                <b>Strengths</b>
+                <ul>
+                    <li>Highly flexible and customizable</li>
+                    <li>Suitable for organizing complex workflows</li>
+                    <li>Supports long-term planning</li>
+                </ul>
 
-            <b>Weaknesses</b>
-            <ul>
-                <li>Steep learning curve for beginners</li>
-                <li>No built-in decision-making or evaluation system</li>
-                <li>Does not provide performance analysis</li>
-            </ul>
+                <b>Weaknesses</b>
+                <ul>
+                    <li>Steep learning curve for beginners</li>
+                    <li>No built-in decision-making or evaluation system</li>
+                    <li>Does not provide performance analysis</li>
+                </ul>
         
-        <h2>3. Habitica</h2>
-            <b>Features</b>
-            <ul>
-                <li>Habit tracking with RPG-style gamification</li>
-                <li>Daily tasks and rewards system</li>
-                <li>Progress tracking over time</li>
-            </ul>
+            <h2>3. Habitica</h2>
+                <b>Features</b>
+                <ul>
+                    <li>Habit tracking with RPG-style gamification</li>
+                    <li>Daily tasks and rewards system</li>
+                    <li>Progress tracking over time</li>
+                </ul>
 
-            <b>Strengths</b>
-            <ul>
-                <li>Engaging and interactive design</li>
-                <li>Encourages habit formation</li>
-                <li>Visual progress system</li>
-            </ul>
+                <b>Strengths</b>
+                <ul>
+                    <li>Engaging and interactive design</li>
+                    <li>Encourages habit formation</li>
+                    <li>Visual progress system</li>
+                </ul>
 
-            <b>Weaknesses</b>
-            <ul>
-                <li>Focuses on habit tracking rather than evaluation</li>
-                <li>Does not analyze multiple lifestyle factors</li>
-                <li>Limited personalization in recommendations</li>
-            </ul>
+                <b>Weaknesses</b>
+                <ul>
+                    <li>Focuses on habit tracking rather than evaluation</li>
+                    <li>Does not analyze multiple lifestyle factors</li>
+                    <li>Limited personalization in recommendations</li>
+                </ul>
         
-        <h2>Conclusion</h2>
-        <b>From the analysis above, most existing applications focus on specific aspects such as time management, task organization, or habit tracking. However, they do not integrate multiple factors such as study time, sleep, focus, and stress into a unified evaluation system.</b>
-        <p></p>
-        <b>Our project aims to address this gap by developing a decision-based simulation system that evaluates multiple factors and provides personalized recommendations for improving study routines.</b>
+            <h2>Conclusion</h2>
+            <p>From the analysis above, most existing applications focus on specific aspects such as time management, task organization, or habit tracking. However, they do not integrate multiple factors such as study time, sleep, focus, and stress into a unified evaluation system.</p>
+            <p>Our project aims to address this gap by developing a decision-based simulation system that evaluates multiple factors and provides personalized recommendations for improving study routines.</p>
         
-        <nav>
-            <a href ="/">
-                <button>Go Back</button>
-            </a>
-        </nav>
+            <nav>
+                <a href ="/">
+                    <button>Go Back</button>
+                </a>
+            </nav>
+        </div>
     </body>
 </html>
