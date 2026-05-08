@@ -153,3 +153,40 @@ def s_focus(focus):
 
 def s_stress(stress):
     return stress_score(stress) * 100
+
+#Calculate Pomodoro (25 min = 5 points)
+def calculate_pomodoro_points(duration):
+    if duration == 25:
+        return 10
+    
+    elif duration == 50:
+        return 25
+    
+    elif duration == 5:
+        return 10
+    
+    return 0
+
+def apply_pomodoro_effects(base_focus, base_stress, pomodoro_count):
+    bonus = min(pomodoro_count, 5)
+
+    focus = min(10, base_focus + round(bonus / 2))
+    stress = max(0, base_stress - round(bonus / 2))
+
+    return focus, stress
+
+#Pomodoro Influence
+def predict_base_state(history_records, pomodoro_count):
+    if not history_records:
+        return None, None
+    
+    avg_focus = sum(r['focus_level'] for r in history_records) / len(history_records)
+    avg_stress = sum(r['stress_level'] for r in history_records) / len(history_records)
+
+    predicted_focus = avg_focus + round(min(5, pomodoro_count) / 2)
+    predicted_stress = avg_stress - round(min(5, pomodoro_count) / 2)
+
+    predicted_focus = max(0, min(10, round(predicted_focus)))
+    predicted_stress = max(0, min(10, round(predicted_stress)))
+    
+    return predicted_focus, predicted_stress
