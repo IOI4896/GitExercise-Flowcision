@@ -9,38 +9,76 @@ from visualization import create_history_trend_chart
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
+#For tester only whoever missing any environments
+def check_dependencies():
+    try:
+        import flask
+        import matplotlib
+        import zoneinfo
+    except ImportError as e:
+        print("Missing dependency: ", e)
+        print("Run: pip install -r requirements.txt")
+        exit()
+
+check_dependencies()
 app = Flask(__name__)
 app.secret_key = "secret123"
 
 print("DB PATH: ", os.path.abspath("users.db"))
 
 #Database
+def get_db():
+    return sqlite3.connect("users.db", timeout = 5)
+
 def init_db():
     print("DB Maintenance Check: INIT DB START")
 
-    conn = sqlite3.connect("users.db")
+    conn = get_db()
     c = conn.cursor()
-    c.execute("""
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT,
-        password TEXT,
-        timezone TEXT DEFAULT 'Asia/Kuala_Lumpur'
-    )
-    """)
 
-    c.execute("""
-    CREATE TABLE IF NOT EXISTS history (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT,
-        study INTEGER,
-        sleep INTEGER,
-        focus INTEGER,
-        stress INTEGER,
-        score REAL,
-        timestamp_utc TEXT
-    )
-    """)
+    try:
+        c.execute("ALTER TABLE users ADD COLUMN points INTEGER DEFAULT 0")
+    except:
+        pass
+
+    try:
+        c.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE,
+            password TEXT,
+            timezone TEXT DEFAULT 'Asia/Kuala_Lumpur',
+            points INTEGER DEFAULT 0
+        )
+        """)
+
+        c.execute("""
+        CREATE TABLE IF NOT EXISTS history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT,
+            study INTEGER,
+            sleep INTEGER,
+            focus INTEGER,
+            stress INTEGER,
+            score REAL,
+            timestamp_utc TEXT
+        )
+        """)
+
+        c.execute("""
+        CREATE TABLE IF NOT EXISTS pomodoro (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT,
+            duration INTEGER,
+            completed INTEGER,
+            timestamp_utc TEXT
+        )
+        """)
+    
+        conn.commit()
+
+    finally:
+        conn.close()
 
     print("DB Maintenance Check: INIT DB DONE")
 
@@ -58,25 +96,46 @@ def register():
         username = request.form.get('username')
         password = request.form.get('password')
 
-        conn = sqlite3.connect("users.db")
+        conn = get_db()
         c = conn.cursor()
-        c.execute("INSERT INTO users (username, password) VALUES (?,?)", (username, password))
-        conn.commit()
-        conn.close()
+
+        try:
+            c.execute("INSERT INTO users (username, password) VALUES (?,?)", (username, password))
+            conn.commit()
+
+        finally:
+            conn.close()
 
         return redirect('/login')
     
     return render_template('register.html')
 
+#Auto switch between login / logout button and also prevent error
 @app.route('/auth')
 def auth():
     if 'user' in session:
         return redirect('/logout_confirm')
     return redirect('/login')
 
+#Able connect info to all HTML
 @app.context_processor
 def inject_user():
-    return dict(user = session.get('user'))
+    points = 0
+    if 'user' in session:
+        conn = get_db()
+        c = conn.cursor()
+
+        try:
+            c.execute("SELECT points FROM users WHERE username=?", (session['user'],))
+            result = c.fetchone()
+
+            if result:
+                points = result[0]
+        
+        finally:
+            conn.close()
+        
+    return dict(user = session.get('user'), points = points)
 
 #Login
 @app.route('/login', methods = ['GET', 'POST'])
@@ -85,11 +144,15 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
 
-        conn = sqlite3.connect("users.db")
+        conn = get_db()
         c = conn.cursor()
-        c.execute("SELECT * FROM users WHERE username=? and password=?", (username, password))
-        user = c.fetchone()
-        conn.close()
+
+        try:
+            c.execute("SELECT * FROM users WHERE username=? and password=?", (username, password))
+            user = c.fetchone()
+        
+        finally:
+            conn.close()
 
         if user:
             session['user'] = username
@@ -112,7 +175,43 @@ def logout():
 #Simulation
 @app.route('/index')
 def index():
-    return render_template("index.html")
+    if 'user' not in session:
+        return render_template("index.html")
+    
+    conn = get_db()
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    try:
+        c.execute("""
+            SELECT focus, stress FROM history WHERE username=? ORDER BY timestamp_utc DESC LIMIT 5
+        """, (session['user'],))
+
+        history = c.fetchall()
+
+        if not history:
+            return render_template("index.html", predicted_focus = None, predicted_stress = None)
+        
+        history_record = [
+            {
+                "focus_level": h["focus"],
+                "stress_level": h["stress"]
+            }
+            for h in history
+        ]
+
+        c.execute("""
+            SELECT COUNT(*) FROM pomodoro WHERE username=? AND timestamp_utc >= datetime('now', '-1 day')
+        """,(session['user'],))
+
+        pomodoro_count = c.fetchone()[0]
+    
+    finally:
+        conn.close()
+
+    predicted_focus, predicted_stress = predict_base_state(history_record, pomodoro_count)
+
+    return render_template("index.html", predicted_focus = predicted_focus, predicted_stress = predicted_stress)
 
 #History
 @app.route('/history')
@@ -120,22 +219,25 @@ def history():
     if 'user' not in session:
         return redirect('/login')
     
-    conn = sqlite3.connect("users.db")
+    conn = get_db()
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
 
-    c.execute('SELECT timezone FROM users WHERE username=?',(session['user'],))
-    user = c.fetchone()
-    user_timezone = user['timezone'] if user else 'UTC'
+    try:
+        c.execute('SELECT timezone FROM users WHERE username=?',(session['user'],))
+        user = c.fetchone()
+        user_timezone = user['timezone'] if user else 'UTC'
 
-    c.execute("""
-        SELECT study, sleep, focus, stress, score, timestamp_utc
-        FROM history WHERE username=?
-        ORDER BY timestamp_utc DESC
-    """, (session['user'],))
+        c.execute("""
+            SELECT study, sleep, focus, stress, score, timestamp_utc
+            FROM history WHERE username=?
+            ORDER BY timestamp_utc DESC
+        """, (session['user'],))
 
-    data = c.fetchall()
-    conn.close()
+        data = c.fetchall()
+    
+    finally:
+        conn.close()
 
     #trend chart record
     history_records = []
@@ -167,6 +269,64 @@ def history():
 
     return render_template('history.html', data = history_data, trend_chart_url = trend_chart_url)
 
+#Pomodoro
+@app.route('/pomodoro')
+def pomodoro():
+    if 'user' not in session:
+        return redirect('/login')
+    return render_template('pomodoro.html')
+
+@app.route('/completed_pomodoro', methods = ['POST'])
+def completed_pomodoro():
+    if 'user' not in session:
+        return redirect('/login')
+    duration = int(request.form['duration']) #25 / 50 etc
+    if duration not in [5, 25, 50]:
+        return "Invalid duration"
+    
+    points = calculate_pomodoro_points(duration)
+
+    timestamp_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+
+    conn = get_db()
+    c = conn.cursor()
+
+    try:
+        c.execute("""
+            INSERT INTO pomodoro (username, duration, completed, timestamp_utc) VALUES (?,?,?,?)
+        """, (session['user'], duration, 1, timestamp_utc))
+
+        c.execute("""
+            UPDATE users SET points = points + ? WHERE username=?
+        """, (points, session['user']))
+
+        conn.commit()
+    
+    finally:
+        conn.close()
+
+    return redirect('/pomodoro_complete')
+
+@app.route('/pomodoro_complete')
+def pomodoro_complete():
+    if 'user' not in session:
+        return redirect('/login')
+    
+    conn = get_db()
+    c = conn.cursor()
+
+    try:
+        c.execute("""
+            SELECT points FROM users WHERE username=?
+        """, (session['user'],))
+
+        points = c.fetchone()[0]
+    
+    finally:
+        conn.close()
+    
+    return render_template("pomodoro_complete.html", points = points)
+
 #Market Research
 @app.route('/market_research')
 def market_research():
@@ -190,6 +350,26 @@ def result():
     if not check_valid_input(study, sleep, focus, stress):
         return "Invalid input"
     
+    #timestamp_utc = Change time record to UTC (EX: Malaysia is UTC +8)
+    timestamp_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+    
+    behavior_msg = "Login any account and try our Pomodoro Technique for more accurate result"
+
+    if 'user' in session:
+        conn = get_db()
+        c = conn.cursor()
+
+        try:
+            #Pomodoro count reset every 24 hours
+            c.execute("SELECT COUNT(*) FROM pomodoro WHERE username=? AND timestamp_utc >= datetime('now', '-1 day')", (session['user'],))
+            pomodoro_count = c.fetchone()[0]
+
+        finally:
+            conn.close()
+
+        behavior_msg = f"You completed {pomodoro_count} Pomodoro sessions in the last 24 hours"
+        focus, stress = apply_pomodoro_effects(focus, stress, pomodoro_count)
+
     analysis, recommendation = analyze_factors(study, sleep, focus, stress)
     recommendation = apply_scenario_context(student_type, recommendation)
 
@@ -205,20 +385,20 @@ def result():
         s_stress(stress)
     )
 
-    #timestamp_utc = Change time record to UTC (EX: Malaysia is UTC +8)
-    timestamp_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-
-    #Save history if user had registered
+    #Save history if user had login
     if 'user' in session:
-        conn = sqlite3.connect("users.db")
+        conn = get_db()
         c = conn.cursor()
 
-        c.execute("""
-            INSERT INTO history (username, study, sleep, focus, stress, score, timestamp_utc) VALUES (?,?,?,?,?,?,?)
-        """, (session['user'], study, sleep, focus, stress, score, timestamp_utc))
+        try:
+            c.execute("""
+                INSERT INTO history (username, study, sleep, focus, stress, score, timestamp_utc) VALUES (?,?,?,?,?,?,?)
+            """, (session['user'], study, sleep, focus, stress, score, timestamp_utc))
 
-        conn.commit()
-        conn.close()
+            conn.commit()
+        
+        finally:
+            conn.close()
 
     return render_template(
         'result.html',
@@ -227,6 +407,7 @@ def result():
         recommendation = recommendation,
         main_issue = main_issue,
         recs = recs,
+        behavior_msg = behavior_msg,
         plot_url = plot_url
     )
 
