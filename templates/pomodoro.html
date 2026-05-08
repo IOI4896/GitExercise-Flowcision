@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Flowcision - Pomodoro</title>
+        <style>
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                margin: 0;
+                color: #333;
+            }
+            .container {
+                background: white;
+                padding: 40px;
+                border-radius: 20px;
+                box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+                width: 100%;
+                max-width: 500px;
+                text-align: center;
+            }
+            h2 { color: #4a4a4a; font-size: 30px; text-align: center; margin-bottom: 10px; }
+            p { color: #667eea; font-size: 24px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; margin-top: 20px; }
+            #timer {
+                font-size: 70px;
+                margin: 30px;
+                color: #e53935
+            }
+            button {
+                width: 100%;
+                padding: 15px;
+                background-color: #667eea;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: bold;
+                margin-top: 25px;
+                transition: 0.3s;
+            }
+            button:hover { background-color: #5a67d8; transform: translateY(-2px); }
+            .mode-btn {
+                background-color: #2196F3;
+                color: white;
+            }
+            .start-btn {
+                background-color: #4CAF50;
+                color: white;
+            }
+            .stop-btn {
+                background-color: #f44336;
+                color: white;
+            }
+            .info {
+                margin-top: 20px;
+                color: #666;
+            }
+            a {
+                text-decoration: none;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class = "container">
+            <h2>Pomodoro Timer</h2>
+
+            <div id = "timer">25:00</div>
+
+            <div>
+                <button class = "mode-btn" onclick = "setMode(25)">25 Minutes</button>
+                <button class = "mode-btn" onclick = "setMode(50)">50 Minutes</button>
+
+                <button class = "mode-btn" onclick = "setMode(5)">Test Mode 5 Seconds</button>
+            </div>
+
+            <div>
+                <button class = "start-btn" id = "startBtn" onclick = "startTimer()">Start</button>
+                <button class = "stop-btn" onclick = "resetTimer()">Reset</button>
+            </div>
+
+            <div class = "info">
+                <p>Username: <strong>{{user}}</strong></p>
+                <p>Current Points: <strong>{{points}}</strong></p>
+            </div>
+
+            <nav>
+                <a href = "/index">
+                    <button>Go Back</button>
+                </a>
+            </nav>
+        </div>
+
+        <form id = "completeForm" action = "/completed_pomodoro" method = "POST" style = "display:none";>
+            <input type = "hidden" name = "duration" id = "durationInput" value = "25">
+        </form>
+
+        <script>
+            let timer = null;
+            let selectedDuration = 25;
+            let timeLeft = selectedDuration * 60
+
+            function setMode(minutes) {
+                selectedDuration = minutes;
+                resetTimer();
+
+                //Testing Mode
+                if (minutes === 5) {
+                    timeLeft = 5
+            
+            document.getElementById("durationInput").value = 5;
+                }
+
+                else {
+                    timeLeft = minutes * 60;
+            
+            document.getElementById("durationInput").value = minutes;
+                }
+
+                updateDisplay();
+            }
+
+            function updateDisplay() {
+                let minutes = Math.floor(timeLeft / 60);
+                let seconds = timeLeft % 60;
+
+                document.getElementById("timer").innerText =
+                    minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+            }
+
+            function startTimer() {
+                if (timer !== null) {
+                    return;
+                }
+            
+            document.getElementById("startBtn").disabled = true;
+                
+                timer = setInterval(() => {
+                    timeLeft--;
+                    updateDisplay();
+
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        timer = null;
+            
+            document.getElementById("completeForm").submit();
+                    }
+                }, 1000);
+            }
+
+            function resetTimer() {
+                clearInterval(timer);
+                timer = null;
+
+            document.getElementById("startBtn").disabled = false;
+                
+                if (selectedDuration === 5) {
+                    timeLeft = 5;
+                }
+                else {
+                    timeLeft = selectedDuration * 60;
+                }
+
+                updateDisplay();
+            }
+
+            updateDisplay()
+
+        </script>
+    </body>
+</html>
