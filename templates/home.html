@@ -46,7 +46,11 @@
     <body>
 
         <div class="container">
-            <h1>Flowcision</h1>
+            {% if user %}
+                <h1>Flowcision</h1>
+            {% else %}
+                <h1>Flowcision (Demo)</h1>
+            {% endif %}
 
             <p></p>
             <b>A decision-based system for evaluating study routines.</b>
@@ -63,12 +67,13 @@
 
                 {% endif %}
             </a>
-                
-            <a href = "/register">
-                <button>Register</button>
-            </a>
             
-
+            {% if not user %}
+                <a href = "/register">
+                    <button>Register</button>
+                </a>
+            {% endif %}
+            
                 <a href = "/index">
                     <button>Start Simulation</button>
                 </a>
