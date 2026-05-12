@@ -1,125 +1,139 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
     <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Flowcision - Pomodoro</title>
         <style>
+            :root {
+                --focus-color: #ff5252;
+                --break-color: #4CAF50;
+                --pause-color: #ff9800;
+                --bg-focus: #1a237e;
+                --bg-break: #1b5e20;
+                --bg-pause: #e65100;
+                --card-bg: #ffffff;
+                --text-main: #333333;
+            }
+
             body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                /* 默认专注态深蓝 */
-                background: #1a237e; 
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                background: var(--bg-focus);
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 min-height: 100vh;
                 margin: 0;
-                color: #333;
-                transition: background 0.5s ease;
+                color: var(--text-main);
+                transition: background 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             }
             
-            /* 状态背景色 */
-            body.state-focus { background: #1a237e; }
-            body.state-break { background: #2e7d32; }
-            body.state-pause { background: #e65100; }
+            /* 状态类 */
+            body.state-focus { background: var(--bg-focus); }
+            body.state-break { background: var(--bg-break); }
+            body.state-pause { background: var(--bg-pause); }
             
-            /* 深色模式下的状态背景色 */
-            body.dark-mode.state-focus { background: #0d113a; }
-            body.dark-mode.state-break { background: #123314; }
-            body.dark-mode.state-pause { background: #5c2000; }
+            /* 深色模式全局覆盖 */
+            body.dark-mode { --card-bg: #1e1e1e; --text-main: #e0e0e0; }
+            body.dark-mode.state-focus { background: #0a0e29; }
+            body.dark-mode.state-break { background: #0d1f0e; }
+            body.dark-mode.state-pause { background: #2e1000; }
 
             .container {
-                background: white;
-                padding: 40px;
-                border-radius: 20px;
-                box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-                width: 100%;
-                max-width: 500px;
+                background: var(--card-bg);
+                padding: 2rem;
+                border-radius: 24px;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+                width: 90%;
+                max-width: 420px;
                 text-align: center;
-                transition: background 0.3s, box-shadow 0.3s;
+                transition: all 0.3s ease;
             }
             
-            h2 { color: #4a4a4a; font-size: 30px; margin-bottom: 10px; transition: color 0.3s; }
+            h2 { font-weight: 700; margin-bottom: 0.5rem; color: var(--text-main); }
             
-            /* 环形进度条容器 */
             .timer-wrapper {
                 position: relative;
-                width: 220px;
-                height: 220px;
-                margin: 20px auto;
-                display: flex;
-                justify-content: center;
-                align-items: center;
+                width: 200px;
+                height: 200px;
+                margin: 1.5rem auto;
             }
-            .progress-ring {
-                position: absolute;
-                top: 0;
-                left: 0;
-                transform: rotate(-90deg); /* 从顶部开始倒数 */
-            }
-            .progress-ring__circle-bg {
-                stroke: #f0f2f5;
-            }
+            
+            .progress-ring { transform: rotate(-90deg); }
             .progress-ring__circle {
-                stroke: #ff5252; /* 默认专注红 */
-                stroke-dasharray: 565.48; /* 2 * pi * 90 */
+                stroke-dasharray: 565.48;
                 stroke-dashoffset: 0;
-                transition: stroke-dashoffset 1s linear, stroke 0.5s ease;
+                transition: stroke-dashoffset 1s linear, stroke 0.6s ease;
             }
             
             #timer { 
-                font-size: 55px; 
-                margin: 0; 
-                position: absolute; 
-                z-index: 10; 
-                color: #ff5252; 
-                transition: color 0.5s ease;
-                font-weight: bold;
+                position: absolute;
+                top: 50%; left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 3.5rem;
+                font-weight: 800;
+                margin: 0;
+                transition: color 0.6s ease;
             }
 
-            button {
-                width: 100%;
-                padding: 15px;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                cursor: pointer;
-                font-size: 16px;
-                font-weight: bold;
-                margin-top: 15px;
-                transition: 0.3s;
+            .btn-group { 
+                display: grid; 
+                grid-template-columns: 1fr 1fr 1fr; 
+                gap: 8px; 
+                margin-bottom: 12px; 
             }
-            button:hover { transform: translateY(-2px); opacity: 0.9; }
-            button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
             
-            .btn-group { display: flex; gap: 10px; margin-top: 15px; }
-            .btn-group button { margin-top: 0; }
+            button {
+                padding: 12px 8px;
+                border: none;
+                border-radius: 12px;
+                cursor: pointer;
+                font-size: 0.9rem;
+                font-weight: 600;
+                transition: 0.2s;
+                color: white;
+            }
             
-            .mode-btn { background-color: #2196F3; }
-            .start-btn { background-color: #4CAF50; }
-            .pause-btn { background-color: #ff9800; }
-            .stop-btn { background-color: #f44336; }
-            .nav-btn { background-color: #667eea; }
+            button:active { transform: scale(0.96); }
+            button:disabled { opacity: 0.4; cursor: not-allowed; }
             
-            .info { margin-top: 20px; color: #666; transition: color 0.3s; }
-            a { text-decoration: none; }
+            .mode-btn { background: rgba(33, 150, 243, 0.15); color: #2196F3; }
+            body.dark-mode .mode-btn { background: rgba(33, 150, 243, 0.3); color: #90caf9; }
+            
+            .start-btn { background: #4CAF50; grid-column: span 1; }
+            .pause-btn { background: #ff9800; grid-column: span 1; }
+            .stop-btn { background: #f44336; grid-column: span 1; }
+            
+            .info { 
+                margin-top: 1.5rem; 
+                padding-top: 1rem;
+                border-top: 1px solid rgba(0,0,0,0.05);
+                font-size: 0.85rem;
+                color: #888;
+            }
+            body.dark-mode .info { border-top-color: rgba(255,255,255,0.05); }
+
+            .nav-btn { 
+                width: 100%; 
+                margin-top: 1rem; 
+                background: transparent; 
+                color: #888; 
+                border: 1px solid #ddd; 
+            }
+            body.dark-mode .nav-btn { border-color: #444; }
 
             .theme-btn {
-                position: absolute;
-                top: 20px;
-                right: 20px;
-                width: auto;
-                padding: 8px 15px;
-                background-color: rgba(255, 255, 255, 0.2);
+                position: absolute; top: 1rem; right: 1rem;
+                width: auto; background: rgba(255,255,255,0.1); backdrop-filter: blur(4px);
             }
 
-            /* 深色模式容器适配 */
-            body.dark-mode .container {
-                background: #1e1e1e;
-                box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+            /* 移动端适配：屏幕小于 480px 时按钮垂直排列 */
+            @media (max-width: 480px) {
+                .container { padding: 1.5rem; }
+                .btn-group { grid-template-columns: 1fr; }
+                #timer { font-size: 3rem; }
+                .timer-wrapper { width: 180px; height: 180px; }
             }
-            body.dark-mode h2 { color: #e0e0e0; }
-            body.dark-mode .info { color: #aaa; }
-            body.dark-mode .theme-btn { background-color: #333; color: #e0e0e0; }
-            body.dark-mode .progress-ring__circle-bg { stroke: #333; }
         </style>
     </head>
 
@@ -127,12 +141,12 @@
         <button class="theme-btn" id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
 
         <div class="container">
-            <h2>Pomodoro Timer</h2>
+            <h2>Pomodoro</h2>
 
             <div class="timer-wrapper">
-                <svg class="progress-ring" width="220" height="220">
-                    <circle class="progress-ring__circle-bg" stroke-width="10" fill="transparent" r="90" cx="110" cy="110"/>
-                    <circle class="progress-ring__circle" stroke-width="10" stroke-linecap="round" fill="transparent" r="90" cx="110" cy="110"/>
+                <svg class="progress-ring" width="200" height="200">
+                    <circle stroke="rgba(0,0,0,0.05)" stroke-width="8" fill="transparent" r="90" cx="100" cy="100"/>
+                    <circle class="progress-ring__circle" stroke-width="8" stroke-linecap="round" fill="transparent" r="90" cx="100" cy="100"/>
                 </svg>
                 <div id="timer">25:00</div>
             </div>
@@ -150,15 +164,11 @@
             </div>
 
             <div class="info">
-                <p>Username: <strong>{{user}}</strong></p>
-                <p>Current Points: <strong>{{points}}</strong></p>
+                <span>User: <strong>{{user}}</strong></span> | 
+                <span>Points: <strong>{{points}}</strong></span>
             </div>
 
-            <nav>
-                <a href="/index">
-                    <button class="nav-btn">Go Back</button>
-                </a>
-            </nav>
+            <a href="/index"><button class="nav-btn">Exit</button></a>
         </div>
 
         <form id="completeForm" action="/completed_pomodoro" method="POST" style="display:none;">
@@ -166,14 +176,8 @@
         </form>
 
         <script>
-            let timer = null;
-            let selectedDuration = 25; // 记录用于提交的分钟数
-            let totalTime = 25 * 60;   // 总秒数，用于计算进度条
-            let timeLeft = totalTime;
-            let currentState = 'focus'; // 'focus', 'break', 'pause'
-
-            const circle = document.querySelector('.progress-ring__circle');
-            const circumference = 2 * Math.PI * 90; // 565.48
+            let timer = null, selectedDuration = 25, totalTime = 25 * 60, timeLeft = totalTime, currentState = 'focus';
+            const circle = document.querySelector('.progress-ring__circle'), circumference = 2 * Math.PI * 90;
 
             document.addEventListener("DOMContentLoaded", () => {
                 if (localStorage.getItem("flowcision-theme") === "dark") {
@@ -185,111 +189,63 @@
 
             function toggleTheme() {
                 document.body.classList.toggle("dark-mode");
-                let isDark = document.body.classList.contains("dark-mode");
+                const isDark = document.body.classList.contains("dark-mode");
                 localStorage.setItem("flowcision-theme", isDark ? "dark" : "light");
                 document.getElementById("themeToggle").innerText = isDark ? "☀️ Light" : "🌙 Dark";
             }
 
             function setMode(value, state) {
-                if (value === 'test') {
-                    selectedDuration = 5;
-                    totalTime = 5;
-                } else {
-                    selectedDuration = value;
-                    totalTime = value * 60;
-                }
+                selectedDuration = value === 'test' ? 5 : value;
+                totalTime = value === 'test' ? 5 : value * 60;
                 currentState = state;
                 document.getElementById("durationInput").value = selectedDuration;
                 resetTimer();
             }
 
             function updateVisuals() {
-                // 1. 更新文字时间
-                let minutes = Math.floor(timeLeft / 60);
-                let seconds = timeLeft % 60;
-                document.getElementById("timer").innerText =
-                    minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+                let m = Math.floor(timeLeft / 60), s = timeLeft % 60;
+                document.getElementById("timer").innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+                circle.style.strokeDashoffset = circumference - (timeLeft / totalTime) * circumference;
 
-                // 2. 更新进度条位置
-                let progress = timeLeft / totalTime;
-                let offset = circumference - progress * circumference;
-                circle.style.strokeDashoffset = offset;
-
-                // 3. 更新颜色 (状态)
                 document.body.classList.remove('state-focus', 'state-break', 'state-pause');
-                
-                let themeColor;
+                let color;
                 if (currentState === 'pause') {
-                    document.body.classList.add('state-pause');
-                    themeColor = '#ff9800'; // 橙色
+                    document.body.classList.add('state-pause'); color = '#ff9800';
                 } else if (currentState === 'break') {
-                    document.body.classList.add('state-break');
-                    themeColor = '#4CAF50'; // 绿色
+                    document.body.classList.add('state-break'); color = '#4CAF50';
                 } else {
-                    document.body.classList.add('state-focus');
-                    themeColor = '#ff5252'; // 红色
+                    document.body.classList.add('state-focus'); color = '#ff5252';
                 }
-
-                circle.style.stroke = themeColor;
-                document.getElementById("timer").style.color = themeColor;
+                circle.style.stroke = color;
+                document.getElementById("timer").style.color = color;
             }
 
             function startTimer() {
-                if (timer !== null) return;
-                
-                // 如果从暂停恢复，还原为其原本的状态颜色
-                if (currentState === 'pause') {
-                    currentState = selectedDuration === 5 && totalTime !== 5 ? 'break' : 'focus'; 
-                }
-                
+                if (timer) return;
+                if (currentState === 'pause') currentState = selectedDuration === 5 && totalTime !== 5 ? 'break' : 'focus';
                 document.getElementById("startBtn").disabled = true;
                 document.getElementById("pauseBtn").innerText = "Pause";
                 updateVisuals();
-                
                 timer = setInterval(() => {
-                    timeLeft--;
-                    updateVisuals();
-
+                    timeLeft--; updateVisuals();
                     if (timeLeft <= 0) {
-                        clearInterval(timer);
-                        timer = null;
-                        // 倒计时结束时，如果是休息状态，不加分，只提示或刷新；如果是专注则提交加分
-                        if (currentState === 'break') {
-                            alert("Break is over! Ready to focus?");
-                            setMode(25, 'focus');
-                        } else {
-                            document.getElementById("completeForm").submit();
-                        }
+                        clearInterval(timer); timer = null;
+                        if (currentState === 'break') { alert("Break over!"); setMode(25, 'focus'); }
+                        else document.getElementById("completeForm").submit();
                     }
                 }, 1000);
             }
 
             function pauseTimer() {
-                let pauseBtn = document.getElementById("pauseBtn");
-                if (timer !== null) {
-                    // 执行暂停
-                    clearInterval(timer);
-                    timer = null;
-                    currentState = 'pause';
-                    updateVisuals();
-                    
-                    pauseBtn.innerText = "Resume";
+                if (timer) {
+                    clearInterval(timer); timer = null; currentState = 'pause'; updateVisuals();
+                    document.getElementById("pauseBtn").innerText = "Resume";
                     document.getElementById("startBtn").disabled = false;
-                } else if (pauseBtn.innerText === "Resume") {
-                    startTimer();
-                }
+                } else if (document.getElementById("pauseBtn").innerText === "Resume") startTimer();
             }
 
             function resetTimer() {
-                clearInterval(timer);
-                timer = null;
-                timeLeft = totalTime;
-                
-                // 重置状态
-                if (currentState === 'pause') {
-                     currentState = totalTime === 300 && selectedDuration !== 5 ? 'break' : 'focus';
-                }
-                
+                clearInterval(timer); timer = null; timeLeft = totalTime;
                 document.getElementById("startBtn").disabled = false;
                 document.getElementById("pauseBtn").innerText = "Pause";
                 updateVisuals();
