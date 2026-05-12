@@ -5,15 +5,27 @@
         <style>
             body {
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                /* 默认专注态深蓝 */
+                background: #1a237e; 
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 min-height: 100vh;
                 margin: 0;
                 color: #333;
-                transition: background 0.3s;
+                transition: background 0.5s ease;
             }
+            
+            /* 状态背景色 */
+            body.state-focus { background: #1a237e; }
+            body.state-break { background: #2e7d32; }
+            body.state-pause { background: #e65100; }
+            
+            /* 深色模式下的状态背景色 */
+            body.dark-mode.state-focus { background: #0d113a; }
+            body.dark-mode.state-break { background: #123314; }
+            body.dark-mode.state-pause { background: #5c2000; }
+
             .container {
                 background: white;
                 padding: 40px;
@@ -24,9 +36,45 @@
                 text-align: center;
                 transition: background 0.3s, box-shadow 0.3s;
             }
+            
             h2 { color: #4a4a4a; font-size: 30px; margin-bottom: 10px; transition: color 0.3s; }
-            p { color: #667eea; font-size: 24px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; margin-top: 20px; transition: color 0.3s, border-color 0.3s; }
-            #timer { font-size: 70px; margin: 30px; color: #e53935; }
+            
+            /* 环形进度条容器 */
+            .timer-wrapper {
+                position: relative;
+                width: 220px;
+                height: 220px;
+                margin: 20px auto;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .progress-ring {
+                position: absolute;
+                top: 0;
+                left: 0;
+                transform: rotate(-90deg); /* 从顶部开始倒数 */
+            }
+            .progress-ring__circle-bg {
+                stroke: #f0f2f5;
+            }
+            .progress-ring__circle {
+                stroke: #ff5252; /* 默认专注红 */
+                stroke-dasharray: 565.48; /* 2 * pi * 90 */
+                stroke-dashoffset: 0;
+                transition: stroke-dashoffset 1s linear, stroke 0.5s ease;
+            }
+            
+            #timer { 
+                font-size: 55px; 
+                margin: 0; 
+                position: absolute; 
+                z-index: 10; 
+                color: #ff5252; 
+                transition: color 0.5s ease;
+                font-weight: bold;
+            }
+
             button {
                 width: 100%;
                 padding: 15px;
@@ -40,6 +88,7 @@
                 transition: 0.3s;
             }
             button:hover { transform: translateY(-2px); opacity: 0.9; }
+            button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
             
             .btn-group { display: flex; gap: 10px; margin-top: 15px; }
             .btn-group button { margin-top: 0; }
@@ -53,7 +102,6 @@
             .info { margin-top: 20px; color: #666; transition: color 0.3s; }
             a { text-decoration: none; }
 
-            /* 主题切换按钮 */
             .theme-btn {
                 position: absolute;
                 top: 20px;
@@ -63,34 +111,36 @@
                 background-color: rgba(255, 255, 255, 0.2);
             }
 
-            /* ---------- 深色模式样式 ---------- */
-            body.dark-mode {
-                background: #121212; /* 用 background 强制覆盖渐变色 */
-                color: #e0e0e0;
-            }
+            /* 深色模式容器适配 */
             body.dark-mode .container {
                 background: #1e1e1e;
                 box-shadow: 0 15px 35px rgba(0,0,0,0.8);
             }
             body.dark-mode h2 { color: #e0e0e0; }
-            body.dark-mode p { color: #8a9ced; border-bottom-color: #333; }
             body.dark-mode .info { color: #aaa; }
             body.dark-mode .theme-btn { background-color: #333; color: #e0e0e0; }
+            body.dark-mode .progress-ring__circle-bg { stroke: #333; }
         </style>
     </head>
 
-    <body>
+    <body class="state-focus">
         <button class="theme-btn" id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
 
         <div class="container">
             <h2>Pomodoro Timer</h2>
 
-            <div id="timer">25:00</div>
+            <div class="timer-wrapper">
+                <svg class="progress-ring" width="220" height="220">
+                    <circle class="progress-ring__circle-bg" stroke-width="10" fill="transparent" r="90" cx="110" cy="110"/>
+                    <circle class="progress-ring__circle" stroke-width="10" stroke-linecap="round" fill="transparent" r="90" cx="110" cy="110"/>
+                </svg>
+                <div id="timer">25:00</div>
+            </div>
 
             <div class="btn-group">
-                <button class="mode-btn" onclick="setMode(25)">25 Minutes</button>
-                <button class="mode-btn" onclick="setMode(50)">50 Minutes</button>
-                <button class="mode-btn" onclick="setMode(5)">Test 5 Sec</button>
+                <button class="mode-btn" onclick="setMode(25, 'focus')">25m Focus</button>
+                <button class="mode-btn" onclick="setMode(5, 'break')">5m Break</button>
+                <button class="mode-btn" onclick="setMode('test', 'focus')">Test 5s</button>
             </div>
 
             <div class="btn-group">
@@ -117,15 +167,20 @@
 
         <script>
             let timer = null;
-            let selectedDuration = 25;
-            let timeLeft = selectedDuration * 60;
+            let selectedDuration = 25; // 记录用于提交的分钟数
+            let totalTime = 25 * 60;   // 总秒数，用于计算进度条
+            let timeLeft = totalTime;
+            let currentState = 'focus'; // 'focus', 'break', 'pause'
 
-            // 页面加载时恢复主题记忆
+            const circle = document.querySelector('.progress-ring__circle');
+            const circumference = 2 * Math.PI * 90; // 565.48
+
             document.addEventListener("DOMContentLoaded", () => {
                 if (localStorage.getItem("flowcision-theme") === "dark") {
                     document.body.classList.add("dark-mode");
                     document.getElementById("themeToggle").innerText = "☀️ Light";
                 }
+                updateVisuals();
             });
 
             function toggleTheme() {
@@ -135,35 +190,76 @@
                 document.getElementById("themeToggle").innerText = isDark ? "☀️ Light" : "🌙 Dark";
             }
 
-            function setMode(minutes) {
-                selectedDuration = minutes;
+            function setMode(value, state) {
+                if (value === 'test') {
+                    selectedDuration = 5;
+                    totalTime = 5;
+                } else {
+                    selectedDuration = value;
+                    totalTime = value * 60;
+                }
+                currentState = state;
+                document.getElementById("durationInput").value = selectedDuration;
                 resetTimer();
-                timeLeft = minutes === 5 ? 5 : minutes * 60;
-                document.getElementById("durationInput").value = minutes;
-                updateDisplay();
             }
 
-            function updateDisplay() {
+            function updateVisuals() {
+                // 1. 更新文字时间
                 let minutes = Math.floor(timeLeft / 60);
                 let seconds = timeLeft % 60;
                 document.getElementById("timer").innerText =
                     minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+
+                // 2. 更新进度条位置
+                let progress = timeLeft / totalTime;
+                let offset = circumference - progress * circumference;
+                circle.style.strokeDashoffset = offset;
+
+                // 3. 更新颜色 (状态)
+                document.body.classList.remove('state-focus', 'state-break', 'state-pause');
+                
+                let themeColor;
+                if (currentState === 'pause') {
+                    document.body.classList.add('state-pause');
+                    themeColor = '#ff9800'; // 橙色
+                } else if (currentState === 'break') {
+                    document.body.classList.add('state-break');
+                    themeColor = '#4CAF50'; // 绿色
+                } else {
+                    document.body.classList.add('state-focus');
+                    themeColor = '#ff5252'; // 红色
+                }
+
+                circle.style.stroke = themeColor;
+                document.getElementById("timer").style.color = themeColor;
             }
 
             function startTimer() {
                 if (timer !== null) return;
                 
+                // 如果从暂停恢复，还原为其原本的状态颜色
+                if (currentState === 'pause') {
+                    currentState = selectedDuration === 5 && totalTime !== 5 ? 'break' : 'focus'; 
+                }
+                
                 document.getElementById("startBtn").disabled = true;
-                document.getElementById("pauseBtn").innerText = "Pause"; // 确保开始时显示Pause
+                document.getElementById("pauseBtn").innerText = "Pause";
+                updateVisuals();
                 
                 timer = setInterval(() => {
                     timeLeft--;
-                    updateDisplay();
+                    updateVisuals();
 
                     if (timeLeft <= 0) {
                         clearInterval(timer);
                         timer = null;
-                        document.getElementById("completeForm").submit();
+                        // 倒计时结束时，如果是休息状态，不加分，只提示或刷新；如果是专注则提交加分
+                        if (currentState === 'break') {
+                            alert("Break is over! Ready to focus?");
+                            setMode(25, 'focus');
+                        } else {
+                            document.getElementById("completeForm").submit();
+                        }
                     }
                 }, 1000);
             }
@@ -171,8 +267,12 @@
             function pauseTimer() {
                 let pauseBtn = document.getElementById("pauseBtn");
                 if (timer !== null) {
+                    // 执行暂停
                     clearInterval(timer);
                     timer = null;
+                    currentState = 'pause';
+                    updateVisuals();
+                    
                     pauseBtn.innerText = "Resume";
                     document.getElementById("startBtn").disabled = false;
                 } else if (pauseBtn.innerText === "Resume") {
@@ -183,13 +283,17 @@
             function resetTimer() {
                 clearInterval(timer);
                 timer = null;
+                timeLeft = totalTime;
+                
+                // 重置状态
+                if (currentState === 'pause') {
+                     currentState = totalTime === 300 && selectedDuration !== 5 ? 'break' : 'focus';
+                }
+                
                 document.getElementById("startBtn").disabled = false;
                 document.getElementById("pauseBtn").innerText = "Pause";
-                timeLeft = selectedDuration === 5 ? 5 : selectedDuration * 60;
-                updateDisplay();
+                updateVisuals();
             }
-
-            updateDisplay();
         </script>
     </body>
 </html>
