@@ -62,6 +62,11 @@
             a {
                 text-decoration: none;
             }
+            .pause-btn {
+                background-color: #ff9800;
+                color: white;
+            }
+            
         </style>
     </head>
 
@@ -79,8 +84,9 @@
             </div>
 
             <div>
-                <button class = "start-btn" id = "startBtn" onclick = "startTimer()">Start</button>
-                <button class = "stop-btn" onclick = "resetTimer()">Reset</button>
+                <button class="start-btn" id="startBtn" onclick="startTimer()">Start</button>
+                <button class="pause-btn" id="pauseBtn" onclick="pauseTimer()">Pause</button>
+                <button class="stop-btn" onclick="resetTimer()">Reset</button>
             </div>
 
             <div class = "info">
@@ -151,7 +157,14 @@
                     }
                 }, 1000);
             }
-
+            
+            function pauseTimer() {
+                if (timer !== null) {
+                    clearInterval(timer);
+                    timer = null;
+                    document.getElementById("startBtn").disabled = false;
+                }
+            }
             function resetTimer() {
                 clearInterval(timer);
                 timer = null;
