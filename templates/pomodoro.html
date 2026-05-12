@@ -12,6 +12,7 @@
                 min-height: 100vh;
                 margin: 0;
                 color: #333;
+                transition: background 0.3s;
             }
             .container {
                 background: white;
@@ -21,129 +22,139 @@
                 width: 100%;
                 max-width: 500px;
                 text-align: center;
+                transition: background 0.3s, box-shadow 0.3s;
             }
-            h2 { color: #4a4a4a; font-size: 30px; text-align: center; margin-bottom: 10px; }
-            p { color: #667eea; font-size: 24px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; margin-top: 20px; }
-            #timer {
-                font-size: 70px;
-                margin: 30px;
-                color: #e53935
-            }
+            h2 { color: #4a4a4a; font-size: 30px; margin-bottom: 10px; transition: color 0.3s; }
+            p { color: #667eea; font-size: 24px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; margin-top: 20px; transition: color 0.3s, border-color 0.3s; }
+            #timer { font-size: 70px; margin: 30px; color: #e53935; }
             button {
                 width: 100%;
                 padding: 15px;
-                background-color: #667eea;
                 color: white;
                 border: none;
                 border-radius: 8px;
                 cursor: pointer;
                 font-size: 16px;
                 font-weight: bold;
-                margin-top: 25px;
+                margin-top: 15px;
                 transition: 0.3s;
             }
-            button:hover { background-color: #5a67d8; transform: translateY(-2px); }
-            .mode-btn {
-                background-color: #2196F3;
-                color: white;
-            }
-            .start-btn {
-                background-color: #4CAF50;
-                color: white;
-            }
-            .stop-btn {
-                background-color: #f44336;
-                color: white;
-            }
-            .info {
-                margin-top: 20px;
-                color: #666;
-            }
-            a {
-                text-decoration: none;
-            }
-            .pause-btn {
-                background-color: #ff9800;
-                color: white;
-            }
+            button:hover { transform: translateY(-2px); opacity: 0.9; }
             
+            .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+            .btn-group button { margin-top: 0; }
+            
+            .mode-btn { background-color: #2196F3; }
+            .start-btn { background-color: #4CAF50; }
+            .pause-btn { background-color: #ff9800; }
+            .stop-btn { background-color: #f44336; }
+            .nav-btn { background-color: #667eea; }
+            
+            .info { margin-top: 20px; color: #666; transition: color 0.3s; }
+            a { text-decoration: none; }
+
+            /* 主题切换按钮 */
+            .theme-btn {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                width: auto;
+                padding: 8px 15px;
+                background-color: rgba(255, 255, 255, 0.2);
+            }
+
+            /* ---------- 深色模式样式 ---------- */
+            body.dark-mode {
+                background: #121212; /* 用 background 强制覆盖渐变色 */
+                color: #e0e0e0;
+            }
+            body.dark-mode .container {
+                background: #1e1e1e;
+                box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+            }
+            body.dark-mode h2 { color: #e0e0e0; }
+            body.dark-mode p { color: #8a9ced; border-bottom-color: #333; }
+            body.dark-mode .info { color: #aaa; }
+            body.dark-mode .theme-btn { background-color: #333; color: #e0e0e0; }
         </style>
     </head>
 
     <body>
-        <div class = "container">
+        <button class="theme-btn" id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
+
+        <div class="container">
             <h2>Pomodoro Timer</h2>
 
-            <div id = "timer">25:00</div>
+            <div id="timer">25:00</div>
 
-            <div>
-                <button class = "mode-btn" onclick = "setMode(25)">25 Minutes</button>
-                <button class = "mode-btn" onclick = "setMode(50)">50 Minutes</button>
-
-                <button class = "mode-btn" onclick = "setMode(5)">Test Mode 5 Seconds</button>
+            <div class="btn-group">
+                <button class="mode-btn" onclick="setMode(25)">25 Minutes</button>
+                <button class="mode-btn" onclick="setMode(50)">50 Minutes</button>
+                <button class="mode-btn" onclick="setMode(5)">Test 5 Sec</button>
             </div>
 
-            <div>
+            <div class="btn-group">
                 <button class="start-btn" id="startBtn" onclick="startTimer()">Start</button>
                 <button class="pause-btn" id="pauseBtn" onclick="pauseTimer()">Pause</button>
                 <button class="stop-btn" onclick="resetTimer()">Reset</button>
             </div>
 
-            <div class = "info">
+            <div class="info">
                 <p>Username: <strong>{{user}}</strong></p>
                 <p>Current Points: <strong>{{points}}</strong></p>
             </div>
 
             <nav>
-                <a href = "/index">
-                    <button>Go Back</button>
+                <a href="/index">
+                    <button class="nav-btn">Go Back</button>
                 </a>
             </nav>
         </div>
 
-        <form id = "completeForm" action = "/completed_pomodoro" method = "POST" style = "display:none";>
-            <input type = "hidden" name = "duration" id = "durationInput" value = "25">
+        <form id="completeForm" action="/completed_pomodoro" method="POST" style="display:none;">
+            <input type="hidden" name="duration" id="durationInput" value="25">
         </form>
 
         <script>
             let timer = null;
             let selectedDuration = 25;
-            let timeLeft = selectedDuration * 60
+            let timeLeft = selectedDuration * 60;
+
+            // 页面加载时恢复主题记忆
+            document.addEventListener("DOMContentLoaded", () => {
+                if (localStorage.getItem("flowcision-theme") === "dark") {
+                    document.body.classList.add("dark-mode");
+                    document.getElementById("themeToggle").innerText = "☀️ Light";
+                }
+            });
+
+            function toggleTheme() {
+                document.body.classList.toggle("dark-mode");
+                let isDark = document.body.classList.contains("dark-mode");
+                localStorage.setItem("flowcision-theme", isDark ? "dark" : "light");
+                document.getElementById("themeToggle").innerText = isDark ? "☀️ Light" : "🌙 Dark";
+            }
 
             function setMode(minutes) {
                 selectedDuration = minutes;
                 resetTimer();
-
-                //Testing Mode
-                if (minutes === 5) {
-                    timeLeft = 5
-            
-            document.getElementById("durationInput").value = 5;
-                }
-
-                else {
-                    timeLeft = minutes * 60;
-            
-            document.getElementById("durationInput").value = minutes;
-                }
-
+                timeLeft = minutes === 5 ? 5 : minutes * 60;
+                document.getElementById("durationInput").value = minutes;
                 updateDisplay();
             }
 
             function updateDisplay() {
                 let minutes = Math.floor(timeLeft / 60);
                 let seconds = timeLeft % 60;
-
                 document.getElementById("timer").innerText =
                     minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
             }
 
             function startTimer() {
-                if (timer !== null) {
-                    return;
-                }
-            
-            document.getElementById("startBtn").disabled = true;
+                if (timer !== null) return;
+                
+                document.getElementById("startBtn").disabled = true;
+                document.getElementById("pauseBtn").innerText = "Pause"; // 确保开始时显示Pause
                 
                 timer = setInterval(() => {
                     timeLeft--;
@@ -152,37 +163,33 @@
                     if (timeLeft <= 0) {
                         clearInterval(timer);
                         timer = null;
-            
-            document.getElementById("completeForm").submit();
+                        document.getElementById("completeForm").submit();
                     }
                 }, 1000);
             }
-            
+
             function pauseTimer() {
+                let pauseBtn = document.getElementById("pauseBtn");
                 if (timer !== null) {
                     clearInterval(timer);
                     timer = null;
+                    pauseBtn.innerText = "Resume";
                     document.getElementById("startBtn").disabled = false;
+                } else if (pauseBtn.innerText === "Resume") {
+                    startTimer();
                 }
             }
+
             function resetTimer() {
                 clearInterval(timer);
                 timer = null;
-
-            document.getElementById("startBtn").disabled = false;
-                
-                if (selectedDuration === 5) {
-                    timeLeft = 5;
-                }
-                else {
-                    timeLeft = selectedDuration * 60;
-                }
-
+                document.getElementById("startBtn").disabled = false;
+                document.getElementById("pauseBtn").innerText = "Pause";
+                timeLeft = selectedDuration === 5 ? 5 : selectedDuration * 60;
                 updateDisplay();
             }
 
-            updateDisplay()
-
+            updateDisplay();
         </script>
     </body>
 </html>
