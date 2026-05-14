@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Flowcision - Dashboard</title>
+        <style>
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                margin: 0;
+                color: #333;
+            }
+            .container {
+                background: white;
+                padding: 40px;
+                border-radius: 20px;
+                box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+                width: 100%;
+                max-width: 900px;
+                text-align: center;
+            }
+            h2 { color: #4a4a4a; font-size: 30px; text-align: center; margin-bottom: 10px; }
+            b { color: #667eea; font-size: 24px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; margin-top: 20px; }
+        
+            button {
+                width: 100%;
+                padding: 15px;
+                background-color: #667eea;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: bold;
+                margin-top: 25px;
+                transition: 0.3s;
+            }
+            button:hover { background-color: #5a67d8; transform: translateY(-2px); }
+        </style>
+    </head>
+
+    <body>
+        <div class = "container">
+            <h1>Dashboard</h1>
+
+            <h2>Welcome, <strong>{{user}}</strong></h2>
+
+            <h3>Your Digital Pet</h3>
+            <b>{{pet_stage}}</b>
+
+            <hr>
+
+            <h3>Your Statistics</h3>
+
+            <table border="1" style="margin: 0 auto; width: 80%;">
+                <tr>
+                    <th>Total Points</th>
+                    <th>Total Pomodoro Session</th>
+                    <th>Total Simulation</th>
+                    <th>Latest Score</th>
+                </tr>
+
+                <tr>
+                    <td>{{points}}</td>
+                    <td>{{total_pomodoro}}</td>
+                    <td>{{total_simulations}}</td>
+                    <td>{{latest_score}}</td>
+                </tr>
+            </table>
+
+            <hr>
+
+            <nav>
+                <a href = "/">
+                    <button>Go Back</button>
+                </a>
+            </nav>
+        </div>
+    </body>
+</html>
