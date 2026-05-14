@@ -190,3 +190,15 @@ def predict_base_state(history_records, pomodoro_count):
     predicted_stress = max(0, min(10, round(predicted_stress)))
     
     return predicted_focus, predicted_stress
+
+#Pet Progression
+def pet_progression(points):
+    if points >= 250:
+        return "🌳 Focus Tree"
+    elif points >= 100:
+        return "🌿 Growing Plant"
+    elif points >= 50:
+        return "🌱 Sprout"
+    else:
+        return "🫘 Seed"
+    
