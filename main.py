@@ -1,6 +1,6 @@
 #render_template = server to browser
 #request = browser to server
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, send_from_directory
 import sqlite3
 import os
 from simulation import *
@@ -42,6 +42,7 @@ def init_db():
         pass
 
     try:
+        #User Database
         c.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -52,6 +53,7 @@ def init_db():
         )
         """)
 
+        #History Database
         c.execute("""
         CREATE TABLE IF NOT EXISTS history (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -65,6 +67,7 @@ def init_db():
         )
         """)
 
+        #Pomodoro Database
         c.execute("""
         CREATE TABLE IF NOT EXISTS pomodoro (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -74,7 +77,28 @@ def init_db():
             timestamp_utc TEXT
         )
         """)
-    
+
+        #Planner Database
+        c.execute("""
+        CREATE TABLE IF NOT EXISTS planner (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT,
+            day TEXT,
+            morning TEXT,
+            afternoon TEXT,
+            night TEXT
+        )
+        """)
+
+        #Planner Preset Database
+        c.execute("""
+        CREATE TABLE IF NOT EXISTS planner_presets (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT,
+            task TEXT
+        )
+        """)
+
         conn.commit()
 
     finally:
@@ -83,6 +107,10 @@ def init_db():
     print("DB Maintenance Check: INIT DB DONE")
 
 init_db()
+
+@app.route('/images/<filename>')
+def get_images(filename):
+    return send_from_directory('static/images', filename)
 
 #Home
 @app.route('/')
@@ -213,6 +241,55 @@ def index():
 
     return render_template("index.html", predicted_focus = predicted_focus, predicted_stress = predicted_stress)
 
+#Dashboard
+@app.route('/dashboard')
+def dashboard():
+    if 'user'not in session:
+        return redirect('/login')
+    
+    conn = get_db()
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    try:
+        #User points
+        c.execute("""
+            SELECT points FROM users WHERE username=?
+        """, (session['user'],))
+
+        user_data = c.fetchone()
+        
+        #Total pomodoro
+        c.execute("""
+            SELECT COUNT(*) FROM pomodoro WHERE username=?
+        """, (session['user'],))
+
+        total_pomodoro = c.fetchone()[0]
+
+        #Total simulations
+        c.execute("""
+            SELECT COUNT(*) FROM history WHERE username=?
+        """, (session['user'],))
+
+        total_simulations = c.fetchone()[0]
+
+        #Latest score
+        c.execute("""
+            SELECT score FROM history WHERE username=? ORDER BY timestamp_utc DESC LIMIT 1
+        """, (session['user'],))
+
+        latest = c.fetchone()
+    
+    finally:
+        conn.close()
+    
+    latest_score = latest['score'] if latest else 0
+    points = user_data['points'] if user_data else 0
+
+    pet_stage = pet_progression(points)
+
+    return render_template("dashboard.html", points = points, total_pomodoro = total_pomodoro, total_simulations =total_simulations, latest_score = latest_score, pet_stage = pet_stage)
+
 #History
 @app.route('/history')
 def history():
@@ -241,8 +318,10 @@ def history():
 
     #trend chart record
     history_records = []
+
     #showcase table record
     history_data = []
+
     for record in data:
         utc_dt = datetime.strptime(record['timestamp_utc'], "%Y-%m-%d %H:%M:%S")
         utc_dt = utc_dt.replace(tzinfo = timezone.utc)
@@ -269,12 +348,115 @@ def history():
 
     return render_template('history.html', data = history_data, trend_chart_url = trend_chart_url)
 
+#Planner
+@app.route('/planner', methods = ['GET', 'POST'])
+def planner():
+    if 'user' not in session:
+        return redirect('/login')
+    
+    conn = get_db()
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    default_presets = ["Lecture", "Self Study", "Rest", "Revision", "Assignment", "Examination"]
+
+    try:
+        if request.method == 'POST':
+            for day in days:
+                morning = request.form.get(f"{day}_morning")
+                if morning == "CUSTOM":
+                    morning = request.form.get(f"{day}_morning_custom")
+
+                afternoon = request.form.get(f"{day}_afternoon")
+                if afternoon == "CUSTOM":
+                    afternoon = request.form.get(f"{day}_afternoon_custom")
+                    
+                night = request.form.get(f"{day}_night")
+                if night == "CUSTOM":
+                    night = request.form.get(f"{day}_night_custom")
+                
+                #Save Custom Preset
+                for task in [morning, afternoon, night]:
+                    if task and task not in default_presets:
+                        c.execute("""
+                            SELECT * FROM planner_presets
+                            WHERE username=? AND task=?
+                        """, (session['user'], task))
+
+                        existing_task = c.fetchone()
+
+                        if not existing_task:
+                            c.execute("""
+                                INSERT INTO planner_presets
+                                (username, task)
+                                VALUES (?,?)
+                            """, (session['user'], task))
+
+                #Save Planner Table
+                c.execute("""
+                    SELECT id FROM planner
+                    WHERE username=? AND day=?
+                """, (session['user'], day))
+
+                existing = c.fetchone()
+
+                if existing:
+                    c.execute("""
+                        UPDATE planner
+                        SET morning=?, afternoon=?, night=?
+                        WHERE username=? AND day=?
+                    """, (morning, afternoon, night, session['user'], day))
+                
+                else:
+                    c.execute("""
+                        INSERT INTO planner
+                        (username, day, morning, afternoon, night)
+                        VALUES(?,?,?,?,?)
+                    """, (session['user'], day, morning, afternoon, night))
+            
+            conn.commit()
+        
+        #Load Preset Data
+        c.execute("""
+            SELECT * FROM planner WHERE username=?
+        """, (session['user'],))
+
+        rows = c.fetchall()
+
+        #Custom Preset
+        planner_data = {}
+
+        for row in rows:
+            planner_data[row['day']] = {
+                'morning': row['morning'],
+                'afternoon': row['afternoon'],
+                'night': row['night']
+            }
+
+        c.execute("""
+            SELECT task FROM planner_presets WHERE username=?
+        """, (session['user'],))
+
+        custom_rows = c.fetchall()
+
+        custom_presets = [row['task'] for row in custom_rows]
+        all_presets = list(set(default_presets + custom_presets))
+    
+    finally:
+        conn.close()
+  
+    return render_template("planner.html", days = days, planner_data = planner_data, all_presets = all_presets)
+
 #Pomodoro
 @app.route('/pomodoro')
 def pomodoro():
     if 'user' not in session:
         return redirect('/login')
-    return render_template('pomodoro.html')
+    
+    task = request.args.get('task', None)
+
+    return render_template('pomodoro.html', task = task)
 
 @app.route('/completed_pomodoro', methods = ['POST'])
 def completed_pomodoro():
