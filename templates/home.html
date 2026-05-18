@@ -3,7 +3,6 @@
     <head>
         <title>Flowcision - Home Page</title>
         <style>
-        
             body {
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -13,6 +12,7 @@
                 min-height: 100vh;
                 margin: 0;
                 color: #333;
+                transition: background 0.3s ease;
             }
             .container {
                 background: white;
@@ -21,29 +21,62 @@
                 box-shadow: 0 15px 35px rgba(0,0,0,0.2);
                 width: 100%;
                 max-width: 500px;
+                transition: background-color 0.3s ease, box-shadow 0.3s ease;
             }
-            h1 { color: #4a4a4a; font-size: 24px; text-align: center; margin-bottom: 10px; }
-            b { color: #667eea; font-size: 18px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; margin-top: 20px; }
+            h1 { color: #4a4a4a; font-size: 24px; text-align: center; margin-bottom: 10px; transition: color 0.3s ease; }
+            b { color: #667eea; font-size: 18px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; margin-top: 20px; display: block; text-align: center; transition: color 0.3s ease, border-color 0.3s ease; }
             p { font-size: 30px; }
 
             button {
-            width: 100%;
-            padding: 15px;
-            background-color: #667eea;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            margin-top: 25px;
-            transition: 0.3s;
-        }
+                width: 100%;
+                padding: 15px;
+                background-color: #667eea;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: bold;
+                margin-top: 25px;
+                transition: 0.3s;
+            }
             button:hover { background-color: #5a67d8; transform: translateY(-2px); }
+
+            
+            body.dark-mode {
+                background: linear-gradient(135deg, #111324 0%, #1a1a2e 100%) !important;
+                background-color: #1a1a2e !important;
+            }
+           
+            body.dark-mode .container {
+                background-color: #22254b !important;
+                box-shadow: 0 15px 35px rgba(0,0,0,0.6) !important;
+            }
+           
+            body.dark-mode h1 {
+                color: #ffffff !important;
+            }
+            body.dark-mode b {
+                color: #818cf8 !important;
+                border-bottom: 2px solid #3d4279 !important;
+            }
+            
+            body.dark-mode button {
+                background-color: #4f46e5 !important;
+            }
+            body.dark-mode button:hover {
+                background-color: #4338ca !important;
+            }
         </style>
     </head>
 
     <body>
+
+        <div id="theme-toggle-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
+            <button id="dark-mode-btn" onclick="toggleDarkMode()" style="width: auto; background: #ffffff; color: #333333; border: 2px solid #667eea; padding: 10px 16px; border-radius: 30px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 8px; font-family: Arial, sans-serif; margin-top: 0; transition: all 0.3s ease;">
+                <span id="theme-icon">🌙</span> <span id="theme-text">Dark Mode</span>
+            </button>
+        </div>
 
         <div class="container">
             {% if user %}
@@ -96,5 +129,28 @@
             </nav>
         </div>
 
+        <script>
+            function toggleDarkMode() {
+                document.body.classList.toggle('dark-mode');
+                
+                const btn = document.getElementById('dark-mode-btn');
+                const icon = document.getElementById('theme-icon');
+                const text = document.getElementById('theme-text');
+                
+                if (document.body.classList.contains('dark-mode')) {
+                    icon.innerText = '☀️';
+                    text.innerText = 'Light Mode';
+                    btn.style.background = '#333333';
+                    btn.style.color = '#ffffff';
+                    btn.style.borderColor = '#ffffff';
+                } else {
+                    icon.innerText = '🌙';
+                    text.innerText = 'Dark Mode';
+                    btn.style.background = '#ffffff';
+                    btn.style.color = '#333333';
+                    btn.style.borderColor = '#667eea';
+                }
+            }
+        </script>
     </body>
 </html>
