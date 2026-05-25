@@ -99,16 +99,16 @@
             <h2>Enter Your Daily Data</h2>
             
             <label>Study Hours:</label>
-            <input type="number" name="study">
+            <input type="number" name="study" min="0" max="24">
 
             <label>Sleep Hours:</label>
-            <input type="number" name="sleep">
+            <input type="number" name="sleep" min="0" max="24">
 
             <label>Focus (0-10):</label>
-            <input type="number" id = "focus" name="focus">
+            <input type="number" id = "focus" name="focus" min="0" max="10">
 
             <label>Stress (0-10):</label>
-            <input type="number" id = "stress" name="stress">
+            <input type="number" id = "stress" name="stress" min="0" max="10">
 
             <button type="submit">Analyzer</button>
         </form>
@@ -131,6 +131,17 @@
             document.getElementById("stress").value = "{{predicted_stress}}";
         }
     </script>
+<script>
+    const studyInput = document.querySelector('input[name="study"]');
+    const sleepInput = document.querySelector('input[name="sleep"]');
 
+    function limitTotal() {
+        studyInput.max = 24 - (parseInt(sleepInput.value) || 0);
+        sleepInput.max = 24 - (parseInt(studyInput.value) || 0);
+    }
+
+    studyInput.addEventListener('input', limitTotal);
+    sleepInput.addEventListener('input', limitTotal);
+</script>
 </body>
 </html>
