@@ -1,3 +1,5 @@
+from collections import Counter
+
 #Score Converter
 def study_score(study_hours):
     ideal = 4
@@ -154,7 +156,7 @@ def s_focus(focus):
 def s_stress(stress):
     return stress_score(stress) * 100
 
-#Calculate Pomodoro (25 min = 5 points)
+#Calculate Pomodoro (25 min = 10 points)
 def calculate_pomodoro_points(duration):
     if duration == 25:
         return 10
@@ -175,7 +177,7 @@ def apply_pomodoro_effects(base_focus, base_stress, pomodoro_count):
 
     return focus, stress
 
-#Pomodoro Influence
+#Predict System
 def predict_base_state(history_records, pomodoro_count):
     if not history_records:
         return None, None
@@ -201,4 +203,155 @@ def pet_progression(points):
         return "🌱 Sprout"
     else:
         return "🫘 Seed"
+
+#Statistics
+def pomodoro_hours(total_minutes):
+    return round(total_minutes / 60, 1)
+
+def task_count(categories):
+    counts = Counter(categories)
+
+    study_count = max(counts["study"], 0)
+    academic_count = max(counts["academic"], 0)
+    rest_count = max(counts["rest"], 0)
+    exercise_count = max(counts["exercise"], 0)
+    work_count = max(counts["work"], 0)
+    other_count = max(counts["other"], 0)
+
+    return study_count, academic_count, rest_count, exercise_count, work_count, other_count
+
+def most_common_tasks(categories):
+    counts = Counter(categories)
+    most_common_task = "No Data"
+
+    if counts:
+        most_common_task = counts.most_common(1)[0][0]
+    return most_common_task
+
+def workload_stats(categories):
+    study_count, academic_count, rest_count, exercise_count, work_count, other_count = task_count(categories)
+
+    workload = study_count + academic_count + work_count
+    recovery = rest_count + exercise_count
+
+    if workload == 0:
+        return "No Data"
+    elif recovery == 0 or workload > recovery * 3:
+        return "Heavy"
+    return "Balanced"
+
+def classify_task(task):
+    task_categories = {
+        "study": [
+            "study",
+            "revision",
+            "research",
+            "coding",
+            "code",
+            "practice",
+            "assignment",
+            "project",
+            "homework"
+        ],
+
+        "academic": [
+            "lecture",
+            "class",
+            "tutorial",
+            "lab",
+            "quiz",
+            "test",
+            "exam",
+            "examination",
+            "presentation",
+        ],
+
+        "rest": [
+            "sleep",
+            "rest",
+            "break",
+            "breakfast",
+            "lunch",
+            "dinner",
+            "nap"
+        ],
+
+        "exercise": [
+            "gym",
+            "gymnasium",
+            "exercise",
+            "workout",
+            "football",
+            "basketball"
+        ],
+
+        "work": [
+            "job",
+            "meeting",
+            "internship",
+            "intern"
+        ]
+    }
+
+    if not task:
+        return "other"
     
+    task = task.lower()
+    for category, keywords in task_categories.items():
+        for keyword in keywords:
+            if keyword in task:
+                return category
+    
+    return "other"
+
+#Smart Planner Suggestion
+def generate_planner_suggestion(categories):
+    suggestions = []
+
+    study_count, academic_count, rest_count, exercise_count, work_count, other_count = task_count(categories)
+
+    recognized_count = study_count + academic_count + rest_count + exercise_count + work_count
+    total_count = recognized_count + other_count
+
+    #Prevent divided by 0
+    if total_count == 0:
+        recognition_rate = 0
+    else:
+        recognition_rate = round((recognized_count / total_count) * 100)
+
+    analysis_confidence = "High"
+    if recognition_rate < 50:
+        analysis_confidence = "Low"
+    elif recognition_rate < 80:
+        analysis_confidence = "Medium"
+
+    if recognized_count == 0:
+        if other_count > 0:
+            suggestions.append("Add recognizable tasks such as Study, Lecture, Assignment, Rest, Exercise or any of default presets that we given for more accurate recommendations.")
+        suggestions.append("Create your weekly schedule to receive smart suggestions.")
+
+        return recognition_rate, analysis_confidence, suggestions
+    
+    if rest_count == 0:
+        suggestions.append("Your schedule contains no rest sessions.")
+
+    if exercise_count == 0:
+        suggestions.append("Consider adding exercise activities.")
+
+    if study_count + academic_count + work_count > rest_count * 3:
+        suggestions.append("Your workload may be too intensive")
+    
+    consecutive = 0
+    for category in categories:
+        if category in ["study", "academic"]:
+            consecutive += 1
+            if consecutive >= 4:
+                suggestions.append("Too many consecutive academic sessions.")
+                break
+            else:
+                consecutive = 0
+
+    if not suggestions:
+        suggestions.append("Your weekly schedule looks balanced.")
+    
+    return recognition_rate, analysis_confidence, suggestions
