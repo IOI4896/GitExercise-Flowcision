@@ -23,10 +23,23 @@
                 text-align: center;
             }
             h1 { color: #4a4a4a; font-size: 30px; text-align: center; margin-bottom: 10px; }
+            h2 { color: #4a4a4a; font-size: 25px; text-align: center; margin-bottom: 10px; }
+            p { color: #667eea; font-size: 24px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; margin-top: 20px; }
+            tr, td { color: #4a4a4a; font-size: 20px; text-align: center; margin-bottom: 10px; }
             .custom-input {
                 display: none;
                 text-align: center;
             }
+            input, select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box; 
+            background-color: #f9f9f9;
+            font-size: 15px;
+            } 
             button {
                 width: 100%;
                 padding: 15px;
@@ -47,6 +60,16 @@
     <body>
         <div class = "container">
             <h1>Weekly Planner</h1>
+            <div style = "background: #eef7ff; padding: 20px; border-radius: 10px; margin-bottom: 20px; ">
+                <h2>Smart Planner Suggestions</h2>
+                <ul>{% for suggestion in planner_suggestion %}
+                    <p>{{suggestion}}</p>
+                {% endfor %}
+                </ul>
+                <h2>Planner Intelligence Report</h2>
+                <p>Recognition Rate: <b>{{recognition_rate}}%</b></p>
+                <p>Analysis Confidence: <b>{{analysis_confidence}}</b></p>
+            </div>
 
             <form method = "POST">
                 <table border="1" style="margin: 0 auto; width: 80%;">
