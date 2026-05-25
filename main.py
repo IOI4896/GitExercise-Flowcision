@@ -112,6 +112,44 @@ init_db()
 def get_images(filename):
     return send_from_directory('static/images', filename)
 
+def get_current_task(planner_data):
+    conn = get_db()
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    try:
+        c.execute("""
+            SELECT timezone FROM users WHERE username=?
+        """, (session['user'],))
+
+        user = c.fetchone()
+        user_timezone = user['timezone'] if user else 'UTC'
+
+        now = datetime.now()
+        current_day = now.strftime("%A")
+        current_hour = now.hour
+
+        if current_hour < 12: #Before 12pm
+            period = "morning"
+        elif current_hour < 18: #Before 6pm
+            period = "afternoon"
+        else:
+            period = "night"
+
+        c.execute(f"""
+            SELECT {period} FROM planner WHERE username=? AND day=?
+        """, (session['user'], current_day))
+
+        planner_data = c.fetchone()
+
+        if planner_data:
+            return planner_data[period]
+        
+        return None
+    
+    finally:
+        conn.close()
+
 #Home
 @app.route('/')
 def home():
@@ -247,6 +285,8 @@ def dashboard():
     if 'user'not in session:
         return redirect('/login')
     
+    task = session.get('current_task')
+    
     conn = get_db()
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
@@ -259,36 +299,70 @@ def dashboard():
 
         user_data = c.fetchone()
         
-        #Total pomodoro
+        #History Analytics
         c.execute("""
-            SELECT COUNT(*) FROM pomodoro WHERE username=?
+            SELECT
+                COUNT(*) as total_simulations,
+                AVG(score) as avg_score,
+                MAX(score) as best_score
+            FROM history WHERE username=?
         """, (session['user'],))
 
-        total_pomodoro = c.fetchone()[0]
+        history_stats = c.fetchone()
+        total_simulations = history_stats["total_simulations"] or 0
+        avg_score = round(history_stats["avg_score"] or 0, 2)
+        best_score = round(history_stats["best_score"] or 0, 2)
 
-        #Total simulations
+        #Pomodoro Analytics
         c.execute("""
-            SELECT COUNT(*) FROM history WHERE username=?
+            SELECT
+                COUNT(*) as total_pomodoro,
+                SUM(duration) as total_minutes
+            FROM pomodoro WHERE username=?
         """, (session['user'],))
 
-        total_simulations = c.fetchone()[0]
+        pomodoro_stats = c.fetchone()
+        total_pomodoro = pomodoro_stats["total_pomodoro"] or 0
+        total_minutes = pomodoro_stats["total_minutes"] or 0
+        total_hours = pomodoro_hours(total_minutes)
 
-        #Latest score
+        #Planner Analytics
         c.execute("""
-            SELECT score FROM history WHERE username=? ORDER BY timestamp_utc DESC LIMIT 1
+            SELECT morning, afternoon, night
+            FROM planner WHERE username=?
         """, (session['user'],))
 
-        latest = c.fetchone()
-    
+        planner_rows = c.fetchall()
+
+        all_tasks = []
+        for row in planner_rows:
+            all_tasks.extend([row["morning"], row["afternoon"], row["night"]])
+        
+        categories = [classify_task(task) for task in all_tasks]
+        study_count, academic_count, rest_count, exercise_count, work_count, other_count = task_count(categories)
+
+        #Workload Status
+        workload_status = workload_stats(categories)
+        
+        #Most Common Task
+        all_tasks = [task for task in all_tasks if task and task.strip()]
+        most_common_task = most_common_tasks(all_tasks)
+
     finally:
         conn.close()
     
-    latest_score = latest['score'] if latest else 0
     points = user_data['points'] if user_data else 0
 
     pet_stage = pet_progression(points)
 
-    return render_template("dashboard.html", points = points, total_pomodoro = total_pomodoro, total_simulations =total_simulations, latest_score = latest_score, pet_stage = pet_stage)
+    return render_template(
+        "dashboard.html", points = points, 
+        total_simulations = total_simulations, avg_score = avg_score, best_score = best_score,
+        total_pomodoro = total_pomodoro, total_minutes = total_minutes, total_hours = total_hours,
+        most_common_task = most_common_task, workload_status = workload_status,
+        study_count = study_count, academic_count = academic_count, rest_count = rest_count, exercise_count = exercise_count, work_count = work_count, other_count = other_count,
+        pet_stage = pet_stage
+    )
 
 #History
 @app.route('/history')
@@ -442,11 +516,18 @@ def planner():
 
         custom_presets = [row['task'] for row in custom_rows]
         all_presets = list(set(default_presets + custom_presets))
+
+        all_tasks = []
+        for day in planner_data.values():
+            all_tasks.extend([day["morning"], day["afternoon"], day["night"]])
+        
+        categories = [classify_task(task) for task in all_tasks]
+        recognition_rate, analysis_confidence, planner_suggestion = generate_planner_suggestion(categories)
     
     finally:
         conn.close()
   
-    return render_template("planner.html", days = days, planner_data = planner_data, all_presets = all_presets)
+    return render_template("planner.html", days = days, planner_data = planner_data, all_presets = all_presets, planner_suggestion = planner_suggestion, analysis_confidence = analysis_confidence, recognition_rate = recognition_rate)
 
 #Pomodoro
 @app.route('/pomodoro')
@@ -454,9 +535,9 @@ def pomodoro():
     if 'user' not in session:
         return redirect('/login')
     
-    task = request.args.get('task', None)
+    current_task = get_current_task(session['user'])
 
-    return render_template('pomodoro.html', task = task)
+    return render_template('pomodoro.html', current_task = current_task)
 
 @app.route('/completed_pomodoro', methods = ['POST'])
 def completed_pomodoro():
