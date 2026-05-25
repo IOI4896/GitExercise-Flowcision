@@ -22,8 +22,8 @@
                 max-width: 900px;
                 text-align: center;
             }
-            h2 { color: #4a4a4a; font-size: 30px; text-align: center; margin-bottom: 10px; }
-            b { color: #667eea; font-size: 24px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; margin-top: 20px; }
+            h2, h3 { color: #4a4a4a; font-size: 30px; text-align: center; margin-bottom: 10px; }
+            b, p { color: #667eea; font-size: 24px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; margin-top: 20px; }
         
             button {
                 width: 100%;
@@ -55,24 +55,35 @@
 
             <h3>Your Statistics</h3>
 
-            <table border="1" style="margin: 0 auto; width: 80%;">
-                <tr>
-                    <th>Total Points</th>
-                    <th>Total Pomodoro Session</th>
-                    <th>Total Simulation</th>
-                    <th>Latest Score</th>
-                </tr>
-
-                <tr>
-                    <td>{{points}}</td>
-                    <td>{{total_pomodoro}}</td>
-                    <td>{{total_simulations}}</td>
-                    <td>{{latest_score}}</td>
-                </tr>
-            </table>
+                <h3>Simulation Analytics</h3>
+                <p>Total Points: <b>{{points}}</b></p>
+                <p>Total Simulation: <b>{{total_simulations}}</b></p>
+                <p>Average Score: <b>{{avg_score}}</b></p>
+                <p>Best Score: <b>{{best_score}}</b></p>
 
             <hr>
 
+                <h3>Pomodoro Analytics</h3>
+                <p>Total Pomodoro Session: <b>{{total_pomodoro}}</b></p>
+                <p>Total Focus Time: <b>{{total_minutes}} minutes</b></p>
+                <p>Total Focus Hours: {{total_hours}} <b>hours</b>
+            <hr>
+
+                <h3>Planner Analytics</h3>
+                <p>Study Tasks: <b>{{study_count}}</b></p>
+                <p>Academic Tasks: <b>{{academic_count}}</b></p>
+                <p>Rest Tasks: <b>{{rest_count}}</b></p>
+                <p>Exercise Tasks: <b>{{exercise_count}}</b></p>
+                <p>Work Tasks: <b>{{work_count}}</b></p>
+                <p>Other Tasks: <b>{{other_count}}</b></p>
+
+                <p>Most Common Task: <b>{{most_common_task}}</b></p>
+            
+            <hr>
+
+                <h3>Workload Analytics</h3>
+                <p>Status: <b>{{workload_status}}</b></p>
+                
             <nav>
                 <a href = "/">
                     <button>Go Back</button>
