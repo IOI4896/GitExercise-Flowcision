@@ -1,6 +1,6 @@
 #render_template = server to browser
 #request = browser to server
-from flask import Flask, render_template, request, redirect, session, send_from_directory
+from flask import Flask, render_template, request, redirect, session, send_from_directory, flash
 import sqlite3
 import os
 from simulation import *
@@ -605,13 +605,13 @@ def result():
         sleep = int(request.form['sleep'])
         focus = int(request.form['focus'])
         stress = int(request.form['stress'])
-    except ValueError:
-        return "Please enter valid numbers"
-    except KeyError:
-        return "Invalid input"
-    
+    except (ValueError, KeyError):
+        flash("Please enter valid numbers")
+        return redirect('/index')
+        
     if not check_valid_input(study, sleep, focus, stress):
-        return "Invalid input"
+        flash("Invalid input")
+        return redirect('/index')
     
     #timestamp_utc = Change time record to UTC (EX: Malaysia is UTC +8)
     timestamp_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
