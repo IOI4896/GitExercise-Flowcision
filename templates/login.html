@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flowcision - Login</title>
     <style>
+        /* 这里是你原本的样式，一字未改！ */
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
@@ -49,6 +50,7 @@
         }
         button:hover { background-color: #5a67d8; }
 
+        /* 这里是暗黑模式触发后的样式覆盖 */
         body.dark-mode {
             background: linear-gradient(135deg, #111324 0%, #1a1a2e 100%) !important;
             background-color: #1a1a2e !important;
@@ -96,27 +98,44 @@
     </div>
 
     <script>
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            
+        function applyTheme(theme) {
             const btn = document.getElementById('dark-mode-btn');
             const icon = document.getElementById('theme-icon');
             const text = document.getElementById('theme-text');
             
-            if (document.body.classList.contains('dark-mode')) {
-                icon.innerText = '☀️';
-                text.innerText = 'Light Mode';
-                btn.style.background = '#333333';
-                btn.style.color = '#ffffff';
-                btn.style.borderColor = '#ffffff';
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+                if(icon) icon.innerText = '☀️';
+                if(text) text.innerText = 'Light Mode';
+                if(btn) {
+                    btn.style.background = '#333333';
+                    btn.style.color = '#ffffff';
+                    btn.style.borderColor = '#ffffff';
+                }
             } else {
-                icon.innerText = '🌙';
-                text.innerText = 'Dark Mode';
-                btn.style.background = '#ffffff';
-                btn.style.color = '#333333';
-                btn.style.borderColor = '#667eea';
+                document.body.classList.remove('dark-mode');
+                if(icon) icon.innerText = '🌙';
+                if(text) text.innerText = 'Dark Mode';
+                if(btn) {
+                    btn.style.background = '#ffffff';
+                    btn.style.color = '#333333';
+                    btn.style.borderColor = '#667eea';
+                }
             }
         }
+
+        function toggleDarkMode() {
+            if (document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'light');
+                applyTheme('light');
+            } else {
+                localStorage.setItem('theme', 'dark');
+                applyTheme('dark');
+            }
+        }
+
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        applyTheme(savedTheme);
     </script>
 </body>
 </html>
