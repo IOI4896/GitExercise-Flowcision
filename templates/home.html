@@ -40,12 +40,34 @@
                 margin-top: 25px;
                 transition: 0.3s;
             }
+            button1 {
+                width: 100%;
+                padding: 15px;
+                background-color: #667eea;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: bold;
+                margin-top: 25px;
+                transition: 0.3s;
+            }
             button:hover { background-color: #5a67d8; transform: translateY(-2px); }
         </style>
     </head>
 
     <body>
         <div class="container">
+            {% extends "base.html" %}
+            {% block content %}
+            <div id="cmdbar" class="hidden">
+                <input id="commandInput" type="'text" placeholder="type command...">
+            </div>
+            <a href = "/settings">
+                <button1>⚙️</button1>
+            </a>
+
             {% if user %}
                 <h1>Flowcision</h1>
             {% else %}
@@ -171,6 +193,62 @@
 
             const savedTheme = localStorage.getItem('theme') || 'light';
             applyTheme(savedTheme);
+
+            const HOTKEYS = {
+                simulation: "{{simulation_hotkey or 'i'}}",
+                pomodoro: "{{pomodoro_hotkey or 'p'}}",
+                history: "{{history_hotkey or 'h'}}",
+                dashboard: "{{dashboard_hotkey or 'd'}}",
+                planner: "{{planner_hotkey or 'l'}}",
+                settings: "{{settings_hotkey or 's'}}",
+                back: "{{back_hotkey or 'z'}}"
+            }
+            document.addEventListener("keydown", 
+                function(e){
+                    try {
+                        const tag = document.activeElement.tagName;
+                        if(tag === "INPUT" ||
+                            tag === "TEXTAREA" ||
+                            tag === "SELECT"
+                        ){ 
+                            return;
+                        };
+                        const key = e.key.toLowerCase();
+                        if(key === HOTKEYS.simulation.toLowerCase()){
+                            window.location.href = "/index";
+                        }
+                        if(key === HOTKEYS.pomodoro.toLowerCase()){
+                            window.location.href = "/pomodoro";
+                        }
+                        if(key === HOTKEYS.history.toLowerCase()){
+                            window.location.href = "/history"
+                        }
+                        if(key === HOTKEYS.dashboard.toLowerCase()){
+                            window.location.href = "/dashboard";
+                        }
+                        if(key === HOTKEYS.planner.toLowerCase()){
+                            window.location.href = "/planner";
+                        }
+                        if(key === HOTKEYS.settings.toLowerCase()){
+                            window.location.href = "/settings";
+                        }
+
+                        let secret = "";
+                        document.addEventListener("keydown", function(e){
+                            if(key === HOTKEYS.back.toLowerCase()){
+                                secret += 1;
+                                if(secret.length >= 9){
+                                    window.location.href = "/backrooms";
+                                }
+                            }
+                        })
+
+                    } catch(err) {
+                        console.error("Hotkey Error: ", err);
+                    }
+                }
+            );
         </script>
+        {% endblock %}
     </body>
 </html>
