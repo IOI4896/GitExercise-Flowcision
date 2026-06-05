@@ -143,6 +143,20 @@
         </div>
 
         <script>
+            window.onload = function(){
+                const task = "{{current_task or ''}}";
+                const desktopEnabled = "{{desktop_notification or 0}}";
+                const plannerEnabled = "{{planner_notification or 0}}";
+                if(desktopEnabled === "1" && plannerEnabled === "1" && task && Notification.permission === "granted"){
+                    new Notification(
+                        "Current Task", 
+                        {
+                            body: "Current Task: " + task
+                        }
+                    );
+                }
+            }
+
             function toggleCustom(select, inputId) {
                 let input = document.getElementById(inputId);
 
