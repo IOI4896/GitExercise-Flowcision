@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <style>
+            body {
+                background-color: #d8c76b;
+                background-image: url("static/images/Backrooms_1.png");
+                background-size: cover;
+                background-position: center;
+                color: black;
+                font-family: monospace;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+            }
+            @keyframes flicker {
+                0%{opacity: 1;}
+                50%{opacity: 0.7;}
+                100%{opacity: 1;}
+            }
+            .container {
+                text-align: center;
+                animation: flicker 2s infinite;
+            }
+            .terminal {
+                background: black;
+                color: #00ff00;
+                font-family: monospace;
+                text-align: center;
+            }
+            h1 {
+                font-size: 60px;
+            }
+            p {
+                font-size: 20px;
+            }
+            button {
+                width: 80%;
+                padding: 15px;
+                background-color: #000000;
+                color: #00ff00;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: bold;
+                margin-top: 25px;
+                transition: 0.3s;
+            }
+            button:hover { background-color: #001d05; transform: translateY(-2px); }
+        </style>
+    </style>
+    </head>
+    <body>
+        <audio autoplay loop>
+           <source src="{{url_for('static', filename='audio/backrooms.mp3.mpeg')}}"  type="audio/mpeg">
+        </audio>
+
+        <div class="backrooms">
+            <div class="container">
+                <h1>You are not supposed to be here.</h1>
+            </div>
+
+            <div class="terminal">
+                <h1>FLOWCISION DEBUG TERMINAL</h1>
+                <p>User: {{user}}</p>
+                <p>Points: {{points}}</p>
+                <p>Timezone: {{timezone}}</p>
+                <br>
+                <p>Status: OK</p>
+                <p>Reality Level: 0</p>
+                <p>Escape Available: NO</p>
+                <a href="/">
+                    <button>BACK TO REALITY</button>
+                </a>
+            </div>
+        </div>
+    </body>
+</html>
