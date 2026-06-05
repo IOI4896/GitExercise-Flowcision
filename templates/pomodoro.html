@@ -285,6 +285,17 @@
                     timeLeft--; updateVisuals();
                     if (timeLeft <= 0) {
                         clearInterval(timer); timer = null;
+                        const desktopEnabled = "{{desktop_notification or 0}}";
+                        const pomodoroEnabled = "{{pomodoro_notification or 0}}";
+                        if(desktopEnabled === "1" && pomodoroEnabled === "1" && Notification.permission === "granted"){
+                            new Notification(
+                                "Pomodoro Complete",
+                                {
+                                    body: "Time for a short break!"
+                                }
+                            );
+                        }
+
                         if (currentState === 'break') { alert("Break over!"); setMode(25, 'focus'); }
                         else document.getElementById("completeForm").submit();
                     }
