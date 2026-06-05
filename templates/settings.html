@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Flowcision - Settings</title>
+        <style>
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                margin: 0;
+                color: #333;
+                transition: background 0.3s ease;
+            }
+            .container {
+                background: white;
+                padding: 40px;
+                border-radius: 20px;
+                box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+                width: 100%;
+                max-width: 500px;
+                transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            }
+            h1 { color: #4a4a4a; font-size: 24px; text-align: center; margin-bottom: 10px; transition: color 0.3s ease; }
+            h2 { color: #4a4a4a; font-size: 20px; text-align: center; margin-bottom: 10px; transition: color 0.3s ease; }
+            b { color: #667eea; font-size: 18px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; margin-top: 20px; display: block; text-align: center; transition: color 0.3s ease, border-color 0.3s ease; }
+            p { font-size: 18px; }
+
+            button {
+                width: 100%;
+                padding: 15px;
+                background-color: #667eea;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: bold;
+                margin-top: 25px;
+                transition: 0.3s;
+            }
+            button:hover { background-color: #5a67d8; transform: translateY(-2px); }
+        </style>
+    </head>
+
+    <body>
+        <div class = "container">
+            <h1>Settings</h1>
+
+            <form method="POST">
+                <h2>Notification</h2>
+                
+                <label>
+                    <input type="checkbox" id="desktop_notification" name="desktop_notification"
+                    {% if settings_data['desktop_notification'] %}
+                    checked
+                    {% endif %}>
+                    Desktop Notification
+                </label>
+
+                <br><br>
+
+                <label>
+                    <input type="checkbox" name="planner_notification"
+                    {% if settings_data['planner_notification'] %}
+                    checked
+                    {% endif %}>
+                    Planner Notification
+                </label>
+
+                <br><br>
+
+                <label>
+                    <input type="checkbox" name="pomodoro_notification"
+                    {% if settings_data['pomodoro_notification'] %}
+                    checked
+                    {% endif %}>
+                    Pomodoro Notification
+                </label>
+
+                <hr>
+
+                <h2>Timezone</h2>
+                <input type="hidden" name="device_timezone" id="timezone_auto">
+
+                <select name="timezone">
+                    <option value="AUTO" {% if settings_data['timezone'] == 'AUTO' %} selected {% endif %}>Auto (Device Timezone)</option>
+
+                    <option value="US/Samoa" {% if settings_data['timezone'] == 'UTC-11' %} selected {% endif %}>UTC -11 (American Samoa)</option>
+                    <option value="US/Hawaii" {% if settings_data['timezone'] == 'UTC-10' %} selected {% endif %}>UTC -10 (US (Hawaii) / French / Polynesia)</option>
+                    <option value="US/Alaska" {% if settings_data['timezone'] == 'UTC-9' %} selected {% endif %}>UTC -9 (US (Alaska))</option>
+                    <option value="US/Pacific" {% if settings_data['timezone'] == 'UTC-8' %} selected {% endif %}>UTC -8 (US / Canada / Mexico (Pacific))</option>
+                    <option value="Canada/Mountain" {% if settings_data['timezone'] == 'UTC-7' %} selected {% endif %}>UTC -7 (Canada (Mountain))</option>
+                    <option value="America/Mexico_City" {% if settings_data['timezone'] == 'UTC-6' %} selected {% endif %}>UTC -6 (US (Central) / Mexico)</option>
+                    <option value="America/New_York" {% if settings_data['timezone'] == 'UTC-5' %} selected {% endif %}>UTC -5 (US (Eastern) / Canada / Peru / Colombia)</option>
+                    <option value="Brazil/West" {% if settings_data['timezone'] == 'UTC-4' %} selected {% endif %}>UTC -4 (Venezuela / Bolivia)</option>
+                    <option value="Brazil/East" {% if settings_data['timezone'] == 'UTC-3' %} selected {% endif %}>UTC -3 (Argentina / Brazil)</option>
+                    <option value="Atlantic/South_Georgia" {% if settings_data['timezone'] == 'UTC-2' %} selected {% endif %}>UTC -2 (South Georgia)</option>
+                    <option value="Atlantic/Cape_Verde" {% if settings_data['timezone'] == 'UTC-1' %} selected {% endif %}>UTC -1 (Cape Verde)</option>
+                    <option value="UTC" {% if settings_data['timezone'] == 'UTC' %} selected {% endif %}>UTC 0 (UK / Ireland / Iceland / Portugal)</option>
+                    <option value="Europe/London" {% if settings_data['timezone'] == 'UTC+1' %} selected {% endif %}>UTC +1 (UK / France / Germany / Spain / Italy)</option>
+                    <option value="Europe/Rome" {% if settings_data['timezone'] == 'UTC+2' %} selected {% endif %}>UTC +2 (South Africa / Greece / Ukraine)</option>
+                    <option value="Europe/Moscow" {% if settings_data['timezone'] == 'UTC+3' %} selected {% endif %}>UTC +3 (Saudi Arabia / Turkey / Russia (Moscow))</option>
+                    <option value="Asia/Dubai" {% if settings_data['timezone'] == 'UTC+4' %} selected {% endif %}>UTC +4 (United Arab Emirates / Oman / Russia (Samara))</option>
+                    <option value="Asia/Kabul" {% if settings_data['timezone'] == 'UTC+4:30' %} selected {% endif %}>UTC +4:30 (Afghanistan)</option>
+                    <option value="Asia/Karachi" {% if settings_data['timezone'] == 'UTC+5' %} selected {% endif %}>UTC +5 (Pakistan / Uzbekistan)</option>
+                    <option value="Asia/Thimphu" {% if settings_data['timezone'] == 'UTC+6' %} selected {% endif %}>UTC +6 (Bangladesh / Bhutan)</option>
+                    <option value="Asia/Bangkok" {% if settings_data['timezone'] == 'UTC+7' %} selected {% endif %}>UTC +7 (Thailand / Indonesia / Vietnam)
+                    <option value="Asia/Kuala_Lumpur" {% if settings_data['timezone'] == 'UTC+8' %} selected {% endif %}>UTC +8 (Malaysia / Singapore / China / Philippines)</option>
+                    <option value="Asia/Tokyo" {% if settings_data['timezone'] == 'UTC+9' %} selected {% endif %}>UTC +9 (Japan / South Korea / Indonesia (Eastern))</option>
+                    <option value="Australia/Queensland" {% if settings_data['timezone'] == 'UTC+10' %} selected {% endif %}>UTC +10 (Australia (Eastern), Papua New Guinea)</option>
+                    <option value="Australia/Lord_Howe" {% if settings_data['timezone'] == 'UTC+10:30' %} selected {% endif %}>UTC +10:30 (Australia (Lord Howe Island))</option>
+                    <option value="Pacific/Nauru" {% if settings_data['timezone'] == 'UTC+11' %} selected {% endif %}>UTC +11 (New Caledonia, Vanuatu / Nauru)</option>
+                    <option value="Pacific/Norfolk" {% if settings_data['timezone'] == 'UTC+11:30' %} selected {% endif %}>UTC +11:30 (Australia (Norfolk Island))</option>
+                    <option value="Pacific/Fiji" {% if settings_data['timezone'] == 'UTC+12' %} selected {% endif %}>UTC +12 (New Zealand / Fiji / Tuvalu)</option>
+                    <option value="Pacific/Chatham" {% if settings_data['timezone'] == 'UTC+12:45' %} selected {% endif %}>UTC +12:45 (New Zealand (Chatham Island))</option>
+                    <option value="Pacific/Samoa" {% if settings_data['timezone'] == 'UTC+13' %} selected {% endif %}>UTC +13 (Tonga / Samoa)</option>
+                    <option value="Pacific/Tarawa" {% if settings_data['timezone'] == 'UTC+14' %} selected {% endif %}>UTC +14 (Kiribati)</option>
+                </select>
+
+                <h2>Hotkey</h2>
+                <b>* Only accept any Alphabet, Number, and Symbol</b>
+                
+                <table border="1" style="margin: 0 auto; width: 80%;">
+                    <tr>
+                        <td>Simulation Hotkey: </td>
+                        <td><input class="hotkey-input" name="simulation_hotkey" value="{{simulation_hotkey}}"></td>
+                    </tr>
+
+                    <tr>
+                        <td>Pomodoro Hotkey: </td>
+                        <td><input class="hotkey-input" name="pomodoro_hotkey" value="{{pomodoro_hotkey}}"></td>
+                    </tr>
+
+                    <tr>
+                        <td>History Hotkey: </td>
+                        <td><input class="hotkey-input" name="history_hotkey" value="{{history_hotkey}}"></td>
+                    </tr>
+
+                    <tr>
+                        <td>Dashboard Hotkey: </td>
+                        <td><input class="hotkey-input" name="dashboard_hotkey" value="{{dashboard_hotkey}}"></td>
+                    </tr>
+
+                    <tr>
+                        <td>Planner Hotkey: </td>
+                        <td><input class="hotkey-input" name="planner_hotkey" value="{{planner_hotkey}}"></td>
+                    </tr>
+
+                    <tr>
+                        <td>Settings Hotkey: </th>
+                        <td><input class="hotkey-input" name="settings_hotkey" value="{{settings_hotkey}}"></td>
+                    </tr>
+
+                    <tr>
+                        <td>Back Hotkey: </td>
+                        <td><input class="hotkey-input" name="back_hotkey" value="{{back_hotkey}}"></td>
+                    </tr>
+                </table>
+
+                <button type="submit">Save Settings</button>
+            </form>
+
+            <nav>
+                <a href = "/">
+                    <button>Go Back</button>
+                </a>
+            </nav>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+                document.getElementById(
+                    "device_timezone"
+                ).value = tz;
+            });
+            
+            document
+            .getElementById("desktop_notification")
+            .addEventListener("change", 
+                async function() {
+                    if(this.checked){
+                        const permission = await Notification.requestPermission();
+
+                        if(permission !== "granted"){
+                            alert("Notification permission denied.");
+                            this.checked = false;
+                        }
+                    }
+                }
+            );
+
+            const inputs = document.querySelectorAll(".hotkey-input");
+
+            inputs.forEach(input => {
+                input.addEventListener("input", function() {
+
+                    const values = Array.from(inputs).map(i => i.value);
+
+                    const duplicates = values.filter(
+                        (v, i) => v && values.indexOf(v) !== i
+                    );
+
+                    if (duplicates.includes(this.value)) {
+                        this.style.border = "1px solid red";
+                    } else {
+                        this.style.border = "1px solid green";
+                    }
+
+                });
+            });
+        </script>
+    </body>
+</html>
