@@ -42,14 +42,73 @@ def init_db():
         pass
 
     try:
+        c.execute("""
+            ALTER TABLE users ADD COLUMN simulation_hotkey TEXT DEFAULT 'i'
+        """)
+    except:
+        pass
+
+    try:
+        c.execute("""
+            ALTER TABLE users ADD COLUMN pomodoro_hotkey TEXT DEFAULT 'p'
+        """)
+    except:
+        pass
+
+    try:
+        c.execute("""
+            ALTER TABLE users ADD COLUMN history_hotkey TEXT DEFAULT 'h'
+        """)
+    except:
+        pass
+
+    try:
+        c.execute("""
+            ALTER TABLE users ADD COLUMN dashboard_hotkey TEXT DEFAULT 'd'
+        """)
+    except:
+        pass
+
+    try:
+        c.execute("""
+            ALTER TABLE users ADD COLUMN planner_hotkey TEXT DEFAULT 'l'
+        """)
+    except:
+        pass
+
+    try:
+        c.execute("""
+            ALTER TABLE users ADD COLUMN settings_hotkey TEXT DEFAULT 's'
+        """)
+    except:
+        pass
+
+    try:
+        c.execute("""
+            ALTER TABLE users ADD COLUMN back_hotkey TEXT DEFAULT 'z'
+        """)
+    except:
+        pass
+
+    try:
         #User Database
         c.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE,
             password TEXT,
-            timezone TEXT DEFAULT 'Asia/Kuala_Lumpur',
-            points INTEGER DEFAULT 0
+            timezone TEXT DEFAULT 'AUTO',
+            points INTEGER DEFAULT 0,
+            planner_notification INTEGER DEFAULT 1,
+            pomodoro_notification INTEGER DEFAULT 1,
+            desktop_notification INTEGER DEFAULT 0,
+            simulation_hotkey TEXT DEFAULT 'i',
+            pomodoro_hotkey TEXT DEFAULT 'p',
+            history_hotkey TEXT DEFAULT 'h',
+            dashboard_hotkey TEXT DEFAULT 'd',
+            planner_hotkey TEXT DEFAULT 'l',
+            settings_hotkey TEXT DEFAULT 's',
+            back_hotkey TEXT DEFAULT 'z'
         )
         """)
 
@@ -112,33 +171,52 @@ init_db()
 def get_images(filename):
     return send_from_directory('static/images', filename)
 
-def get_current_task(planner_data):
+def get_user_timezone(username):
     conn = get_db()
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
 
     try:
-        c.execute("""
-            SELECT timezone FROM users WHERE username=?
-        """, (session['user'],))
+        c.execute("Select timezone FROM users WHERE username=?", (username,))
 
         user = c.fetchone()
-        user_timezone = user['timezone'] if user else 'UTC'
 
-        now = datetime.now()
+        if not user:
+            return "UTC"
+
+        timezone_setting = user["timezone"]
+
+        if timezone_setting == "AUTO":
+            device_tz = session.get("device_timezone", "UTC")
+            return device_tz
+        
+        return timezone_setting
+    
+    finally:
+        conn.close()
+
+def get_current_task(username):
+    conn = get_db()
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    try:
+        user_timezone = get_user_timezone(username)
+
+        now = datetime.now(ZoneInfo(user_timezone))
         current_day = now.strftime("%A")
         current_hour = now.hour
 
-        if current_hour < 12: #Before 12pm
+        if 5 <= current_hour < 12: #5am - Before 12pm
             period = "morning"
-        elif current_hour < 18: #Before 6pm
+        elif current_hour < 18: #12pm - Before 6pm
             period = "afternoon"
-        else:
+        else: 
             period = "night"
 
         c.execute(f"""
             SELECT {period} FROM planner WHERE username=? AND day=?
-        """, (session['user'], current_day))
+        """, (username, current_day))
 
         planner_data = c.fetchone()
 
@@ -149,6 +227,13 @@ def get_current_task(planner_data):
     
     finally:
         conn.close()
+
+@app.route('/save_timezone', methods = ["POST"])
+def save_timezone():
+    data = request.get_json()
+    
+    session["device_timezone"] = data["timezone"]
+    return {"status": "ok"}
 
 #Home
 @app.route('/')
@@ -168,6 +253,8 @@ def register():
         try:
             c.execute("INSERT INTO users (username, password) VALUES (?,?)", (username, password))
             conn.commit()
+        except:
+            return "Username already exists"
 
         finally:
             conn.close()
@@ -187,22 +274,67 @@ def auth():
 @app.context_processor
 def inject_user():
     points = 0
+    desktop_notification = 0
+    planner_notification = 0
+    pomodoro_notification = 0
+
+    simulation_hotkey = "i"
+    pomodoro_hotkey = "p"
+    history_hotkey = "h"
+    dashboard_hotkey = "d"
+    planner_hotkey = "l"
+    settings_hotkey = "s"
+    back_hotkey = "z"
+
     if 'user' in session:
         conn = get_db()
+        conn.row_factory = sqlite3.Row
         c = conn.cursor()
 
         try:
-            c.execute("SELECT points FROM users WHERE username=?", (session['user'],))
-            result = c.fetchone()
+            c.execute("SELECT points, desktop_notification, planner_notification, pomodoro_notification, simulation_hotkey, pomodoro_hotkey, history_hotkey, dashboard_hotkey, planner_hotkey, settings_hotkey, back_hotkey FROM users WHERE username=?", (session['user'],))
+            row = c.fetchone()
 
-            if result:
-                points = result[0]
+            if row:
+                points = row["points"]
+                desktop_notification = row["desktop_notification"]
+                planner_notification = row["planner_notification"]
+                pomodoro_notification = row["pomodoro_notification"]
+                simulation_hotkey = (row["simulation_hotkey"] or "i")
+                pomodoro_hotkey = (row["pomodoro_hotkey"] or "p")
+                history_hotkey = (row["history_hotkey"] or "h")
+                dashboard_hotkey = (row["dashboard_hotkey"] or "d")
+                planner_hotkey = (row["planner_hotkey"] or "l")
+                settings_hotkey = (row["settings_hotkey"] or "s")
+                back_hotkey = (row["back_hotkey"] or "z")
         
         finally:
             conn.close()
         
-    return dict(user = session.get('user'), points = points)
+    return dict(user = session.get('user'), 
+                points = points, 
+                desktop_notification = desktop_notification, 
+                planner_notification = planner_notification, 
+                pomodoro_notification = pomodoro_notification,
+                simulation_hotkey = simulation_hotkey,
+                pomodoro_hotkey = pomodoro_hotkey,
+                history_hotkey = history_hotkey,
+                dashboard_hotkey = dashboard_hotkey,
+                planner_hotkey = planner_hotkey,
+                settings_hotkey = settings_hotkey,
+                back_hotkey = back_hotkey)
 
+@app.route('/api/start_pomodoro', methods = ["POST"])
+def api_start_pomodoro():
+    data = request.get_json()
+    duration = data.get("duration", 25)
+
+    session["active_pomodoro"] = {
+        "duration": duration,
+        "start": datetime.now(timezone.utc).isoformat()
+    }
+
+    return {"status": "started"}
 #Login
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
@@ -237,6 +369,82 @@ def logout_confirm():
 def logout():
     session.pop('user', None)
     return redirect('/')
+
+#Settings
+@app.route('/settings', methods = ['GET', 'POST'])
+def settings():
+    if 'user' not in session:
+        return redirect('/login')
+    
+    conn = get_db()
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    if request.method == 'POST':
+        planner_notification = (1 if 'planner_notification' in request.form else 0)
+        pomodoro_notification = (1 if 'pomodoro_notification' in request.form else 0)
+        desktop_notification = (1 if 'desktop_notification' in request.form else 0)
+
+        hotkeys = {
+            "simulation": request.form.get("simulation_hotkey", "i"),
+            "pomodoro": request.form.get("pomodoro_hotkey", "p"),
+            "history": request.form.get("history_hotkey", "h"),
+            "dashboard": request.form.get("dashboard_hotkey", "d"),
+            "planner": request.form.get("planner_hotkey", "l"),
+            "settings": request.form.get("settings_hotkey", "s"),
+            "back": request.form.get("back_hotkey", "z")
+        }
+
+        #Check duplicate
+        values = list(hotkeys.values())
+        if len(values) != len(set(values)):
+            flash("Hotkeys cannot be duplicated")
+            return redirect('/settings')
+        
+        #Only single key
+        for k, v in hotkeys.items():
+            if len(v) != 1:
+                flash(f"{k} hotkey must be a single key")
+                return redirect('/settings')
+        
+        timezone = request.form.get('timezone', 'UTC')
+        
+        try:
+            c.execute("""
+                UPDATE users
+                SET
+                    planner_notification=?,
+                    pomodoro_notification=?,
+                    desktop_notification=?,
+                    timezone=?,
+                    simulation_hotkey=?,
+                    pomodoro_hotkey=?,
+                    history_hotkey=?,
+                    dashboard_hotkey=?,
+                    planner_hotkey=?,
+                    settings_hotkey=?,
+                    back_hotkey=?
+                WHERE username=?
+            """, (planner_notification, pomodoro_notification, desktop_notification, timezone, hotkeys["simulation"], hotkeys["pomodoro"], hotkeys["history"], hotkeys["dashboard"], hotkeys["planner"], hotkeys["settings"], hotkeys["back"], session['user'],))
+
+            conn.commit()
+        
+        finally:
+            conn.close()
+        
+        return redirect('/settings')
+    
+    try:
+        c.execute("""
+            SELECT * FROM users WHERE username=?
+        """, (session['user'],))
+
+        settings_data = c.fetchone()
+    
+    finally:
+        conn.close()
+    
+    return render_template("settings.html", settings_data = settings_data)
 
 #Simulation
 @app.route('/index')
@@ -377,7 +585,7 @@ def history():
     try:
         c.execute('SELECT timezone FROM users WHERE username=?',(session['user'],))
         user = c.fetchone()
-        user_timezone = user['timezone'] if user else 'UTC'
+        user_timezone = get_user_timezone(session['user'])
 
         c.execute("""
             SELECT study, sleep, focus, stress, score, timestamp_utc
@@ -523,11 +731,13 @@ def planner():
         
         categories = [classify_task(task) for task in all_tasks]
         recognition_rate, analysis_confidence, planner_suggestion = generate_planner_suggestion(categories)
+
+        current_task = get_current_task(session['user'])
     
     finally:
         conn.close()
   
-    return render_template("planner.html", days = days, planner_data = planner_data, all_presets = all_presets, planner_suggestion = planner_suggestion, analysis_confidence = analysis_confidence, recognition_rate = recognition_rate)
+    return render_template("planner.html", days = days, planner_data = planner_data, all_presets = all_presets, planner_suggestion = planner_suggestion, analysis_confidence = analysis_confidence, recognition_rate = recognition_rate, current_task = current_task)
 
 #Pomodoro
 @app.route('/pomodoro')
@@ -589,6 +799,31 @@ def pomodoro_complete():
         conn.close()
     
     return render_template("pomodoro_complete.html", points = points)
+
+#Easter Egg
+@app.route('/backrooms')
+def backrooms():
+    if 'user' not in session:
+        return redirect('/')
+    
+    conn = get_db()
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    try:
+        c.execute("""
+            SELECT points FROM users WHERE username=?
+        """, (session['user'],))
+
+        user_data = c.fetchone()
+
+        points = user_data['points'] if user_data else 0
+        user_timezone = get_user_timezone(session['user'])
+    
+    finally:
+        conn.close()
+    
+    return render_template("backrooms.html", user = session['user'], points= points, timezone = user_timezone)
 
 #Market Research
 @app.route('/market_research')
