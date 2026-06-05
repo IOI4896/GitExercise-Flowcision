@@ -127,6 +127,30 @@
     } else {
         document.body.classList.remove('dark-mode');
     }
+
+    const HOTKEYS = {
+                back: "{{back_hotkey or 'z'}}"
+            }
+            document.addEventListener("keydown", 
+                function(e){
+                    try {
+                        const tag = document.activeElement.tagName;
+                        if(tag === "INPUT" ||
+                            tag === "TEXTAREA" ||
+                            tag === "SELECT"
+                        ){ 
+                            return;
+                        };
+                        const key = e.key.toLowerCase();
+                        if(key === HOTKEYS.back.toLowerCase()){
+                            window.location.href = "/";
+                        }
+
+                    } catch(err) {
+                        console.error("Hotkey Error: ", err);
+                    }
+                }
+            );
 </script>
     </body>
 </html>
