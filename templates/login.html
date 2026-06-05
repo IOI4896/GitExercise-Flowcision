@@ -136,6 +136,16 @@
 
         const savedTheme = localStorage.getItem('theme') || 'light';
         applyTheme(savedTheme);
+
+        fetch("/save_timezone", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+            })
+        });
     </script>
 </body>
 </html>
