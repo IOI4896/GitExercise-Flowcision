@@ -58,6 +58,15 @@
                 transition: 0.3s;
             }
             button:hover { background-color: #5a67d8; transform: translateY(-2px); }
+
+            /* 新增的表格与对比样式 */
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 16px; }
+            th, td { border: 1px solid #ddd; padding: 15px; text-align: left; vertical-align: top; }
+            th { background-color: #667eea; color: white; font-size: 18px; width: 50%; }
+            ul.pros-list { padding-left: 20px; margin: 0; }
+            .diff-item { margin-bottom: 15px; }
+            .diff-item:last-child { margin-bottom: 0; }
+            .flowcision-highlight { color: #667eea; font-weight: bold; display: block; margin-top: 5px; }
         </style>
     </head>
 
@@ -82,19 +91,35 @@
                 <img src="static/images/forest3.png" class="market-img">
                 <p class="fig-caption">Figure 1.3: Forest Focus Statistics View <br>Source: <a href = "https://www.forestapp.cc/">https://www.forestapp.cc/</a></p>
 
-                <b>Strengths</b>
-                <ul>
-                    <li>Simple and intuitive interface</li>
-                    <li>Strong motivation through gamification</li>
-                    <li>Encourage users to avoid distractions</li>
-                </ul>
-
-                <b>Weaknesses</b>
-                <ul>
-                    <li>Focuses only on time management</li>
-                    <li>Does not consider other factors such as stress or sleep</li>
-                    <li>No personalized recommendations</li>
-                </ul>
+                <table>
+                    <tr>
+                        <th>Pros</th>
+                        <th>Cons</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <ul class="pros-list">
+                                <li>参考网页：Simple and intuitive interface</li>
+                                <li>参考网页：Strong motivation through gamification</li>
+                                <li>参考网页：Encourage users to avoid distractions</li>
+                            </ul>
+                        </td>
+                        <td>
+                            <div class="diff-item">
+                                参考网页：Focuses only on time management<br>
+                                <span class="flowcision-highlight">Flowcision：Pomodoro-based stress analysis</span>
+                            </div>
+                            <div class="diff-item">
+                                参考网页：Does not consider other factors such as stress or sleep<br>
+                                <span class="flowcision-highlight">Flowcision：Behavioral prediction</span>
+                            </div>
+                            <div class="diff-item">
+                                参考网页：No personalized recommendations<br>
+                                <span class="flowcision-highlight">Flowcision：Personalized recommendation system</span>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
 
                 <nav>
                     <a href = "https://www.forestapp.cc/">
@@ -113,19 +138,34 @@
                 <img src="static/images/notion.png" class="market-img">
                 <p class="fig-caption">Figure 1.4: Notion Project Management Dashboard <br>Source: <a href = "https://www.notion.com/">https://www.notion.com/</a></p>
 
-                <b>Strengths</b>
-                <ul>
-                    <li>Highly flexible and customizable</li>
-                    <li>Suitable for organizing complex workflows</li>
-                    <li>Supports long-term planning</li>
-                </ul>
-
-                <b>Weaknesses</b>
-                <ul>
-                    <li>Steep learning curve for beginners</li>
-                    <li>No built-in decision-making or evaluation system</li>
-                    <li>Does not provide performance analysis</li>
-                </ul>
+                <table>
+                    <tr>
+                        <th>Pros</th>
+                        <th>Cons</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <ul class="pros-list">
+                                <li>参考网页：Highly flexible and customizable</li>
+                                <li>参考网页：Suitable for organizing complex workflows</li>
+                                <li>参考网页：Supports long-term planning</li>
+                            </ul>
+                        </td>
+                        <td>
+                            <div class="diff-item">
+                                参考网页：Steep learning curve for beginners
+                            </div>
+                            <div class="diff-item">
+                                参考网页：No built-in decision-making or evaluation system<br>
+                                <span class="flowcision-highlight">Flowcision：Academic performance simulation</span>
+                            </div>
+                            <div class="diff-item">
+                                参考网页：Does not provide performance analysis<br>
+                                <span class="flowcision-highlight">Flowcision：Historical trend visualization</span>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
 
                 <nav>
                     <a href = "https://www.notion.com/">
@@ -142,36 +182,43 @@
                 </ul>
 
                 <img src="static/images/habitica.png" class="market-img">
-                <p class="fig-caption">Figure 1.5: Habitica Character and Task Progression <br>Source: <a href = "https://habitica.com/">https://habitica.com/</a></p></p>
+                <p class="fig-caption">Figure 1.5: Habitica Character and Task Progression <br>Source: <a href = "https://habitica.com/">https://habitica.com/</a></p>
 
-                <b>Strengths</b>
-                <ul>
-                    <li>Engaging and interactive design</li>
-                    <li>Encourages habit formation</li>
-                    <li>Visual progress system</li>
-                </ul>
-
-                <b>Weaknesses</b>
-                <ul>
-                    <li>Focuses on habit tracking rather than evaluation</li>
-                    <li>Does not analyze multiple lifestyle factors</li>
-                    <li>Limited personalization in recommendations</li>
-                </ul>
+                <table>
+                    <tr>
+                        <th>Pros</th>
+                        <th>Cons</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <ul class="pros-list">
+                                <li>参考网页：Engaging and interactive design</li>
+                                <li>参考网页：Encourages habit formation</li>
+                                <li>参考网页：Visual progress system</li>
+                            </ul>
+                        </td>
+                        <td>
+                            <div class="diff-item">
+                                参考网页：Focuses on habit tracking rather than evaluation<br>
+                                <span class="flowcision-highlight">Flowcision：Academic performance simulation</span>
+                            </div>
+                            <div class="diff-item">
+                                参考网页：Does not analyze multiple lifestyle factors<br>
+                                <span class="flowcision-highlight">Flowcision：Behavioral prediction</span>
+                            </div>
+                            <div class="diff-item">
+                                参考网页：Limited personalization in recommendations<br>
+                                <span class="flowcision-highlight">Flowcision：Personalized recommendation system</span>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
 
                 <nav>
                     <a href = "https://habitica.com/">
                         <button>Go to Habitica</button>
                     </a>
                 </nav>
-            
-            <h2>Our Differentiation</h2>
-            <ul>
-                <li>Academic performance simulation</li>
-                <li>Behavioral prediction</li>
-                <li>Pomodoro-based stress analysis</li>
-                <li>Historical trend visualization</li>
-                <li>Personalized recommendation system</li>
-            </ul>
             
             <h2>Conclusion</h2>
             <p>From the analysis above, most existing applications focus on specific aspects such as time management, task organization, or habit tracking. However, they do not integrate multiple factors such as study time, sleep, focus, and stress into a unified evaluation system.</p>
@@ -207,7 +254,7 @@
     }
     body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4,
     body.dark-mode p, body.dark-mode label, body.dark-mode span, 
-    body.dark-mode b, body.dark-mode li {
+    body.dark-mode b, body.dark-mode li, body.dark-mode div {
         color: #ffffff !important;
     }
     body.dark-mode input, body.dark-mode select, body.dark-mode textarea {
@@ -222,6 +269,10 @@
     }
     body.dark-mode button:hover, body.dark-mode .btn:hover {
         background-color: #4338ca !important;
+    }
+    /* 适配 Dark Mode 的高亮文字 */
+    body.dark-mode .flowcision-highlight {
+        color: #a3bffa !important;
     }
 </style>
 
