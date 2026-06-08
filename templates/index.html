@@ -154,19 +154,29 @@
     body.dark-mode div[class*="card"], 
     body.dark-mode div[style*="background-color: white"],
     body.dark-mode div[style*="background: white"],
-    body.dark-mode table, body.dark-mode tr, body.dark-mode td, body.dark-mode th {
+    body.dark-mode div[style*="background: #eef7ff"] {
         background-color: #22254b !important;
         background: #22254b !important;
         box-shadow: 0 15px 35px rgba(0,0,0,0.6) !important;
-        border: none !important;
+    }
+    body.dark-mode table {
+        background-color: #22254b !important;
         color: #ffffff !important;
+        border-collapse: collapse !important;
+        box-shadow: none !important;
+    }
+    body.dark-mode th, body.dark-mode td {
+        background-color: transparent !important;
+        border: 1px solid #4a5199 !important;
+        color: #ffffff !important;
+        box-shadow: none !important;
     }
     body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4,
     body.dark-mode p, body.dark-mode label, body.dark-mode span, 
-    body.dark-mode b, body.dark-mode li {
+    body.dark-mode b, body.dark-mode li, body.dark-mode strong {
         color: #ffffff !important;
     }
-    body.dark-mode input, body.dark-mode select, body.dark-mode textarea {
+    body.dark-mode input, body.dark-mode select, body.dark-mode textarea, body.dark-mode option {
         background-color: #2c305e !important;
         color: #ffffff !important;
         border: 1px solid #4a5199 !important;
