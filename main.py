@@ -1,14 +1,3 @@
-#render_template = server to browser
-#request = browser to server
-from flask import Flask, render_template, request, redirect, session, send_from_directory, flash
-import sqlite3
-import os
-from simulation import *
-from visualization import get_performance_chart
-from visualization import create_history_trend_chart
-from datetime import datetime, timezone
-from zoneinfo import ZoneInfo
-
 #For tester only whoever missing any environments
 def check_dependencies():
     try:
@@ -21,6 +10,18 @@ def check_dependencies():
         exit()
 
 check_dependencies()
+
+#render_template = server to browser
+#request = browser to server
+from flask import Flask, render_template, request, redirect, session, send_from_directory, flash
+import sqlite3
+import os
+from simulation import *
+from visualization import get_performance_chart
+from visualization import create_history_trend_chart
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
+
 app = Flask(__name__)
 app.secret_key = "secret123"
 
