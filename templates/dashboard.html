@@ -23,7 +23,46 @@
                 text-align: center;
             }
             h2, h3 { color: #4a4a4a; font-size: 30px; text-align: center; margin-bottom: 10px; }
-            b, p { color: #667eea; font-size: 24px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; margin-top: 20px; }
+            .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+    width: 100%;
+}
+.card {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    text-align: left;
+}
+.card h3 {
+    font-size: 20px;
+    margin-top: 0;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 10px;
+    color: #4a4a4a;
+}
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    color: #667eea;
+    margin-bottom: 10px;
+}
+.stat-item b {
+    color: #4a4a4a;
+    font-size: 18px;
+}
+.pet-section {
+    background: #f0f4f8;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
         
             button {
                 width: 100%;
@@ -43,53 +82,54 @@
     </head>
 
     <body>
-        <div class = "container">
-            <h1>Dashboard</h1>
+        <div class="container">
+    <h1>Dashboard</h1>
+    <h2>Welcome, <strong>{{user}}</strong></h2>
 
-            <h2>Welcome, <strong>{{user}}</strong></h2>
+    <div class="pet-section">
+        <h3>Your Digital Pet</h3>
+        <b>{{pet_stage}}</b>
+    </div>
 
-            <h3>Your Digital Pet</h3>
-            <b>{{pet_stage}}</b>
-
-            <hr>
-
-            <h3>Your Statistics</h3>
-
-                <h3>Simulation Analytics</h3>
-                <p>Total Points: <b>{{points}}</b></p>
-                <p>Total Simulation: <b>{{total_simulations}}</b></p>
-                <p>Average Score: <b>{{avg_score}}</b></p>
-                <p>Best Score: <b>{{best_score}}</b></p>
-
-            <hr>
-
-                <h3>Pomodoro Analytics</h3>
-                <p>Total Pomodoro Session: <b>{{total_pomodoro}}</b></p>
-                <p>Total Focus Time: <b>{{total_minutes}} minutes</b></p>
-                <p>Total Focus Hours: {{total_hours}} <b>hours</b>
-            <hr>
-
-                <h3>Planner Analytics</h3>
-                <p>Study Tasks: <b>{{study_count}}</b></p>
-                <p>Academic Tasks: <b>{{academic_count}}</b></p>
-                <p>Rest Tasks: <b>{{rest_count}}</b></p>
-                <p>Exercise Tasks: <b>{{exercise_count}}</b></p>
-                <p>Work Tasks: <b>{{work_count}}</b></p>
-                <p>Other Tasks: <b>{{other_count}}</b></p>
-
-                <p>Most Common Task: <b>{{most_common_task}}</b></p>
-            
-            <hr>
-
-                <h3>Workload Analytics</h3>
-                <p>Status: <b>{{workload_status}}</b></p>
-                
-            <nav>
-                <a href = "/">
-                    <button>Go Back</button>
-                </a>
-            </nav>
+    <div class="dashboard-grid">
+        <div class="card">
+            <h3>Simulation Analytics</h3>
+            <div class="stat-item"><span>Total Points:</span> <b>{{points}}</b></div>
+            <div class="stat-item"><span>Total Simulation:</span> <b>{{total_simulations}}</b></div>
+            <div class="stat-item"><span>Average Score:</span> <b>{{avg_score}}</b></div>
+            <div class="stat-item"><span>Best Score:</span> <b>{{best_score}}</b></div>
         </div>
+
+        <div class="card">
+            <h3>Pomodoro Analytics</h3>
+            <div class="stat-item"><span>Total Sessions:</span> <b>{{total_pomodoro}}</b></div>
+            <div class="stat-item"><span>Focus Time:</span> <b>{{total_minutes}} min</b></div>
+            <div class="stat-item"><span>Focus Hours:</span> <b>{{total_hours}} hr</b></div>
+        </div>
+
+        <div class="card">
+            <h3>Planner Analytics</h3>
+            <div class="stat-item"><span>Study Tasks:</span> <b>{{study_count}}</b></div>
+            <div class="stat-item"><span>Academic Tasks:</span> <b>{{academic_count}}</b></div>
+            <div class="stat-item"><span>Rest Tasks:</span> <b>{{rest_count}}</b></div>
+            <div class="stat-item"><span>Exercise Tasks:</span> <b>{{exercise_count}}</b></div>
+            <div class="stat-item"><span>Work Tasks:</span> <b>{{work_count}}</b></div>
+            <div class="stat-item"><span>Other Tasks:</span> <b>{{other_count}}</b></div>
+            <div class="stat-item"><span>Most Common:</span> <b>{{most_common_task}}</b></div>
+        </div>
+
+        <div class="card">
+            <h3>Workload Analytics</h3>
+            <div class="stat-item"><span>Status:</span> <b>{{workload_status}}</b></div>
+        </div>
+    </div>
+
+    <nav>
+        <a href="/">
+            <button>Go Back</button>
+        </a>
+    </nav>
+</div>
         <style>
     body.dark-mode {
         background: linear-gradient(135deg, #111324 0%, #1a1a2e 100%) !important;
@@ -126,6 +166,8 @@
     body.dark-mode button:hover, body.dark-mode .btn:hover {
         background-color: #4338ca !important;
     }
+    body.dark-mode .stat-item b { color: #ffffff !important; }
+body.dark-mode .pet-section { background-color: #22254b !important; }
 </style>
 
 <script>
