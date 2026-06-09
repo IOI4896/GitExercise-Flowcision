@@ -1,24 +1,16 @@
-#commandInput {
-    width: 100%;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: white;
-    font-size: 22px;
-    font-family: Consolas, monospace;
-}
-
+/* 1. 保留你原有的开场动画 */
 @keyframes cmdOpen {
     from {
         opacity: 0;
         transform: translateX(-50%) translateY(-20px);
     }
-
     to {
         opacity: 1;
         transform: translateX(-50%) translateY(0);
     }
 }
+
+/* 2. 保留你原有的面板基础外观 */
 #cmdbar {
     position: fixed;
     top: 10vh;
@@ -35,6 +27,76 @@
     animation: cmdOpen 0.2s ease-out;
 }
 
+/* 3. 新增：输入框的外层包裹结构 */
+.cmd-input-wrapper {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+/* 4. 新增：搜索小图标的样式 */
+.cmd-icon {
+    font-size: 20px;
+    margin-right: 15px;
+    color: #888;
+}
+
+/* 5. 替换：输入框本身去掉边框和背景 */
+#commandInput {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    font-size: 22px;
+    font-family: Consolas, monospace;
+}
+
+/* 6. 新增：下拉命令列表的整体框架 */
+#cmd-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* 7. 新增：列表中每一个命令选项的样式 */
+.cmd-item {
+    padding: 12px 20px;
+    color: #ccc;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-family: sans-serif;
+    transition: background 0.1s;
+}
+
+/* 8. 新增：鼠标悬停或键盘选中时的变色高亮 */
+.cmd-item:hover, .cmd-item.active {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+}
+
+/* 9. 新增：选项图标的间距 */
+.cmd-item-icon {
+    margin-right: 15px;
+    font-size: 18px;
+}
+
+/* 10. 新增：输入错误指令时的震动提示动画 */
+@keyframes shake {
+    0%, 100% { transform: translateX(-50%); }
+    25% { transform: translateX(calc(-50% - 5px)); }
+    75% { transform: translateX(calc(-50% + 5px)); }
+}
+
+.shake-error {
+    animation: shake 0.2s ease-in-out !important;
+    border: 1px solid #ff4444 !important;
+}
+
 .hidden {
-    display: none
+    display: none;
 }

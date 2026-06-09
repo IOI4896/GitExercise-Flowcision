@@ -5,6 +5,13 @@
         <link rel="stylesheet" href="{{url_for('static', filename='css/style.css')}}">
     </head>
     <body>
+        <div id="cmdbar" style="display: none;">
+    <div class="cmd-input-wrapper">
+        <span class="cmd-icon">🔍</span>
+        <input type="text" id="commandInput" placeholder="Type a command or search..." autocomplete="off">
+    </div>
+    <ul id="cmd-list"></ul>
+</div>
         {% block content %}
         {% endblock %}
         <script src="{{url_for('static', filename='js/command.js')}}"></script>
