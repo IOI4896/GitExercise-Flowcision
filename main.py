@@ -488,6 +488,14 @@ def index():
 
     return render_template("index.html", predicted_focus = predicted_focus, predicted_stress = predicted_stress)
 
+# Game
+@app.route('/game')
+def game():
+    if 'user' not in session:
+        return redirect('/login')
+    
+    return render_template("game.html")
+
 #Dashboard
 @app.route('/dashboard')
 def dashboard():
