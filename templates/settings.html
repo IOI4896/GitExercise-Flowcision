@@ -46,6 +46,23 @@
     </head>
 
     <body>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div id="error-toast" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #ff4d4f; color: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); font-weight: bold; z-index: 1000; transition: opacity 0.5s;">
+                    {{ messages[0] }}
+                </div>
+                <script>
+                    setTimeout(() => {
+                        let toast = document.getElementById("error-toast");
+                        if (toast) {
+                            toast.style.opacity = "0";
+                            setTimeout(() => toast.remove(), 500);
+                        }
+                    }, 3000);
+                </script>
+            {% endif %}
+        {% endwith %}
+
         <div class = "container">
             <h1>Settings</h1>
 
@@ -159,6 +176,29 @@
                         <td><input class="hotkey-input" name="back_hotkey" value="{{back_hotkey}}"></td>
                     </tr>
                 </table>
+
+                <h2>Audio</h2>
+                <label>
+                    <input type="checkbox" name="music_enabled"
+                        {% if settings_data['music_enabled'] %}
+                        checked
+                        {% endif %}>
+                        Enable Background Sound
+                </label>
+                
+                <br><br>
+
+                <select name="music_theme">
+                    <option value="none">No Sound</option>
+                    <option value="rain">Rain</option>
+                    <option value="ocean">Ocean</option>
+                    <option value="white_noise">White Noise</option>
+                </select>
+
+                <br><br>
+
+                <label>Volume</label>
+                <input type="range" name="music_volume" min="0" max="100" value="{{settings_data['music_volume']}}">
 
                 <button type="submit">Save Settings</button>
             </form>
