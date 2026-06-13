@@ -1,11 +1,11 @@
 const COMMANDS = [
-    { id: 'home', name: 'Go Home', icon: '🏠', url: '/' },
-    { id: 'simulation', name: 'Go Simulation', icon: '🎮', url: '/index' },
-    { id: 'pomodoro', name: 'Go Pomodoro', icon: '⏱️', url: '/pomodoro' },
-    { id: 'history', name: 'Go History', icon: '📜', url: '/history' },
-    { id: 'dashboard', name: 'Go Dashboard', icon: '📊', url: '/dashboard' },
-    { id: 'planner', name: 'Go Planner', icon: '📅', url: '/planner' },
-    { id: 'settings', name: 'Go Settings', icon: '⚙️', url: '/settings' }
+    { id: 'home', name: 'Go Home', icon: '🏠', url: '/', tags: ['home'] },
+    { id: 'simulation', name: 'Go Simulation', icon: '🎮', url: '/index', tags: ['simulation'] },
+    { id: 'pomodoro', name: 'Go Pomodoro', icon: '⏱️', url: '/pomodoro', tags: ['pomodoro'] },
+    { id: 'history', name: 'Go History', icon: '📜', url: '/history', tags: ['history'] },
+    { id: 'dashboard', name: 'Go Dashboard', icon: '📊', url: '/dashboard', tags: ['dashboard'] },
+    { id: 'planner', name: 'Go Planner', icon: '📅', url: '/planner', tags: ['planner'] },
+    { id: 'settings', name: 'Go Settings', icon: '⚙️', url: '/settings', tags: ['settings'] }
 ];
 
 let selectedIndex = 0;
@@ -35,38 +35,84 @@ function togglePalette(show){
     }
 }
 
-function renderList() {
+function renderList(){
     cmdList.innerHTML = "";
+
+    if(filteredCommands.length === 0){
+
+        cmdList.innerHTML =
+            '<li class="cmd-empty">No command found</li>';
+
+        return;
+    }
+
     filteredCommands.forEach((cmd, index) => {
+
         const li = document.createElement("li");
-        li.className = "cmd-item" + (index === selectedIndex ? " active" : "");
-        li.innerHTML = `<span class="cmd-item-icon">${cmd.icon}</span><span>${cmd.name}</span>`;
-        li.onclick = () => window.location.href = cmd.url;
+
+        li.className =
+            "cmd-item" +
+            (index === selectedIndex ? " active" : "");
+
+        li.innerHTML =
+            `<span class="cmd-item-icon">${cmd.icon}</span>
+             <span>${cmd.name}</span>`;
+
+        li.onclick = () => {
+
+            if(cmd.url){
+                window.location.href = cmd.url;
+            }
+        };
+
         li.onmouseover = () => {
             selectedIndex = index;
             renderList();
         };
+
         cmdList.appendChild(li);
     });
+}
+
+function scoreCommand(cmd, query){
+    query = query.toLowerCase()
+
+    let score = 0;
+
+    if(cmd.name.toLowerCase().includes(query)) score += 3;
+    if(cmd.id.toLowerCase().includes(query)) score += 2;
+    
+    for(const tag of (cmd.tags || [])){
+        if(tag.toLowerCase().includes(query)) score += 2;
+    }
+
+    return score;
 }
 
 function filterCommands(query) {
     if (!query) {
         filteredCommands = [...COMMANDS];
     } else {
-        const lowerQuery = query.toLowerCase();
-        filteredCommands = COMMANDS.filter(cmd => 
-            cmd.name.toLowerCase().includes(lowerQuery) || 
-            cmd.id.toLowerCase().includes(lowerQuery)
-        );
+        filteredCommands = COMMANDS
+        .map(cmd => ({
+            ...cmd,
+            score: scoreCommand(cmd, query)
+        }))
+        .filter(cmd => cmd.score > 0)
+        .sort((a, b) => b.score - a.score);
     }
     selectedIndex = 0;
     renderList();
 }
 
+function getSelected(){
+    if(!filteredCommands.length) return null;
+    return filteredCommands[selectedIndex];
+}
+
 cmdInput.addEventListener("input", function(e) {
-    filterCommands(e.target.value);
-    cmdbar.classList.remove("shake-error");
+    filterCommands(e.target.value.trim());
+    cmdbar.classList.remove("shake-error")
 });
 
 cmdInput.addEventListener("keydown", function(e){
@@ -84,10 +130,12 @@ cmdInput.addEventListener("keydown", function(e){
         }
     } else if (e.key === "Enter") {
         e.preventDefault();
-        if (filteredCommands.length > 0) {
-            window.location.href = filteredCommands[selectedIndex].url;
+
+        const cmd = getSelected();
+
+        if (cmd && cmd.url) {
+            window.location.href = cmd.url;
         } else {
-            // 触发震动动画
             cmdbar.classList.remove("shake-error");
             void cmdbar.offsetWidth; 
             cmdbar.classList.add("shake-error");
