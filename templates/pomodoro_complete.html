@@ -49,6 +49,12 @@
 
     <body>
         <div class = "container">
+            {% extends "base.html" %}
+            {% block content %}
+            <div id="cmdbar" class="hidden">
+                <input id="commandInput" type="'text" placeholder="type command...">
+            </div>
+
             <h1>🥳 Pomodoro Completed 🎉</h1>
             <p>You did great, keep it up!</p>
 
@@ -90,5 +96,6 @@
                 }
             );
         </script>
+        {% endblock %}
     </body>
 </html>
