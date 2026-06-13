@@ -98,6 +98,7 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE,
             password TEXT,
+            tutorial_completed INTEGER DEFAULT 0,
             timezone TEXT DEFAULT 'AUTO',
             points INTEGER DEFAULT 0,
             planner_notification INTEGER DEFAULT 1,
@@ -109,7 +110,10 @@ def init_db():
             dashboard_hotkey TEXT DEFAULT 'd',
             planner_hotkey TEXT DEFAULT 'l',
             settings_hotkey TEXT DEFAULT 's',
-            back_hotkey TEXT DEFAULT 'z'
+            back_hotkey TEXT DEFAULT 'z',
+            music_enabled INTEGER DEFAULT 1,
+            music_volume INTEGER DEFAULT 50,
+            music_theme TEXT DEFAULT 'none'
         )
         """)
 
@@ -287,20 +291,28 @@ def inject_user():
     settings_hotkey = "s"
     back_hotkey = "z"
 
+    music_enabled = 1
+    music_volume = 50
+    music_theme = "none"
+
+    tutorial_completed = 0
+
     if 'user' in session:
         conn = get_db()
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
 
         try:
-            c.execute("SELECT points, desktop_notification, planner_notification, pomodoro_notification, simulation_hotkey, pomodoro_hotkey, history_hotkey, dashboard_hotkey, planner_hotkey, settings_hotkey, back_hotkey FROM users WHERE username=?", (session['user'],))
+            c.execute("SELECT tutorial_completed, points, desktop_notification, planner_notification, pomodoro_notification, simulation_hotkey, pomodoro_hotkey, history_hotkey, dashboard_hotkey, planner_hotkey, settings_hotkey, back_hotkey, music_enabled, music_volume, music_theme FROM users WHERE username=?", (session['user'],))
             row = c.fetchone()
 
             if row:
+                tutorial_completed = row["tutorial_completed"]
                 points = row["points"]
                 desktop_notification = row["desktop_notification"]
                 planner_notification = row["planner_notification"]
                 pomodoro_notification = row["pomodoro_notification"]
+
                 simulation_hotkey = (row["simulation_hotkey"] or "i")
                 pomodoro_hotkey = (row["pomodoro_hotkey"] or "p")
                 history_hotkey = (row["history_hotkey"] or "h")
@@ -308,11 +320,16 @@ def inject_user():
                 planner_hotkey = (row["planner_hotkey"] or "l")
                 settings_hotkey = (row["settings_hotkey"] or "s")
                 back_hotkey = (row["back_hotkey"] or "z")
+
+                music_enabled = row["music_enabled"]
+                music_volume = row["music_volume"]
+                music_theme = row["music_theme"]
         
         finally:
             conn.close()
         
     return dict(user = session.get('user'), 
+                tutorial_completed = tutorial_completed,
                 points = points, 
                 desktop_notification = desktop_notification, 
                 planner_notification = planner_notification, 
@@ -323,7 +340,10 @@ def inject_user():
                 dashboard_hotkey = dashboard_hotkey,
                 planner_hotkey = planner_hotkey,
                 settings_hotkey = settings_hotkey,
-                back_hotkey = back_hotkey)
+                back_hotkey = back_hotkey,
+                music_enabled = music_enabled,
+                music_volume = music_volume,
+                music_theme = music_theme)
 
 @app.route('/api/start_pomodoro', methods = ["POST"])
 def api_start_pomodoro():
@@ -336,6 +356,7 @@ def api_start_pomodoro():
     }
 
     return {"status": "started"}
+
 #Login
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
@@ -371,6 +392,29 @@ def logout():
     session.pop('user', None)
     return redirect('/')
 
+#Tutorial
+@app.route('/complete_tutorial', methods = ["POST"])
+def complete_tutorial():
+    if 'user' not in session:
+        return {"status": "not logged in"}, 401
+    
+    conn = get_db()
+    c = conn.cursor()
+
+    try:
+        c.execute("""
+            UPDATE users
+            SET tutorial_completed=1
+            WHERE username=?
+        """, (session['user'],))
+
+        conn.commit()
+    
+    finally:
+        conn.close()
+    
+    return {"status": "ok"}
+
 #Settings
 @app.route('/settings', methods = ['GET', 'POST'])
 def settings():
@@ -395,6 +439,10 @@ def settings():
             "settings": request.form.get("settings_hotkey", "s"),
             "back": request.form.get("back_hotkey", "z")
         }
+
+        music_enabled = 1 if 'music_enabled' in request.form else 0
+        music_theme = request.form.get("music_theme", "none")
+        music_volume = int(request.form.get("music_volume", 50))
 
         #Check duplicate
         values = list(hotkeys.values())
@@ -424,9 +472,12 @@ def settings():
                     dashboard_hotkey=?,
                     planner_hotkey=?,
                     settings_hotkey=?,
-                    back_hotkey=?
+                    back_hotkey=?,
+                    music_enabled=?,
+                    music_theme=?,
+                    music_volume=?
                 WHERE username=?
-            """, (planner_notification, pomodoro_notification, desktop_notification, timezone, hotkeys["simulation"], hotkeys["pomodoro"], hotkeys["history"], hotkeys["dashboard"], hotkeys["planner"], hotkeys["settings"], hotkeys["back"], session['user'],))
+            """, (planner_notification, pomodoro_notification, desktop_notification, timezone, hotkeys["simulation"], hotkeys["pomodoro"], hotkeys["history"], hotkeys["dashboard"], hotkeys["planner"], hotkeys["settings"], hotkeys["back"], music_enabled, music_theme, music_volume, session['user'],))
 
             conn.commit()
         
@@ -488,7 +539,7 @@ def index():
 
     return render_template("index.html", predicted_focus = predicted_focus, predicted_stress = predicted_stress)
 
-# Game
+#Game
 @app.route('/game')
 def game():
     if 'user' not in session:
@@ -745,7 +796,7 @@ def planner():
     
     finally:
         conn.close()
-  
+
     return render_template("planner.html", days = days, planner_data = planner_data, all_presets = all_presets, planner_suggestion = planner_suggestion, analysis_confidence = analysis_confidence, recognition_rate = recognition_rate, current_task = current_task)
 
 #Pomodoro
@@ -763,8 +814,6 @@ def completed_pomodoro():
     if 'user' not in session:
         return redirect('/login')
     duration = int(request.form['duration']) #25 / 50 etc
-    if duration not in [5, 25, 50]:
-        return "Invalid duration"
     
     points = calculate_pomodoro_points(duration)
 
