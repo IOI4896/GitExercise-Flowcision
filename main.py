@@ -21,9 +21,23 @@ from visualization import get_performance_chart
 from visualization import create_history_trend_chart
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+import hashlib
 
 app = Flask(__name__)
 app.secret_key = "secret123"
+
+app.config.update(
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='Lax'
+)
+# 初始化限流器，默认全局限制每天200次，每小时50次请求
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"]
+)
 
 print("DB PATH: ", os.path.abspath("users.db"))
 
@@ -252,11 +266,13 @@ def register():
         username = request.form.get('username')
         password = request.form.get('password')
 
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+
         conn = get_db()
         c = conn.cursor()
 
         try:
-            c.execute("INSERT INTO users (username, password) VALUES (?,?)", (username, password))
+            c.execute("INSERT INTO users (username, password) VALUES (?,?)", (username, hashed_password))
             conn.commit()
         except:
             return "Username already exists"
@@ -358,17 +374,20 @@ def api_start_pomodoro():
     return {"status": "started"}
 
 #Login
-@app.route('/login', methods = ['GET', 'POST'])
+@app.route('/login/', methods = ['GET', 'POST'])
+@limiter.limit("5 per minute")
 def login():
     if request.method == "POST":
         username = request.form.get('username')
         password = request.form.get('password')
 
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+
         conn = get_db()
         c = conn.cursor()
 
         try:
-            c.execute("SELECT * FROM users WHERE username=? and password=?", (username, password))
+            c.execute("SELECT * FROM users WHERE username=? and password=?", (username, hashed_password))
             user = c.fetchone()
         
         finally:
