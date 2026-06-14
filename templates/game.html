@@ -424,8 +424,8 @@
                         if (blocks[i].hp <= 0) {
                             playSound('powerup');
                             if (blocks[i].type === 0) { player.lives++; spawnText(blocks[i].x, blocks[i].y, "+1HP", "#ff0000"); }
-                            else if (blocks[i].type === 1) { if (player.speedLvl < 10) player.speedLvl++; spawnText(blocks[i].x, blocks[i].y, "攻速升级", "#ffff00"); }
-                            else if (blocks[i].type === 2) { if (player.multiLvl < 5) player.multiLvl++; spawnText(blocks[i].x, blocks[i].y, "弹道增加", "#00ffff"); }
+                            else if (blocks[i].type === 1) { if (player.speedLvl < 10) player.speedLvl++; spawnText(blocks[i].x, blocks[i].y, "Enhance Attack Speed", "#ffff00"); }
+                            else if (blocks[i].type === 2) { if (player.multiLvl < 5) player.multiLvl++; spawnText(blocks[i].x, blocks[i].y, "Add Bullet Stream", "#00ffff"); }
                             player.updateUI(); blocks.splice(i, 1);
                         }
                     }
