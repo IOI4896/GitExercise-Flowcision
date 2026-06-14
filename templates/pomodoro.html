@@ -266,7 +266,15 @@
 
             function updateVisuals() {
                 let m = Math.floor(timeLeft / 60), s = timeLeft % 60;
-                document.getElementById("timer").innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+                let timeString = `${m}:${s < 10 ? '0' : ''}${s}`;
+                
+                
+                document.getElementById("timer").innerText = timeString;
+                
+                
+                let stateName = currentState === 'focus' ? 'Focus' : currentState === 'break' ? 'Break' : 'Pause';
+                document.title = `(${timeString}) ${stateName} - Flowcision`;
+
                 circle.style.strokeDashoffset = circumference - (timeLeft / totalTime) * circumference;
 
                 document.body.classList.remove('state-focus', 'state-break', 'state-pause');
