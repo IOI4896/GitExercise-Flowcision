@@ -98,6 +98,25 @@
             </button>
         </div>
 
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div id="error-toast" style="position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background-color: #ff4d4f; color: white; padding: 16px 24px; border-radius: 12px; box-shadow: 0 8px 20px rgba(255, 77, 79, 0.3); z-index: 10000; text-align: center; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); opacity: 1;">
+                    <div style="font-weight: bold; font-size: 16px; margin-bottom: 4px;">Login Failed</div>
+                    <div style="font-size: 14px; opacity: 0.9;">{{ messages[0] }}</div>
+                </div>
+                <script>
+                    setTimeout(() => {
+                        let toast = document.getElementById("error-toast");
+                        if (toast) {
+                            toast.style.opacity = "0";
+                            toast.style.transform = "translate(-50%, 20px)";
+                            setTimeout(() => toast.remove(), 400);
+                        }
+                    }, 3000);
+                </script>
+            {% endif %}
+        {% endwith %}
+
         <div class="login-card">
             <h2>Flowcision - Login</h2>
             <form method = "post">
