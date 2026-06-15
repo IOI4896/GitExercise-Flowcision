@@ -397,7 +397,8 @@ def login():
             session['user'] = username
             return redirect('/')
         else:
-            return "Login Failed"
+            flash("Invalid Username or Password. Please try again.")
+            return redirect('/login/')
         
     return render_template('login.html')
 
