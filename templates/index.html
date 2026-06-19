@@ -125,14 +125,19 @@
             {% endif %}
         {% endwith %}
         <div class="container">
-            {% if user and predicted_focus is not none %}
+            {% if user and predicted_focus is not none or predicted_study is not none %}
                 <div style = "background: #eef7ff; padding: 20px; border-radius: 10px; margin-bottom: 20px; ">
                     <h1>Smart Prediction</h1>
-                    <p>Based on your recent Pomodoro and history: </p>
+                    <p>Based on your recent Pomodoro, History, and Planner: </p>
+                    {% if predicted_study is not none %}
+                        <p>Predicted Study: <strong>{{predicted_study}}</strong></p>
+                    {% endif %}
 
-                    <p>Predicted Focus: <strong>{{predicted_focus}}</strong></p>
-                    <p>Predicted Stress: <strong>{{predicted_stress}}</strong></p>
-
+                    {% if predicted_focus is not none %}
+                        <p>Predicted Sleep: <strong>{{predicted_sleep}}</strong></p>
+                        <p>Predicted Focus: <strong>{{predicted_focus}}</strong></p>
+                        <p>Predicted Stress: <strong>{{predicted_stress}}</strong></p>
+                    {% endif %}
                     <button type = "button" onclick = "usePrediction()">Use Smart Prediction</button>
                 </div>
             {% endif %}
@@ -151,10 +156,10 @@
                 <h2>Enter Your Daily Data</h2>
             
                 <label>Study Hours:</label>
-                <input type="number" name="study" min="0" max="24">
+                <input type="number" id = "study" name="study" min="0" max="24">
 
                 <label>Sleep Hours:</label>
-                <input type="number" name="sleep" min="0" max="24">
+                <input type="number" id = "sleep" name="sleep" min="0" max="24">
 
                 <label>Focus (0-10):</label>
                 <input type="number" id = "focus" name="focus" min="0" max="10">
@@ -177,6 +182,10 @@
                 document.getElementById("focus").value = "{{predicted_focus}}";
 
                 document.getElementById("stress").value = "{{predicted_stress}}";
+
+                document.getElementById("study").value = "{{predicted_study}}";
+
+                document.getElementById("sleep").value = "{{predicted_sleep}}";
             }
 
             const studyInput = document.querySelector('input[name="study"]');
