@@ -4,6 +4,7 @@ def check_dependencies():
         import flask
         import matplotlib
         import zoneinfo
+        import flask_limiter
     except ImportError as e:
         print("Missing dependency: ", e)
         print("Run: pip install -r requirements.txt")
@@ -32,7 +33,8 @@ app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE='Lax'
 )
-# 初始化限流器，默认全局限制每天200次，每小时50次请求
+
+#Initialize the rate limiter (default global limit is 200 requests per day and 5)
 limiter = Limiter(
     get_remote_address,
     app=app,
@@ -535,29 +537,60 @@ def index():
 
         history = c.fetchall()
 
-        if not history:
-            return render_template("index.html", predicted_focus = None, predicted_stress = None)
-        
-        history_record = [
-            {
-                "focus_level": h["focus"],
-                "stress_level": h["stress"]
-            }
-            for h in history
-        ]
+        c.execute("""
+            SELECT sleep FROM history WHERE username=? 
+        """, (session['user'],))
+
+        sleep = c.fetchone()
+
+        today = datetime.now().strftime("%A")
 
         c.execute("""
-            SELECT COUNT(*) FROM pomodoro WHERE username=? AND timestamp_utc >= datetime('now', '-1 day')
-        """,(session['user'],))
+            SELECT morning, afternoon, night
+            FROM planner WHERE username=? AND day=?
+        """, (session['user'], today))
 
-        pomodoro_count = c.fetchone()[0]
-    
+        planner_rows = c.fetchone()
+
+        if planner_rows:
+            morning_category = classify_task(planner_rows["morning"])
+            afternoon_category = classify_task(planner_rows["afternoon"])
+            night_category = classify_task(planner_rows["night"])
+
+            predicted_study, e = study_pattern(sleep, morning_category, afternoon_category, night_category)
+        
+        if history:
+            predicted_sleep = sleep["sleep"]
+
+            history_record = [
+                {
+                    "focus_level": h["focus"],
+                    "stress_level": h["stress"]
+                }
+                for h in history
+            ]
+
+            c.execute("""
+                SELECT COUNT(*) FROM pomodoro WHERE username=? AND timestamp_utc >= datetime('now', '-1 day')
+            """,(session['user'],))
+
+            pomodoro_count = c.fetchone()[0]
+
+            predicted_focus, predicted_stress = predict_base_state(history_record, pomodoro_count)
+        
+        if not planner_rows and not history:
+            return render_template("index.html", predicted_focus = None, predicted_stress = None, predicted_study = None, predicted_sleep = None)
+        
+        elif not history:
+            return render_template("index.html", predicted_focus = None, predicted_stress = None, predicted_study = predicted_study, predicted_sleep = None)
+        
+        elif not planner_rows:
+            return render_template("index.html", predicted_focus = predicted_focus, predicted_stress = predicted_stress, predicted_study = None, predicted_sleep = predicted_sleep)
+
     finally:
         conn.close()
 
-    predicted_focus, predicted_stress = predict_base_state(history_record, pomodoro_count)
-
-    return render_template("index.html", predicted_focus = predicted_focus, predicted_stress = predicted_stress)
+    return render_template("index.html", predicted_focus = predicted_focus, predicted_stress = predicted_stress, predicted_study = predicted_study, predicted_sleep = predicted_sleep)
 
 #Game
 @app.route('/game')
@@ -933,6 +966,7 @@ def result():
 
     if 'user' in session:
         conn = get_db()
+        conn.row_factory = sqlite3.Row
         c = conn.cursor()
 
         try:
@@ -940,19 +974,59 @@ def result():
             c.execute("SELECT COUNT(*) FROM pomodoro WHERE username=? AND timestamp_utc >= datetime('now', '-1 day')", (session['user'],))
             pomodoro_count = c.fetchone()[0]
 
+            c.execute("SELECT music_theme FROM users WHERE username=?", (session['user'],))
+            music_theme = c.fetchone()
+
+            today = datetime.now().strftime("%A")
+
+            c.execute("""
+                SELECT morning, afternoon, night
+                FROM planner WHERE username=? AND day=?
+            """, (session['user'], today))
+
+            planner_rows = c.fetchone()
+
+            study_count = "None"
+            academic_count = "None"
+            rest_count = "None"
+            work_count = "None"
+
+            if planner_rows:
+                morning_category = classify_task(planner_rows["morning"])
+                afternoon_category = classify_task(planner_rows["afternoon"])
+                night_category = classify_task(planner_rows["night"])
+
+                planner_msg = planner_feedback(study, sleep, morning_category, afternoon_category, night_category)
+
+                c.execute("""
+                    SELECT morning, afternoon, night
+                    FROM planner WHERE username=?
+                """, (session['user'],))
+
+                planner_rows = c.fetchall()
+
+                all_tasks = []
+                for row in planner_rows:
+                    all_tasks.extend([row["morning"], row["afternoon"], row["night"]])
+        
+                categories = [classify_task(task) for task in all_tasks]
+                study_count, academic_count, rest_count, e0, work_count, e1 = task_count(categories)
+            else:
+                planner_msg = ["Create your weekly schedule to receive smart planner suggestions."]
+
         finally:
             conn.close()
 
-        behavior_msg = f"You completed {pomodoro_count} Pomodoro sessions in the last 24 hours"
+        behavior_msg = behavior_analysis(pomodoro_count, music_theme)
         focus, stress = apply_pomodoro_effects(focus, stress, pomodoro_count)
 
-    analysis, recommendation = analyze_factors(study, sleep, focus, stress)
+    analysis, recommendation, potential_strengths, potential_risks = analyze_factors(study, sleep, focus, stress, study_count, academic_count, work_count, rest_count, pomodoro_count)
     recommendation = apply_scenario_context(student_type, recommendation)
 
     score = calculate_score(study, sleep, focus, stress)
 
     main_issue = get_main_issue(score, study, sleep, focus, stress)
-    recs = get_recommendation(score, analysis, recommendation)
+    recs = get_recommendation(score)
 
     plot_url = get_performance_chart(
         s_study(study),
@@ -961,12 +1035,12 @@ def result():
         s_stress(stress)
     )
 
-    #Save history if user had login
     if 'user' in session:
         conn = get_db()
         c = conn.cursor()
 
         try:
+            #Save history if user had login
             c.execute("""
                 INSERT INTO history (username, study, sleep, focus, stress, score, timestamp_utc) VALUES (?,?,?,?,?,?,?)
             """, (session['user'], study, sleep, focus, stress, score, timestamp_utc))
@@ -981,9 +1055,12 @@ def result():
         score = score,
         analysis = analysis,
         recommendation = recommendation,
+        potential_strengths = potential_strengths,
+        potential_risks = potential_risks,
         main_issue = main_issue,
         recs = recs,
         behavior_msg = behavior_msg,
+        planner_msg = planner_msg,
         plot_url = plot_url
     )
 
