@@ -49,42 +49,71 @@ def check_valid_input(study, sleep, focus, stress):
     return True
 
 #Analysis Data
-def analyze_factors(study, sleep, focus, stress):
+def analyze_factors(study, sleep, focus, stress, study_count, academic_count, work_count, rest_count, pomodoro_streak):
     analysis = []
     recommendation = []
+    strengths = []
+    risks = []
 
     #Study
-    if study < 3:
+    if study <= 2:
         analysis.append("Your study time is low, this may lead to insufficient preparation or misunderstading.")
         recommendation.append("Increase daily study time, roman civilization was not achieved in a few days.")
-    elif study > 8:
+    elif study >= 9:
         analysis.append("You may be overstudying.")
         recommendation.append("Avoid burnout by taking breaks and arrage learning paths reasonably, understanding is better than rote memorization.")
     
     #Sleep
-    if sleep < 6:
+    if sleep <= 5:
         analysis.append("Your sleep is below optimal level.")
         recommendation.append("Try to sleep atleast 7 hours, rest is for going further.")
-    elif sleep > 9:
+        risks.append("Insufficient sleep may affect performance")
+    elif sleep >= 10:
         analysis.append("You may be oversleeping.")
         recommendation.append("Maintain a consistent sleep schedule, having too much of anything is not good")
+        risks.append("Excessive sleep may affect performance")
+    else:
+        strengths.append("Maintains a healthy sleep schedule.")
     
     #Focus
-    if focus < 5:
+    if focus <= 4:
         analysis.append("Your focus level is low.")
         recommendation.append("Reduce distractions during study, focus is better than multitasking.")
+        risks.append("Difficulty maintaining focus")
+    elif focus >= 7:
+        strengths.append("Demonstrates strong concentration ability.")
 
     #Stress
-    if stress > 7:
+    if stress >= 7:
         analysis.append("Your stress level is too high.")
         recommendation.append("Consider relaxation or breaks, the world waits for no one, but you can wait for yourself.")
+        risks.append("Elevated stress level detected.")
 
-    #Reasonable Daily Routine (No schedule issue)
-    if analysis == [] and recommendation == []:
+    #Planner
+    if study_count != "None":
+        if study_count + academic_count + work_count < rest_count * 3:
+            strengths.append("Maintains a structured overall routine.")
+
+    #Pomodoro
+    if pomodoro_streak >= 5:
+        strengths.append("Shows consistent focus discipline.")
+
+    #Reasonable Daily Routine (No schedule issue and many potential)
+    if analysis == [] and recommendation == [] and risks == [] and len(strengths) >= 3:
         analysis.append("You have a reasonable daily routine, keep it up!")
         recommendation.append("Try this kind of schedule to improve your grades.")
 
-    return analysis, recommendation
+    elif analysis == [] and recommendation == []:
+        analysis.append("You have a reasonable daily routine, but you still have room for improvement.")
+        recommendation.append("Try out the accessibility features (Pomodoro, Planner, etc) we provided as your preference.")
+
+    if risks == []:
+        risks.append("No major concerns were identified based on the current data.")
+    
+    if strengths == []:
+        strengths.append("Potential strengths become more accurate as additional simulations and activity records are collected.")
+
+    return analysis, recommendation, strengths, risks
 
 def get_main_issue(score, study, sleep, focus, stress):
     scores = {
@@ -126,22 +155,13 @@ def apply_scenario_context(student_type, recommendation):
 
     return context_recs + recommendation
 
-def get_recommendation(score, analysis, recommendation):
-    print("\nAnalysis: ")
-    for a in analysis:
-        print("-", a)
-
-    print("\nRecommendation: ")
-    for r in recommendation:
-        print("-", r)
-
-    print(f"\nScore: {score}")
+def get_recommendation(score):
     if score < 40:
-        return "Your study pattern is ineffective. Consider reducing stress and improving focus."
+        return "The user may benefit from improving study habits and recovery routines."
     elif score < 70:
-        return "You are doing great, try to optimize study consistency."
+        return "The user shows moderate productivity with room for improvement."
     
-    return "Excellent performance, keep it up!"
+    return "The user demostrates strong productivity potential."
 
 #Calculate Graph
 def s_study(study):
@@ -158,11 +178,11 @@ def s_stress(stress):
 
 #Calculate Pomodoro (25 min = 10 points)
 def calculate_pomodoro_points(duration):
-    if duration == 25:
-        return 10
-    
-    elif duration == 50:
+    if duration >= 50:
         return 25
+    
+    elif duration >= 25:
+        return 10
     
     elif duration == 5:
         return 10
@@ -193,6 +213,24 @@ def predict_base_state(history_records, pomodoro_count):
     
     return predicted_focus, predicted_stress
 
+def study_pattern(sleep, morning_category, afternoon_category, night_category):
+    planned_study = 0
+    study_slots = 0
+
+    if morning_category == "study":
+        planned_study += 7
+        study_slots += 1
+
+    if afternoon_category == "study":
+        planned_study += 6
+        study_slots += 1
+
+    if night_category == "study":
+        planned_study += (11 - sleep)
+        study_slots += 1
+    
+    return round(planned_study), study_slots
+
 #Pet Progression
 def pet_progression(points):
     if points >= 250:
@@ -203,7 +241,7 @@ def pet_progression(points):
         return "🌱 Sprout"
     else:
         return "🫘 Seed"
-
+    
 #Statistics
 def pomodoro_hours(total_minutes):
     return round(total_minutes / 60, 1)
@@ -355,3 +393,42 @@ def generate_planner_suggestion(categories):
         suggestions.append("Your weekly schedule looks balanced.")
     
     return recognition_rate, analysis_confidence, suggestions
+
+#User Behavior Analysis
+def behavior_analysis(pomodoro_count, music_theme):
+    behavior_msg = []
+
+    behavior_msg.append(f"You completed {pomodoro_count} Pomodoro sessions today.")
+
+    if music_theme == "rain":
+        behavior_msg.append("Rain ambience may provide a calming environment for focused work.")
+
+    if music_theme == "ocean":
+        behavior_msg.append("Ocean sounds may promote relaxation and stress recovery.")
+
+    if music_theme == "white_noise":
+        behavior_msg.append("White noise can help reduce distractions during study sessions.")
+
+    return behavior_msg
+
+#Planner Feedback (Result)
+def planner_feedback(study, sleep, morning_category, afternoon_category, night_category):
+    planner_feedback = []
+    planned_study, study_slots = study_pattern(sleep, morning_category, afternoon_category, night_category)
+    
+    if study_slots >= 2:
+        planner_feedback.append("Your planner suggests a balanced day with significant study activities")
+    
+    elif study_slots == 1:
+        planner_feedback.append("Today's planner contains a moderate study workload.")
+    
+    else:
+        planner_feedback.append("Today's planner emphasizes recovery and non-study activities.")
+    
+    if study >= planned_study * 0.6:
+        planner_feedback.append("Your study duration aligns well with today's planned workload.")
+
+    else:
+        planner_feedback.append("Your study is below the workload estimated from today's planner.")
+    
+    return planner_feedback
