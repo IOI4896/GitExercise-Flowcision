@@ -24,7 +24,9 @@
             }
             h2 { color: #4a4a4a; font-size: 30px; text-align: center; margin-bottom: 10px; }
             h3 { color: #667eea; font-size: 24px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; margin-top: 20px; }
+            h4 { color: #ea6666; font-size: 24px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; margin-top: 20px; text-align: center; }
             b { color: #667eea; font-size: 24px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; margin-top: 20px; }
+            p1 { color: #ea6666; font-size: 20px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; margin-top: 20px; text-align: center; display: flex; }
             p { font-size: 20px; }
             li { font-size: 20px; }
         
@@ -99,6 +101,20 @@
             <p><b>Score: </b>{{score}}</p>
             <p><b>Main Issue: </b>{{main_issue}}</p>
 
+            <h3>Potential Strengths: </h3>
+            <ul>
+                {% for s in potential_strengths %}
+                    <li>{{s}}</li>
+                {% endfor %}
+            </ul>
+
+            <h3>Potential Risks</h3>
+            <ul>
+                {% for d in potential_risks %}
+                    <li>{{d}}</li>
+                {% endfor %}
+            </ul>
+
             <h3>Analysis: </h3>
             <ul>
                 {% for a in analysis %}
@@ -113,12 +129,29 @@
                 {% endfor %}
             </ul>
 
-            <h3>Finalize: </h3>
+            <h3>Personalized Insights: </h3>
+            <ul>
+                {% for b in behavior_msg %}
+                    <li>{{b}}</li>
+                {% endfor %}
+
+                {% for p in planner_msg %}
+                    <li>{{p}}</li>
+                {% endfor %}
+            </ul>
+
+            <h3>Score Review: </h3>
             <ul>
                 <li>{{recs}}</li>
-                <li>{{behavior_msg}}</li>
             </ul>
-        
+            
+            <br><br>
+
+            <h4>Disclaimer</h4>
+            <p1>This assessment is generated from simulation inputs and available activity records. Results are intended for self-improvement and should not be considered a definitive evaluation of ability or potential.</p1>
+            
+            <br>
+            
             <nav>
                 <a href ="/index">
                     <button>Go Back</button>
