@@ -541,7 +541,7 @@ def index():
             SELECT sleep FROM history WHERE username=? 
         """, (session['user'],))
 
-        sleep = c.fetchone()
+        sleep_row = c.fetchone()
 
         today = datetime.now().strftime("%A")
 
@@ -557,10 +557,10 @@ def index():
             afternoon_category = classify_task(planner_rows["afternoon"])
             night_category = classify_task(planner_rows["night"])
 
-            predicted_study, e = study_pattern(sleep, morning_category, afternoon_category, night_category)
+            predicted_study, e = study_pattern(sleep_row["sleep"], morning_category, afternoon_category, night_category)
         
         if history:
-            predicted_sleep = sleep["sleep"]
+            predicted_sleep = sleep_row["sleep"]
 
             history_record = [
                 {
@@ -1066,4 +1066,4 @@ def result():
 
 if __name__ == "__main__":
     #Prevent Flask auto-reload that turn off socket
-    app.run(debug = True, use_reloader = False)
+    app.run(host = "0.0.0.0", debug = True, use_reloader = False)
