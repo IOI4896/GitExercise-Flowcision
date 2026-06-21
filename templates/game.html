@@ -184,7 +184,7 @@
                 this.shieldAngle += 0.1;
                 if (this.buffs.has(1)) {
                     this.healTimer++;
-                    if (this.healTimer > 1800) { this.lives++; this.healTimer = 0; this.updateUI(); spawnText(this.x, this.y, "+1命", "#ff0000"); playSound('powerup'); }
+                if (this.healTimer > 1800) { this.lives++; this.healTimer = 0; this.updateUI(); spawnText(this.x, this.y, "+1HP", "#ff0000"); playSound('powerup'); }
                 }
                 if (this.buffs.has(3)) {
                     this.homingTimer++;

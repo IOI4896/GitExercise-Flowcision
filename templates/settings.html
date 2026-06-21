@@ -2,7 +2,8 @@
 <html>
     <head>
         <title>Flowcision - Settings</title>
-        <style>
+<style>
+            /* ================= 基础浅色模式样式 ================= */
             body {
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -12,7 +13,7 @@
                 min-height: 100vh;
                 margin: 0;
                 color: #333;
-                transition: background 0.3s ease;
+                transition: background 0.3s ease, color 0.3s ease;
             }
             .container {
                 background: white;
@@ -23,25 +24,85 @@
                 max-width: 500px;
                 transition: background-color 0.3s ease, box-shadow 0.3s ease;
             }
-            h1 { color: #4a4a4a; font-size: 24px; text-align: center; margin-bottom: 10px; transition: color 0.3s ease; }
-            h2 { color: #4a4a4a; font-size: 20px; text-align: center; margin-bottom: 10px; transition: color 0.3s ease; }
-            b { color: #667eea; font-size: 18px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; margin-top: 20px; display: block; text-align: center; transition: color 0.3s ease, border-color 0.3s ease; }
-            p { font-size: 18px; }
+            h1 { color: #4a4a4a; font-size: 28px; text-align: center; margin-bottom: 20px; transition: color 0.3s ease; }
+            
+            /* 标题自带下划线分割，替代原有的丑陋 <hr> */
+            h2 { color: #667eea; font-size: 18px; margin-bottom: 15px; margin-top: 25px; border-bottom: 2px solid #f0f2f5; padding-bottom: 8px; transition: color 0.3s ease, border-color 0.3s ease; }
+            
+            /* 美化复选框为高级卡片形式 */
+            label {
+                display: flex;
+                align-items: center;
+                padding: 15px 20px;
+                background: #f8f9fa;
+                border-radius: 12px;
+                margin-bottom: 12px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: 500;
+                transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            }
+            label:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+            label input[type="checkbox"] {
+                margin-right: 15px;
+                transform: scale(1.3);
+                cursor: pointer;
+            }
 
+            /* 美化时区下拉选单 */
+            select {
+                width: 100%;
+                padding: 15px 20px;
+                border-radius: 12px;
+                border: 1px solid #ddd;
+                background: #f8f9fa;
+                font-size: 15px;
+                color: #333;
+                outline: none;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+            select:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2); }
+
+            /* 美化保存按钮 */
             button {
                 width: 100%;
-                padding: 15px;
+                padding: 16px;
                 background-color: #667eea;
                 color: white;
                 border: none;
-                border-radius: 8px;
+                border-radius: 12px;
                 cursor: pointer;
-                font-size: 16px;
+                font-size: 18px;
                 font-weight: bold;
-                margin-top: 25px;
+                margin-top: 30px;
                 transition: 0.3s;
             }
-            button:hover { background-color: #5a67d8; transform: translateY(-2px); }
+            button:hover { background-color: #5a67d8; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(90, 103, 216, 0.4); }
+
+            /* 隐藏原本用作排版的 <br> 和 <hr> 标签 */
+            br, hr { display: none; }
+
+            /* ================= 深色模式 (Dark Mode) ================= */
+            body.dark-mode {
+                background: #121212 !important;
+                color: #e0e0e0;
+            }
+            body.dark-mode .container {
+                background: #1e1e1e;
+                box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+            }
+            body.dark-mode h1 { color: #ffffff; }
+            body.dark-mode h2 { color: #a3bffa; border-color: #333; }
+            
+            body.dark-mode label { background: #2a2a2a; color: #e0e0e0; }
+            body.dark-mode label:hover { background: #333; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+            
+            body.dark-mode select { background: #2a2a2a; color: #e0e0e0; border-color: #444; }
+            body.dark-mode select:focus { border-color: #a3bffa; }
+            
+            body.dark-mode button { background-color: #5a67d8; color: white; }
+            body.dark-mode button:hover { background-color: #4c51bf; }
         </style>
     </head>
 
@@ -253,6 +314,9 @@
 
                 });
             });
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+            }
         </script>
     </body>
 </html>
