@@ -6,6 +6,26 @@
         <link rel="stylesheet" href="{{url_for('static', filename='css/style.css')}}">
     </head>
     <body>
+            <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 10000;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="toast-msg {{ category }}" style="background: rgba(30,30,30,0.95); color: #fff; padding: 15px 25px; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-family: sans-serif; animation: slideInRight 0.3s forwards;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        </div>
+        <script>
+            // 3秒后自动淡出并移除弹窗
+            setTimeout(() => {
+                document.querySelectorAll('.toast-msg').forEach(el => {
+                    el.style.opacity = '0';
+                    setTimeout(() => el.remove(), 300);
+                });
+            }, 3000);
+        </script>
         {% block content %}
         {% endblock %}
         <script src="{{url_for('static', filename='js/command.js')}}"></script>

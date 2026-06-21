@@ -94,28 +94,35 @@
                     <img src="data:image/png;base64,{{ trend_chart_url }}" alt="History Trend Chart" style="max-width: 80%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
                 </div>
             {% endif %}
-            
-            <table border="1" style="margin: 0 auto; width: 80%;">
-                <tr>
-                    <th>Study</th>
-                    <th>Sleep</th>
-                    <th>Focus</th>
-                    <th>Stress</th>
-                    <th>Score</th>
-                    <th>Date & Time</th>
-                </tr>
+           {% if data %}
+                <table border="1" style="margin: 0 auto; width: 80%;">
+                    <tr>
+                        <th>Study</th>
+                        <th>Sleep</th>
+                        <th>Focus</th>
+                        <th>Stress</th>
+                        <th>Score</th>
+                        <th>Date & Time</th>
+                    </tr>
 
-                {% for record in data %}
-                <tr>
-                    <td>{{ record.study }}</td>
-                    <td>{{ record.sleep }}</td>
-                    <td>{{ record.focus }}</td>
-                    <td>{{ record.stress }}</td>
-                    <td>{{ record.score }}</td>
-                    <td>{{ record.timestamp }}</td>
-                </tr>
-                {% endfor %}
-            </table>
+                    {% for record in data %}
+                    <tr>
+                        <td>{{ record.study }}</td>
+                        <td>{{ record.sleep }}</td>
+                        <td>{{ record.focus }}</td>
+                        <td>{{ record.stress }}</td>
+                        <td>{{ record.score }}</td>
+                        <td>{{ record.timestamp }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <div class="empty-state">
+                    <span class="icon">📭</span>
+                    <p style="color: #667eea; font-weight: bold;">No records found.</p>
+                    <p style="font-size: 16px;">Start a new simulation or Pomodoro session to see your progress here!</p>
+                </div>
+            {% endif %}
 
             <nav>
                 <a href = "/">
