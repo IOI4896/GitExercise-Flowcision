@@ -125,7 +125,7 @@
             {% endif %}
         {% endwith %}
         <div class="container">
-            {% if user and predicted_focus is not none or predicted_study is not none %}
+            {% if user and (predicted_focus is not none or predicted_study is not none) %}
                 <div style = "background: #eef7ff; padding: 20px; border-radius: 10px; margin-bottom: 20px; ">
                     <h1>Smart Prediction</h1>
                     <p>Based on your recent Pomodoro, History, and Planner: </p>
