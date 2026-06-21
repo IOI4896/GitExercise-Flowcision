@@ -40,6 +40,27 @@
             background-color: #f9f9f9;
             font-size: 15px;
             } 
+            .planner-scroll {
+                width: 100%; 
+                overflow-x: auto; 
+                -webkit-overflow-scrolling: touch;
+            }
+            .planner-scroll::after {
+                display: none;
+            }
+            @media (max-width: 768px) {
+                .planner-scroll::after {
+                    content: "<- Swipe to view ->";
+                    display: block;
+                    text-align: center;
+                    font-size: 12px;
+                    color: #667eea;
+                    margin-top: 6px;
+                }
+            }
+            .planner-scroll::-webkit-scrollbar {
+                display: none;
+            }
             button {
                 width: 100%;
                 padding: 15px;
@@ -125,65 +146,67 @@
             </div>
 
             <form method = "POST">
-                <table border="1" style="margin: 0 auto; width: 80%;">
-                    <tr>
-                        <th>Day</th>
-                        <th>Morning</th>
-                        <th>Afternoon</th>
-                        <th>Night</th>
-                    </tr>
+                <div class = "planner-scroll">
+                    <table border="1" style="margin: 0 auto; width: 80%; min-width: 600px; border-collapse: collapse;">
+                        <tr>
+                            <th>Day</th>
+                            <th>Morning</th>
+                            <th>Afternoon</th>
+                            <th>Night</th>
+                        </tr>
 
-                    {% for day in days %}
+                        {% for day in days %}
 
-                    <tr>
-                        <td>{{day}}</td>
+                        <tr>
+                            <td>{{day}}</td>
 
-                        <td>
-                            <select name = "{{day}}_morning" onchange = "toggleCustom(this, '{{day}}_morning_custom')">
+                            <td>
+                                <select name = "{{day}}_morning" onchange = "toggleCustom(this, '{{day}}_morning_custom')">
 
-                                {% for task in all_presets %}
-                                    <option value = "{{task}}" {% if planner_data.get(day, {}).get('morning') == task %} selected {% endif %}>{{task}}</option>
-                                {% endfor %}
+                                    {% for task in all_presets %}
+                                        <option value = "{{task}}" {% if planner_data.get(day, {}).get('morning') == task %} selected {% endif %}>{{task}}</option>
+                                    {% endfor %}
 
-                                <option value = "CUSTOM">Custom</option>
+                                    <option value = "CUSTOM">Custom</option>
 
-                            </select>
+                                </select>
 
-                            <input type = "text" name = "{{day}}_morning_custom" id = "{{day}}_morning_custom" class = "custom-input" placeholder = "Custom Task">
-                        </td>
+                                <input type = "text" name = "{{day}}_morning_custom" id = "{{day}}_morning_custom" class = "custom-input" placeholder = "Custom Task">
+                            </td>
 
-                        <td>
-                            <select name = "{{day}}_afternoon" onchange = "toggleCustom(this, '{{day}}_afternoon_custom')">
+                            <td>
+                                <select name = "{{day}}_afternoon" onchange = "toggleCustom(this, '{{day}}_afternoon_custom')">
 
-                                {% for task in all_presets %}
-                                    <option value = "{{task}}" {% if planner_data.get(day, {}).get('afternoon') == task %} selected {% endif %}>{{task}}</option>
-                                {% endfor %}
+                                    {% for task in all_presets %}
+                                        <option value = "{{task}}" {% if planner_data.get(day, {}).get('afternoon') == task %} selected {% endif %}>{{task}}</option>
+                                    {% endfor %}
 
-                                <option value = "CUSTOM">Custom</option>
+                                    <option value = "CUSTOM">Custom</option>
 
-                            </select>
+                                </select>
 
-                            <input type = "text" name = "{{day}}_afternoon_custom" id = "{{day}}_afternoon_custom" class = "custom-input" placeholder = "Custom Task">
-                        </td>
+                                <input type = "text" name = "{{day}}_afternoon_custom" id = "{{day}}_afternoon_custom" class = "custom-input" placeholder = "Custom Task">
+                            </td>
 
-                        <td>
-                            <select name = "{{day}}_night" onchange = "toggleCustom(this, '{{day}}_night_custom')">
+                            <td>
+                                <select name = "{{day}}_night" onchange = "toggleCustom(this, '{{day}}_night_custom')">
 
-                                {% for task in all_presets %}
-                                    <option value = "{{task}}" {% if planner_data.get(day, {}).get('night') == task %} selected {% endif %}>{{task}}</option>
-                                {% endfor %}
+                                    {% for task in all_presets %}
+                                        <option value = "{{task}}" {% if planner_data.get(day, {}).get('night') == task %} selected {% endif %}>{{task}}</option>
+                                    {% endfor %}
 
-                                <option value = "CUSTOM">Custom</option>
+                                    <option value = "CUSTOM">Custom</option>
 
-                            </select>
+                                </select>
 
-                            <input type = "text" name = "{{day}}_night_custom" id = "{{day}}_night_custom" class = "custom-input" placeholder = "Custom Task">
-                        </td>
-                    </tr>
+                                <input type = "text" name = "{{day}}_night_custom" id = "{{day}}_night_custom" class = "custom-input" placeholder = "Custom Task">
+                            </td>
+                        </tr>
 
-                    {% endfor %}
+                        {% endfor %}
 
-                </table>
+                    </table>
+                </div>
 
                 <button type = "submit">Save Planner</button>
             </form>
