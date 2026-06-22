@@ -5,7 +5,23 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="{{url_for('static', filename='css/style.css')}}">
         <style>
+            /* 安全版：页面加载时的丝滑浮现动画，只对卡片生效，保护弹窗层级 */
+            .container, .card, .login-card, .register-card, .encourage-card {
+                animation: fadeInSlideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            }
+
+            @keyframes fadeInSlideUp {
+                0% {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                100% {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
           
+            /* 新手教程暗黑模式修复 */
             body.dark-mode #tutorialBox {
                 background-color: #22254b !important;
                 box-shadow: 0 15px 35px rgba(0,0,0,0.6) !important;
