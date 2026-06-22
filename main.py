@@ -277,7 +277,8 @@ def register():
             c.execute("INSERT INTO users (username, password) VALUES (?,?)", (username, hashed_password))
             conn.commit()
         except:
-            return "Username already exists"
+            flash("Username already exists")
+            return redirect('/register')
 
         finally:
             conn.close()
@@ -362,18 +363,6 @@ def inject_user():
                 music_enabled = music_enabled,
                 music_volume = music_volume,
                 music_theme = music_theme)
-
-@app.route('/api/start_pomodoro', methods = ["POST"])
-def api_start_pomodoro():
-    data = request.get_json()
-    duration = data.get("duration", 25)
-
-    session["active_pomodoro"] = {
-        "duration": duration,
-        "start": datetime.now(timezone.utc).isoformat()
-    }
-
-    return {"status": "started"}
 
 #Login
 @app.route('/login/', methods = ['GET', 'POST'])
