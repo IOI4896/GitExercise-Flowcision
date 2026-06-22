@@ -1,0 +1,323 @@
+2026-06-23 07:03:17,948 - INFO - [main.py:45] - System Boot: Security Audit Logging initialized.
+2026-06-23 07:03:18,099 - INFO - [_internal.py:97] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.2.0.2:5000
+2026-06-23 07:03:18,099 - INFO - [_internal.py:97] - [33mPress CTRL+C to quit[0m
+2026-06-23 07:03:20,482 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:20] "[32mGET /auth HTTP/1.1[0m" 302 -
+2026-06-23 07:03:20,556 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:20] "GET /login/ HTTP/1.1" 200 -
+2026-06-23 07:03:20,575 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:20] "POST /save_timezone HTTP/1.1" 200 -
+2026-06-23 07:03:24,685 - WARNING - [main.py:409] - FAILED LOGIN: Invalid credentials for 'admin' from IP 127.0.0.1.
+2026-06-23 07:03:24,687 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:24] "[32mPOST /login/ HTTP/1.1[0m" 302 -
+2026-06-23 07:03:24,692 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:24] "GET /login/ HTTP/1.1" 200 -
+2026-06-23 07:03:24,714 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:24] "POST /save_timezone HTTP/1.1" 200 -
+2026-06-23 07:03:25,950 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:25] "GET / HTTP/1.1" 200 -
+2026-06-23 07:03:26,084 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:26] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:03:26,092 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:26] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:03:26,100 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:26] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:03:26,819 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:26] "GET /register HTTP/1.1" 200 -
+2026-06-23 07:03:31,905 - INFO - [main.py:287] - Registration Attempt: User 'admin' from IP 127.0.0.1
+2026-06-23 07:03:31,911 - INFO - [main.py:295] - SUCCESS: Account 'admin' successfully created.
+2026-06-23 07:03:31,912 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:31] "[32mPOST /register HTTP/1.1[0m" 302 -
+2026-06-23 07:03:31,916 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:31] "[32mGET /login HTTP/1.1[0m" 308 -
+2026-06-23 07:03:31,922 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:31] "GET /login/ HTTP/1.1" 200 -
+2026-06-23 07:03:31,943 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:31] "POST /save_timezone HTTP/1.1" 200 -
+2026-06-23 07:03:34,650 - INFO - [main.py:406] - SUCCESS: User 'admin' logged in from IP 127.0.0.1.
+2026-06-23 07:03:34,651 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:34] "[32mPOST /login/ HTTP/1.1[0m" 302 -
+2026-06-23 07:03:34,658 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:34] "GET / HTTP/1.1" 200 -
+2026-06-23 07:03:34,683 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:34] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:03:34,684 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:34] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:03:34,701 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:34] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:03:39,750 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:39] "POST /complete_tutorial HTTP/1.1" 200 -
+2026-06-23 07:03:43,971 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:43] "GET /history HTTP/1.1" 200 -
+2026-06-23 07:03:43,990 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:43] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:03:43,991 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:43] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:03:44,022 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:44] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:03:46,094 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:46] "GET / HTTP/1.1" 200 -
+2026-06-23 07:03:46,114 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:46] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:03:46,115 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:46] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:03:46,134 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:03:46] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:04:14,804 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:14] "GET /index HTTP/1.1" 200 -
+2026-06-23 07:04:14,823 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:14] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:04:14,825 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:14] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:04:14,842 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:14] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:04:38,196 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:38] "POST /result HTTP/1.1" 200 -
+2026-06-23 07:04:38,215 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:38] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:04:38,221 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:38] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:04:38,236 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:38] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:04:41,230 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:41] "GET /index HTTP/1.1" 200 -
+2026-06-23 07:04:41,251 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:41] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:04:41,253 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:41] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:04:41,277 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:41] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:04:43,172 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:43] "GET / HTTP/1.1" 200 -
+2026-06-23 07:04:43,192 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:43] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:04:43,197 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:43] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:04:43,211 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:43] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:04:44,397 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:44] "GET /history HTTP/1.1" 200 -
+2026-06-23 07:04:44,414 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:44] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:04:44,419 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:44] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:04:44,435 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:44] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:04:46,465 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:46] "GET / HTTP/1.1" 200 -
+2026-06-23 07:04:46,489 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:46] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:04:46,494 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:46] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:04:46,513 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:46] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:04:48,045 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:48] "GET /index HTTP/1.1" 200 -
+2026-06-23 07:04:48,061 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:48] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:04:48,066 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:48] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:04:48,083 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:48] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:04:50,699 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:50] "[32mPOST /result HTTP/1.1[0m" 302 -
+2026-06-23 07:04:50,707 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:50] "GET /index HTTP/1.1" 200 -
+2026-06-23 07:04:50,736 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:50] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:04:50,737 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:50] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:04:50,752 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:50] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:04:59,122 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:59] "POST /result HTTP/1.1" 200 -
+2026-06-23 07:04:59,140 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:59] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:04:59,144 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:59] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:04:59,161 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:04:59] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:05:01,426 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:05:01] "GET /index HTTP/1.1" 200 -
+2026-06-23 07:05:01,452 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:05:01] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:05:01,453 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:05:01] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:05:01,471 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:05:01] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:05:07,567 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:05:07] "GET / HTTP/1.1" 200 -
+2026-06-23 07:05:07,585 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:05:07] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:05:07,589 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:05:07] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:05:07,609 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:05:07] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:05:09,861 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:05:09] "GET /history HTTP/1.1" 200 -
+2026-06-23 07:05:09,881 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:05:09] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:05:09,887 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:05:09] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:05:09,905 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:05:09] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:16:07,990 - INFO - [main.py:45] - System Boot: Security Audit Logging initialized.
+2026-06-23 07:16:08,036 - INFO - [_internal.py:97] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.2.0.2:5000
+2026-06-23 07:16:08,036 - INFO - [_internal.py:97] - [33mPress CTRL+C to quit[0m
+2026-06-23 07:16:10,476 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:16:10] "GET / HTTP/1.1" 200 -
+2026-06-23 07:16:10,615 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:16:10] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:16:10,622 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:16:10] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:16:10,703 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /undefined from IP 127.0.0.1
+2026-06-23 07:16:10,706 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:16:10] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:16:12,655 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:16:12] "GET /history HTTP/1.1" 200 -
+2026-06-23 07:16:12,672 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:16:12] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:16:12,684 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:16:12] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:16:12,701 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /undefined from IP 127.0.0.1
+2026-06-23 07:16:12,703 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:16:12] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:16:16,811 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /export_csv from IP 127.0.0.1
+2026-06-23 07:16:16,813 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:16:16] "[33mGET /export_csv HTTP/1.1[0m" 404 -
+2026-06-23 07:16:18,223 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /export_csv from IP 127.0.0.1
+2026-06-23 07:16:18,225 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:16:18] "[33mGET /export_csv HTTP/1.1[0m" 404 -
+2026-06-23 07:19:54,648 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:19:54] "GET / HTTP/1.1" 200 -
+2026-06-23 07:19:54,673 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:19:54] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:19:54,675 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:19:54] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:19:54,849 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /undefined from IP 127.0.0.1
+2026-06-23 07:19:54,850 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:19:54] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:19:58,658 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:19:58] "GET /history HTTP/1.1" 200 -
+2026-06-23 07:19:58,675 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:19:58] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:19:58,678 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:19:58] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:19:58,705 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /undefined from IP 127.0.0.1
+2026-06-23 07:19:58,706 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:19:58] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:20:11,301 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:20:11] "GET /history HTTP/1.1" 200 -
+2026-06-23 07:20:11,319 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:20:11] "GET /static/css/style.css HTTP/1.1" 200 -
+2026-06-23 07:20:11,322 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:20:11] "GET /static/js/command.js HTTP/1.1" 200 -
+2026-06-23 07:20:11,338 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /undefined from IP 127.0.0.1
+2026-06-23 07:20:11,339 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:20:11] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:20:11,358 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /favicon.ico from IP 127.0.0.1
+2026-06-23 07:20:11,360 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:20:11] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-06-23 07:20:53,814 - INFO - [main.py:45] - System Boot: Security Audit Logging initialized.
+2026-06-23 07:20:53,855 - INFO - [_internal.py:97] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.2.0.2:5000
+2026-06-23 07:20:53,855 - INFO - [_internal.py:97] - [33mPress CTRL+C to quit[0m
+2026-06-23 07:20:56,096 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:20:56] "GET / HTTP/1.1" 200 -
+2026-06-23 07:20:56,224 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:20:56] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:20:56,226 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:20:56] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:20:56,334 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /undefined from IP 127.0.0.1
+2026-06-23 07:20:56,338 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:20:56] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:20:59,911 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:20:59] "GET /history HTTP/1.1" 200 -
+2026-06-23 07:20:59,931 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:20:59] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:20:59,932 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:20:59] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:20:59,946 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /undefined from IP 127.0.0.1
+2026-06-23 07:20:59,948 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:20:59] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:21:02,086 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /export_csv from IP 127.0.0.1
+2026-06-23 07:21:02,089 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:21:02] "[33mGET /export_csv HTTP/1.1[0m" 404 -
+2026-06-23 07:21:03,042 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /export_csv from IP 127.0.0.1
+2026-06-23 07:21:03,044 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:21:03] "[33mGET /export_csv HTTP/1.1[0m" 404 -
+2026-06-23 07:21:06,439 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:21:06] "GET /history HTTP/1.1" 200 -
+2026-06-23 07:21:06,465 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:21:06] "GET /static/css/style.css HTTP/1.1" 200 -
+2026-06-23 07:21:06,466 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:21:06] "GET /static/js/command.js HTTP/1.1" 200 -
+2026-06-23 07:21:06,492 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /undefined from IP 127.0.0.1
+2026-06-23 07:21:06,495 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:21:06] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:21:06,515 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /favicon.ico from IP 127.0.0.1
+2026-06-23 07:21:06,518 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:21:06] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-06-23 07:21:06,732 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:21:06] "GET /history HTTP/1.1" 200 -
+2026-06-23 07:21:06,767 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:21:06] "GET /static/css/style.css HTTP/1.1" 200 -
+2026-06-23 07:21:06,768 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:21:06] "GET /static/js/command.js HTTP/1.1" 200 -
+2026-06-23 07:21:06,780 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /undefined from IP 127.0.0.1
+2026-06-23 07:21:06,782 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:21:06] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:21:07,033 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:21:07] "GET /history HTTP/1.1" 200 -
+2026-06-23 07:21:07,050 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:21:07] "GET /static/css/style.css HTTP/1.1" 200 -
+2026-06-23 07:21:07,051 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:21:07] "GET /static/js/command.js HTTP/1.1" 200 -
+2026-06-23 07:21:07,065 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /undefined from IP 127.0.0.1
+2026-06-23 07:21:07,067 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:21:07] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:21:07,083 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /favicon.ico from IP 127.0.0.1
+2026-06-23 07:21:07,085 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:21:07] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-06-23 07:21:09,321 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /export_csv from IP 127.0.0.1
+2026-06-23 07:21:09,323 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:21:09] "[33mGET /export_csv HTTP/1.1[0m" 404 -
+2026-06-23 07:21:12,347 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /export_csv from IP 127.0.0.1
+2026-06-23 07:21:12,350 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:21:12] "[33mGET /export_csv HTTP/1.1[0m" 404 -
+2026-06-23 07:22:36,736 - INFO - [main.py:45] - System Boot: Security Audit Logging initialized.
+2026-06-23 07:22:36,777 - INFO - [_internal.py:97] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.2.0.2:5000
+2026-06-23 07:22:36,777 - INFO - [_internal.py:97] - [33mPress CTRL+C to quit[0m
+2026-06-23 07:22:37,868 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:22:37] "GET / HTTP/1.1" 200 -
+2026-06-23 07:22:37,964 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:22:37] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:22:37,966 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:22:37] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:22:38,074 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /undefined from IP 127.0.0.1
+2026-06-23 07:22:38,076 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:22:38] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:22:40,511 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:22:40] "GET /history HTTP/1.1" 200 -
+2026-06-23 07:22:40,531 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:22:40] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:22:40,532 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:22:40] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:22:40,546 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /undefined from IP 127.0.0.1
+2026-06-23 07:22:40,548 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:22:40] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:22:43,244 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /export_csv from IP 127.0.0.1
+2026-06-23 07:22:43,246 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:22:43] "[33mGET /export_csv HTTP/1.1[0m" 404 -
+2026-06-23 07:22:44,401 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /export_csv from IP 127.0.0.1
+2026-06-23 07:22:44,403 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:22:44] "[33mGET /export_csv HTTP/1.1[0m" 404 -
+2026-06-23 07:22:45,395 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /export_csv from IP 127.0.0.1
+2026-06-23 07:22:45,397 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:22:45] "[33mGET /export_csv HTTP/1.1[0m" 404 -
+2026-06-23 07:22:46,000 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /export_csv from IP 127.0.0.1
+2026-06-23 07:22:46,001 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:22:46] "[33mGET /export_csv HTTP/1.1[0m" 404 -
+2026-06-23 07:22:56,998 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /export_csv from IP 127.0.0.1
+2026-06-23 07:22:57,000 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:22:57] "[33mGET /export_csv HTTP/1.1[0m" 404 -
+2026-06-23 07:23:44,744 - WARNING - [main.py:1084] - 404 ERROR: User tried to access non-existent page: /export_csv from IP 127.0.0.1
+2026-06-23 07:23:44,746 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:23:44] "[33mGET /export_csv HTTP/1.1[0m" 404 -
+2026-06-23 07:25:59,492 - INFO - [main.py:48] - System Boot: Security Audit Logging initialized.
+2026-06-23 07:25:59,541 - INFO - [_internal.py:97] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.2.0.2:5000
+2026-06-23 07:25:59,541 - INFO - [_internal.py:97] - [33mPress CTRL+C to quit[0m
+2026-06-23 07:26:01,527 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:26:01] "GET / HTTP/1.1" 200 -
+2026-06-23 07:26:01,646 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:26:01] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:26:01,652 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:26:01] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:26:01,759 - WARNING - [main.py:1119] - 404 ERROR: User tried to access non-existent page: /undefined from IP 127.0.0.1
+2026-06-23 07:26:01,762 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:26:01] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:26:04,075 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:26:04] "GET / HTTP/1.1" 200 -
+2026-06-23 07:26:04,093 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:26:04] "GET /static/css/style.css HTTP/1.1" 200 -
+2026-06-23 07:26:04,095 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:26:04] "GET /static/js/command.js HTTP/1.1" 200 -
+2026-06-23 07:26:04,114 - WARNING - [main.py:1119] - 404 ERROR: User tried to access non-existent page: /undefined from IP 127.0.0.1
+2026-06-23 07:26:04,116 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:26:04] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:26:04,138 - WARNING - [main.py:1119] - 404 ERROR: User tried to access non-existent page: /favicon.ico from IP 127.0.0.1
+2026-06-23 07:26:04,140 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:26:04] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-06-23 07:26:05,965 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:26:05] "GET /history HTTP/1.1" 200 -
+2026-06-23 07:26:05,983 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:26:05] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:26:05,986 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:26:05] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:26:06,015 - WARNING - [main.py:1119] - 404 ERROR: User tried to access non-existent page: /undefined from IP 127.0.0.1
+2026-06-23 07:26:06,016 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:26:06] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:26:07,484 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:26:07] "[35m[1mGET /export_csv HTTP/1.1[0m" 500 -
+2026-06-23 07:26:07,514 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:26:07] "GET /export_csv?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2026-06-23 07:26:07,527 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:26:07] "GET /export_csv?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2026-06-23 07:26:07,587 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:26:07] "GET /export_csv?__debugger__=yes&cmd=resource&f=console.png&s=CAFw3JGlPbtmPWO904b7 HTTP/1.1" 200 -
+2026-06-23 07:26:07,612 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:26:07] "GET /export_csv?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2026-06-23 07:27:20,251 - INFO - [main.py:48] - System Boot: Security Audit Logging initialized.
+2026-06-23 07:27:20,296 - INFO - [_internal.py:97] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.2.0.2:5000
+2026-06-23 07:27:20,296 - INFO - [_internal.py:97] - [33mPress CTRL+C to quit[0m
+2026-06-23 07:27:22,531 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:27:22] "GET / HTTP/1.1" 200 -
+2026-06-23 07:27:22,595 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:27:22] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:27:22,606 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:27:22] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:27:22,759 - WARNING - [main.py:1114] - 404 ERROR: User tried to access non-existent page: /undefined from IP 127.0.0.1
+2026-06-23 07:27:22,761 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:27:22] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:27:26,453 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:27:26] "GET /history HTTP/1.1" 200 -
+2026-06-23 07:27:26,472 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:27:26] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:27:26,473 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:27:26] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:27:26,505 - WARNING - [main.py:1114] - 404 ERROR: User tried to access non-existent page: /undefined from IP 127.0.0.1
+2026-06-23 07:27:26,507 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:27:26] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:27:27,910 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:27:27] "[35m[1mGET /export_csv HTTP/1.1[0m" 500 -
+2026-06-23 07:27:27,927 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:27:27] "[36mGET /export_csv?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:27:27,928 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:27:27] "[36mGET /export_csv?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2026-06-23 07:27:27,975 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:27:27] "GET /export_csv?__debugger__=yes&cmd=resource&f=console.png&s=WmRJUrFlswUAQsYaUdaP HTTP/1.1" 200 -
+2026-06-23 07:30:48,402 - INFO - [main.py:48] - System Boot: Security Audit Logging initialized.
+2026-06-23 07:30:48,445 - INFO - [_internal.py:97] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.2.0.2:5000
+2026-06-23 07:30:48,445 - INFO - [_internal.py:97] - [33mPress CTRL+C to quit[0m
+2026-06-23 07:30:49,435 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:30:49] "GET / HTTP/1.1" 200 -
+2026-06-23 07:30:49,509 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:30:49] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:30:49,514 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:30:49] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:30:49,596 - WARNING - [main.py:1114] - 404 ERROR: User tried to access non-existent page: /undefined from IP 127.0.0.1
+2026-06-23 07:30:49,598 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:30:49] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:30:51,766 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:30:51] "GET /history HTTP/1.1" 200 -
+2026-06-23 07:30:51,783 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:30:51] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:30:51,784 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:30:51] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:30:51,815 - WARNING - [main.py:1114] - 404 ERROR: User tried to access non-existent page: /undefined from IP 127.0.0.1
+2026-06-23 07:30:51,818 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:30:51] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:30:53,171 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:30:53] "GET /export_csv HTTP/1.1" 200 -
+2026-06-23 07:32:54,317 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:32:54] "GET /export_csv HTTP/1.1" 200 -
+2026-06-23 07:32:58,889 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:32:58] "GET /index HTTP/1.1" 200 -
+2026-06-23 07:32:58,907 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:32:58] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:32:58,909 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:32:58] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:32:58,937 - WARNING - [main.py:1114] - 404 ERROR: User tried to access non-existent page: /undefined from IP 127.0.0.1
+2026-06-23 07:32:58,939 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:32:58] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:33:04,082 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:33:04] "POST /result HTTP/1.1" 200 -
+2026-06-23 07:33:04,100 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:33:04] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:33:04,102 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:33:04] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:33:04,117 - WARNING - [main.py:1114] - 404 ERROR: User tried to access non-existent page: /undefined from IP 127.0.0.1
+2026-06-23 07:33:04,118 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:33:04] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:33:06,307 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:33:06] "GET /index HTTP/1.1" 200 -
+2026-06-23 07:33:06,327 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:33:06] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:33:06,331 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:33:06] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:33:06,346 - WARNING - [main.py:1114] - 404 ERROR: User tried to access non-existent page: /undefined from IP 127.0.0.1
+2026-06-23 07:33:06,348 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:33:06] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:33:08,168 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:33:08] "GET / HTTP/1.1" 200 -
+2026-06-23 07:33:08,187 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:33:08] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:33:08,188 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:33:08] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:33:08,203 - WARNING - [main.py:1114] - 404 ERROR: User tried to access non-existent page: /undefined from IP 127.0.0.1
+2026-06-23 07:33:08,205 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:33:08] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:33:09,333 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:33:09] "GET /history HTTP/1.1" 200 -
+2026-06-23 07:33:09,353 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:33:09] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:33:09,354 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:33:09] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:33:09,367 - WARNING - [main.py:1114] - 404 ERROR: User tried to access non-existent page: /undefined from IP 127.0.0.1
+2026-06-23 07:33:09,369 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:33:09] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:33:10,965 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:33:10] "GET /export_csv HTTP/1.1" 200 -
+2026-06-23 07:38:07,099 - WARNING - [main.py:1114] - 404 ERROR: User tried to access non-existent page: /adadawd from IP 127.0.0.1
+2026-06-23 07:38:07,101 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:38:07] "[33mGET /adadawd HTTP/1.1[0m" 404 -
+2026-06-23 07:38:08,682 - WARNING - [main.py:1114] - 404 ERROR: User tried to access non-existent page: /adadawd from IP 127.0.0.1
+2026-06-23 07:38:08,684 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:38:08] "[33mGET /adadawd HTTP/1.1[0m" 404 -
+2026-06-23 07:38:09,405 - WARNING - [main.py:1114] - 404 ERROR: User tried to access non-existent page: /adadawd from IP 127.0.0.1
+2026-06-23 07:38:09,408 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:38:09] "[33mGET /adadawd HTTP/1.1[0m" 404 -
+2026-06-23 07:41:43,557 - WARNING - [main.py:1114] - 404 ERROR: User tried to access non-existent page: /adawd123 from IP 127.0.0.1
+2026-06-23 07:41:43,559 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:41:43] "[33mGET /adawd123 HTTP/1.1[0m" 404 -
+2026-06-23 07:41:44,918 - WARNING - [main.py:1114] - 404 ERROR: User tried to access non-existent page: /adawd123 from IP 127.0.0.1
+2026-06-23 07:41:44,935 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:41:44] "[33mGET /adawd123 HTTP/1.1[0m" 404 -
+2026-06-23 07:42:05,121 - WARNING - [main.py:1114] - 404 ERROR: User tried to access non-existent page: /history/dad from IP 127.0.0.1
+2026-06-23 07:42:05,122 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:42:05] "[33mGET /history/dad HTTP/1.1[0m" 404 -
+2026-06-23 07:42:06,968 - WARNING - [main.py:1114] - 404 ERROR: User tried to access non-existent page: /history/dad from IP 127.0.0.1
+2026-06-23 07:42:06,970 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:42:06] "[33mGET /history/dad HTTP/1.1[0m" 404 -
+2026-06-23 07:44:54,719 - WARNING - [main.py:1114] - 404 ERROR: User tried to access non-existent page: /broken_link_test from IP 127.0.0.1
+2026-06-23 07:44:54,721 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:44:54] "[33mGET /broken_link_test HTTP/1.1[0m" 404 -
+2026-06-23 07:48:30,926 - INFO - [main.py:48] - System Boot: Security Audit Logging initialized.
+2026-06-23 07:48:30,970 - INFO - [_internal.py:97] - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.2.0.2:5000
+2026-06-23 07:48:30,970 - INFO - [_internal.py:97] - [33mPress CTRL+C to quit[0m
+2026-06-23 07:48:33,401 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:48:33] "GET / HTTP/1.1" 200 -
+2026-06-23 07:48:33,488 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:48:33] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2026-06-23 07:48:33,492 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:48:33] "[36mGET /static/js/command.js HTTP/1.1[0m" 304 -
+2026-06-23 07:48:33,682 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:48:33] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:48:48,352 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:48:48] "[33mGET /test HTTP/1.1[0m" 404 -
+2026-06-23 07:48:49,643 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:48:49] "[33mGET /test HTTP/1.1[0m" 404 -
+2026-06-23 07:49:00,766 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:49:00] "GET / HTTP/1.1" 200 -
+2026-06-23 07:49:00,787 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:49:00] "GET /static/css/style.css HTTP/1.1" 200 -
+2026-06-23 07:49:00,788 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:49:00] "GET /static/js/command.js HTTP/1.1" 200 -
+2026-06-23 07:49:00,808 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:49:00] "[33mGET /undefined HTTP/1.1[0m" 404 -
+2026-06-23 07:49:00,834 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:49:00] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-06-23 07:49:03,561 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:49:03] "[33mGET /test HTTP/1.1[0m" 404 -
+2026-06-23 07:49:04,566 - INFO - [_internal.py:97] - 127.0.0.1 - - [23/Jun/2026 07:49:04] "[33mGET /test HTTP/1.1[0m" 404 -

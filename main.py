@@ -1111,7 +1111,7 @@ def result():
 
 @app.errorhandler(404)
 def page_not_found(e):
-    logger.warning(f"404 ERROR: User tried to access non-existent page: {request.path} from IP {request.remote_addr}")
+    
     return render_template('404.html'), 404
 
 
