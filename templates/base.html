@@ -4,6 +4,20 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="{{url_for('static', filename='css/style.css')}}">
+        <style>
+          
+            body.dark-mode #tutorialBox {
+                background-color: #22254b !important;
+                box-shadow: 0 15px 35px rgba(0,0,0,0.6) !important;
+                border: none !important;
+            }
+            body.dark-mode #tutorialBox h2, 
+            body.dark-mode #tutorialBox p,
+            body.dark-mode #tutorialTitle,
+            body.dark-mode #tutorialText {
+                color: #ffffff !important;
+            }
+        </style>
     </head>
     <body>
             <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 10000;">
