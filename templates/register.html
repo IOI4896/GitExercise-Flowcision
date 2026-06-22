@@ -32,6 +32,25 @@
             border-radius: 8px;
             box-sizing: border-box;
         }
+        #warningBox {
+        width: 500px;
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        text-align: center;
+        }
+        #warningOverlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #warningOverlay.hidden {
+            display: none;
+        }
         button {
             width: 100%;
             padding: 12px;
@@ -85,11 +104,29 @@
 </head>
 
     <body>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div id="error-toast" style="position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background-color: #ff4d4f; color: white; padding: 16px 24px; border-radius: 12px; box-shadow: 0 8px 20px rgba(255, 77, 79, 0.3); z-index: 10000; text-align: center; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); opacity: 1;">
+                    <div style="font-weight: bold; font-size: 16px; margin-bottom: 4px;">Login Failed</div>
+                    <div style="font-size: 14px; opacity: 0.9;">{{ messages[0] }}</div>
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        <div id="warningOverlay" class="hidden">
+            <div id="warningBox">
+                <h3>Security Warning</h3>
+                <p>Your password appears to be weak. Weak passwords may be vulnerable to guessing attacks.</p>
+                <button id="cancelBtn">Cancel</button>
+                <button id="continueBtn">Continue Anyway</button>
+            </div>
+        </div>
+
         <div class="register-card">
             <h2>Flowcision - Register</h2>
-            <form method = "post">
+            <form method = "post" id="registerForm">
                 <input type = "text" name = "username" placeholder = "Username" required>
-                <input type = "password" name = "password" placeholder = "Password" required>
+                <input type = "password" id="password" name = "password" placeholder = "Password" required>
                 <button type = "submit">Register</button>
             </form>
 
@@ -100,6 +137,52 @@
             </nav>
         </div>
         <script>
+            setTimeout(() => {
+                let toast = document.getElementById("error-toast");
+                if (toast) {
+                    toast.style.opacity = "0";
+                    toast.style.transform = "translate(-50%, 20px)";
+                    setTimeout(() => toast.remove(), 400);
+                }
+            }, 3000);
+
+            document.getElementById("registerForm").addEventListener("submit", function(e){
+                const password = document.getElementById("password").value;
+
+                if (isWeakpassword(password)){
+                    e.preventDefault();
+                    showWarning();
+                }
+            })
+
+            function showWarning(){
+                document.getElementById("warningOverlay")
+                .classList
+                .remove("hidden");
+            }
+
+            document.getElementById("cancelBtn").addEventListener("click", function(){
+                document.getElementById("warningOverlay")
+                .classList
+                .add("hidden");
+            })
+
+            document.getElementById("continueBtn").addEventListener("click", function(){
+                document.getElementById("registerForm")
+                .submit();
+            })
+
+            function isWeakpassword(password){
+                let score = 0;
+
+                if (password.length >= 8) score++;
+                if (/[A-Z]/.test(password)) score++;
+                if (/[0-9]/.test(password)) score++;
+                if (/[^A-Za-z0-9]/.test(password)) score++;
+
+                return score < 2;
+            }
+
             if (localStorage.getItem('theme') === 'dark') {
                 document.body.classList.add('dark-mode');
             } else {
