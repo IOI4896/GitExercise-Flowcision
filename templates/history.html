@@ -80,11 +80,11 @@
         </style>
     </head>
     <body>
-        <div class = "container">
+        <div class="container">
             {% extends "base.html" %}
             {% block content %}
             <div id="cmdbar" class="hidden">
-                <input id="commandInput" type="'text" placeholder="type command...">
+                <input id="commandInput" type="text" placeholder="type command...">
             </div>
 
             <h2>Your History</h2>
@@ -94,41 +94,49 @@
                     <img src="data:image/png;base64,{{ trend_chart_url }}" alt="History Trend Chart" style="max-width: 80%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
                 </div>
             {% endif %}
-           {% if data %}
-                <table border="1" style="margin: 0 auto; width: 80%;">
-                    <tr>
-                        <th>Study</th>
-                        <th>Sleep</th>
-                        <th>Focus</th>
-                        <th>Stress</th>
-                        <th>Score</th>
-                        <th>Date & Time</th>
+
+            <div style="text-align: right; width: 80%; margin: 0 auto 15px auto;">
+                <a href="/export_csv" style="display: inline-block; background-color: #38a169; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; box-shadow: 0 4px 10px rgba(56,161,105,0.3); transition: 0.3s;">
+                    📊 Export to CSV (Excel)
+                </a>
+            </div>
+
+            {% if data %}
+                <table border="1" style="margin: 0 auto; width: 80%; border-collapse: collapse; text-align: center;">
+                    <tr style="background-color: rgba(102,126,234,0.1);">
+                        <th style="padding: 10px;">Study</th>
+                        <th style="padding: 10px;">Sleep</th>
+                        <th style="padding: 10px;">Focus</th>
+                        <th style="padding: 10px;">Stress</th>
+                        <th style="padding: 10px;">Score</th>
+                        <th style="padding: 10px;">Date & Time</th>
                     </tr>
 
                     {% for record in data %}
                     <tr>
-                        <td>{{ record.study }}</td>
-                        <td>{{ record.sleep }}</td>
-                        <td>{{ record.focus }}</td>
-                        <td>{{ record.stress }}</td>
-                        <td>{{ record.score }}</td>
-                        <td>{{ record.timestamp }}</td>
+                        <td style="padding: 8px;">{{ record.study }}</td>
+                        <td style="padding: 8px;">{{ record.sleep }}</td>
+                        <td style="padding: 8px;">{{ record.focus }}</td>
+                        <td style="padding: 8px;">{{ record.stress }}</td>
+                        <td style="padding: 8px;"><b>{{ record.score }}</b></td>
+                        <td style="padding: 8px; color: #718096; font-size: 14px;">{{ record.timestamp }}</td>
                     </tr>
                     {% endfor %}
                 </table>
             {% else %}
                 <div class="empty-state">
-                    <span class="icon">📭</span>
+                    <span class="icon" style="font-size: 40px; display: block; margin-bottom: 10px;">📭</span>
                     <p style="color: #667eea; font-weight: bold;">No records found.</p>
-                    <p style="font-size: 16px;">Start a new simulation or Pomodoro session to see your progress here!</p>
+                    <p style="font-size: 16px; color: #718096;">Start a new simulation or Pomodoro session to see your progress here!</p>
                 </div>
             {% endif %}
 
             <nav>
-                <a href = "/">
+                <a href="/">
                     <button>Go Back</button>
                 </a>
             </nav>
+            
         </div>
 
         <script>

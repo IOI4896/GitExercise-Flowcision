@@ -25,6 +25,9 @@ from zoneinfo import ZoneInfo
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import hashlib
+import csv
+import io
+from flask import Response
 
 app = Flask(__name__)
 app.secret_key = "secret123"
@@ -758,6 +761,33 @@ def history():
 
     return render_template('history.html', data = history_data, trend_chart_url = trend_chart_url)
 
+# Export data as a CSV report
+@app.route('/export_csv')
+def export_csv():
+    if 'user' not in session:
+        return redirect('/login')
+    
+    username = session['user']
+    conn = get_db()
+    c = conn.cursor()
+    
+    
+    c.execute("SELECT study, sleep, focus, stress, score, timestamp_utc FROM history WHERE username=?", (username,))
+    records = c.fetchall()
+    conn.close()
+
+    # Generate CSV table
+    si = io.StringIO()
+    cw = csv.writer(si)
+    cw.writerow(['Study', 'Sleep', 'Focus', 'Stress', 'Score', 'Date & Time'])
+    cw.writerows(records)
+    
+    return Response(
+        si.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment; filename=Flowcision_History.csv"}
+    )
+
 #Planner
 @app.route('/planner', methods = ['GET', 'POST'])
 def planner():
@@ -1078,6 +1108,12 @@ def result():
         planner_msg = planner_msg,
         plot_url = plot_url
     )
+
+@app.errorhandler(404)
+def page_not_found(e):
+    logger.warning(f"404 ERROR: User tried to access non-existent page: {request.path} from IP {request.remote_addr}")
+    return render_template('404.html'), 404
+
 
 if __name__ == "__main__":
     #Prevent Flask auto-reload that turn off socket
