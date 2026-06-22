@@ -29,6 +29,21 @@ import hashlib
 app = Flask(__name__)
 app.secret_key = "secret123"
 
+import logging
+
+# Initialize Security Audit Logging
+log_format = '%(asctime)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s'
+logging.basicConfig(
+    level=logging.INFO,
+    format=log_format,
+    handlers=[
+        logging.FileHandler("server_audit.log", encoding='utf-8'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger("FlowcisionLogger")
+logger.info("System Boot: Security Audit Logging initialized.")
+
 app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE='Lax'
@@ -267,24 +282,25 @@ def register():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
+        ip_address = request.remote_addr # 抓取访问者IP
+        
+        logger.info(f"Registration Attempt: User '{username}' from IP {ip_address}")
 
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
-
         conn = get_db()
         c = conn.cursor()
-
         try:
             c.execute("INSERT INTO users (username, password) VALUES (?,?)", (username, hashed_password))
             conn.commit()
-        except:
+            logger.info(f"SUCCESS: Account '{username}' successfully created.")
+        except Exception as e:
+            logger.warning(f"SECURITY ALERT: Failed registration for '{username}' from IP {ip_address}. Reason: Username exists.")
             flash("Username already exists")
             return redirect('/register')
-
         finally:
             conn.close()
 
         return redirect('/login')
-    
     return render_template('register.html')
 
 #Auto switch between login / logout button and also prevent error
@@ -371,6 +387,7 @@ def login():
     if request.method == "POST":
         username = request.form.get('username')
         password = request.form.get('password')
+        ip_address = request.remote_addr  
 
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
 
@@ -386,12 +403,21 @@ def login():
 
         if user:
             session['user'] = username
+            logger.info(f"SUCCESS: User '{username}' logged in from IP {ip_address}.") 
             return redirect('/')
         else:
+            logger.warning(f"FAILED LOGIN: Invalid credentials for '{username}' from IP {ip_address}.") 
             flash("Invalid Username or Password. Please try again.")
             return redirect('/login/')
         
     return render_template('login.html')
+
+
+@app.errorhandler(429)
+def ratelimit_handler(e):
+    ip_address = request.remote_addr
+    logger.warning(f"SECURITY ALERT: Rate limit exceeded by IP: {ip_address}! Blocked by Limiter.")
+    return "Too Many Requests. You have been temporarily blocked.", 429
 
 #Logout
 @app.route('/logout_confirm')
