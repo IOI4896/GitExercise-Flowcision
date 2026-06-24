@@ -147,65 +147,205 @@
 
             <form method = "POST">
                 <div class = "planner-scroll">
-                    <table border="1" style="margin: 0 auto; width: 80%; min-width: 600px; border-collapse: collapse;">
-                        <tr>
-                            <th>Day</th>
-                            <th>Morning</th>
-                            <th>Afternoon</th>
-                            <th>Night</th>
-                        </tr>
+<style>
+    
+    .planner-wrapper {
+        position: relative;
+        width: 95%; 
+        margin: 0 auto;
+        border: 2px solid #ccc;
+        border-radius: 8px;
+        background: white;
+        overflow: hidden; 
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
 
-                        {% for day in days %}
+    
+    .planner-wrapper.maximized {
+        position: fixed;
+        top: 5vh; 
+        left: 5vw;
+        width: 90vw; 
+        height: 90vh;
+        z-index: 9999;
+        box-shadow: 0 0 30px rgba(0,0,0,0.6);
+        border-radius: 12px;
+    }
 
-                        <tr>
-                            <td>{{day}}</td>
+    
+    .table-scroll-container {
+        max-height: 65vh; 
+        overflow-y: auto; 
+        overflow-x: hidden; 
+    }
 
-                            <td>
-                                <select name = "{{day}}_morning" onchange = "toggleCustom(this, '{{day}}_morning_custom')">
+    .planner-wrapper.maximized .table-scroll-container {
+        max-height: calc(90vh - 2px); 
+    }
 
-                                    {% for task in all_presets %}
-                                        <option value = "{{task}}" {% if planner_data.get(day, {}).get('morning') == task %} selected {% endif %}>{{task}}</option>
-                                    {% endfor %}
+    
+    .planner-table {
+        width: 100%;
+        table-layout: fixed; 
+        border-collapse: separate;
+        border-spacing: 0;
+        text-align: center;
+    }
 
-                                    <option value = "CUSTOM">Custom</option>
+    
+    .planner-table th, .planner-table td {
+        width: 12.5%; 
+        padding: 8px 4px;
+        border-right: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+        box-sizing: border-box;
+    }
 
-                                </select>
+   
+    .planner-table thead th {
+        position: sticky;
+        top: 0; 
+        background-color: #3b4252; 
+        color: white;
+        font-weight: bold;
+        z-index: 10;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.3); 
+        border-bottom: none;
+    }
 
-                                <input type = "text" name = "{{day}}_morning_custom" id = "{{day}}_morning_custom" class = "custom-input" placeholder = "Custom Task">
-                            </td>
+    
+    .planner-table select, 
+    .planner-table input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 5px 2px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        font-size: 13px;
+    }
 
-                            <td>
-                                <select name = "{{day}}_afternoon" onchange = "toggleCustom(this, '{{day}}_afternoon_custom')">
+    
+    .planner-table tbody td:first-child {
+        background-color: #f8fafc;
+        font-weight: bold;
+        color: #333;
+    }
 
-                                    {% for task in all_presets %}
-                                        <option value = "{{task}}" {% if planner_data.get(day, {}).get('afternoon') == task %} selected {% endif %}>{{task}}</option>
-                                    {% endfor %}
+    
+    .resize-btn {
+        background: #eceff4;
+        color: #2e3440;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        margin-left: 5px;
+        padding: 2px 6px;
+        transition: 0.2s;
+    }
+    .resize-btn:hover { background: #d8dee9; }
+</style>
 
-                                    <option value = "CUSTOM">Custom</option>
+<div id="planner-wrapper" class="planner-wrapper">
+    <div class="table-scroll-container">
+        <table class="planner-table">
+            <thead>
+                <tr>
+                    <th>
+                        Time 
+                        <button type="button" class="resize-btn" onclick="togglePlannerSize()" title="Zoom in/out">⛶</button>
+                    </th>
+                    <th>Monday</th>
+                    <th>Tuesday</th>
+                    <th>Wednesday</th>
+                    <th>Thursday</th>
+                    <th>Friday</th>
+                    <th>Saturday</th>
+                    <th>Sunday</th>
+                </tr>
+            </thead>
+            <tbody id="planner-body"></tbody>
+        </table>
+    </div>
+</div>
 
-                                </select>
+<script>
+    const plannerBody = document.getElementById("planner-body");
+    const options = ["Self Study", "Lecture", "Rest", "Exercise", "Entertainment", "Custom"];
+    const days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+    
+    let rowsHTML = "";
+    
+    for (let i = 0; i < 24; i++) {
+        let hourStart = i.toString().padStart(2, '0') + ":00";
+        let hourEnd = ((i+1)%24).toString().padStart(2, '0') + ":00";
+        
+        rowsHTML += `<tr><td>${hourStart}<br>|<br>${hourEnd}</td>`;
+        
+        for (let j = 0; j < 7; j++) {
+            let inputName = `${days[j]}_${hourStart}`;
+            rowsHTML += `<td>
+                <select name="${inputName}" onchange="handleCustom(this)">
+                    <option value="" disabled selected>Select</option>
+                    ${options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+                </select>
+                <input type="text" name="${inputName}_custom" placeholder="Type..." style="display:none;" class="custom-input">
+            </td>`;
+        }
+        rowsHTML += `</tr>`;
+    }
+    plannerBody.innerHTML = rowsHTML;
 
-                                <input type = "text" name = "{{day}}_afternoon_custom" id = "{{day}}_afternoon_custom" class = "custom-input" placeholder = "Custom Task">
-                            </td>
+   
+    function handleCustom(selectElem) {
+        let inputElem = selectElem.nextElementSibling;
+        if (selectElem.value === "Custom") {
+            inputElem.style.display = "block";
+            selectElem.style.display = "none"; 
+            inputElem.focus();
+        } else {
+            inputElem.style.display = "none";
+            inputElem.value = ""; 
+        }
+    }
 
-                            <td>
-                                <select name = "{{day}}_night" onchange = "toggleCustom(this, '{{day}}_night_custom')">
+    
+    function togglePlannerSize() {
+        let wrapper = document.getElementById('planner-wrapper');
+        let scrollContainer = document.querySelector('.table-scroll-container');
+        
+        wrapper.classList.toggle('maximized');
+        
+        
+        scrollContainer.scrollTop = 0;
+    }
 
-                                    {% for task in all_presets %}
-                                        <option value = "{{task}}" {% if planner_data.get(day, {}).get('night') == task %} selected {% endif %}>{{task}}</option>
-                                    {% endfor %}
-
-                                    <option value = "CUSTOM">Custom</option>
-
-                                </select>
-
-                                <input type = "text" name = "{{day}}_night_custom" id = "{{day}}_night_custom" class = "custom-input" placeholder = "Custom Task">
-                            </td>
-                        </tr>
-
-                        {% endfor %}
-
-                    </table>
+    
+    document.addEventListener("DOMContentLoaded", function() {
+        const savedData = {{ planner_data | tojson | safe }};
+        if (!savedData) return;
+        
+        for (const [key, value] of Object.entries(savedData)) {
+            const el = document.querySelector(`[name="${key}"]`);
+            if(el && value && value !== "Custom" && !key.includes("_custom")) {
+                let optionExists = Array.from(el.options).some(opt => opt.value === value);
+                if(!optionExists) {
+                    el.value = "Custom";
+                    const customInput = document.querySelector(`[name="${key}_custom"]`);
+                    if(customInput) {
+                        el.style.display = "none";
+                        customInput.style.display = "block";
+                        customInput.value = value;
+                    }
+                } else {
+                    el.value = value;
+                }
+            }
+        }
+    });
+</script>
                 </div>
 
                 <button type = "submit">Save Planner</button>

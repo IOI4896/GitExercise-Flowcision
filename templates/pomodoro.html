@@ -221,7 +221,7 @@
             </div>
 
             <a href="/"><button class="nav-btn" id="navBtn">Exit</button></a>
-            <a href="/game"><button class="nav-btn" id="gameBtn">Game</button></a>
+            
         </div>
 
         <form id="completeForm" action="/completed_pomodoro" method="POST" style="display:none;">
@@ -295,7 +295,7 @@
                 if (currentState === 'pause') currentState = selectedDuration === 5 && totalTime !== 5 ? 'break' : 'focus';
                 document.getElementById("startBtn").disabled = true;
                 document.getElementById("navBtn").disabled = true;
-                document.getElementById("gameBtn").disabled = true;
+                
                 document.getElementById("focusBtn").disabled = true;
                 document.getElementById("deepBtn").disabled = true;
                 document.getElementById("breakBtn").disabled = true;
@@ -338,7 +338,7 @@
                 clearInterval(timer); timer = null; timeLeft = totalTime;
                 document.getElementById("startBtn").disabled = false;
                 document.getElementById("navBtn").disabled = false;
-                document.getElementById("gameBtn").disabled = false;
+                
                 document.getElementById("focusBtn").disabled = false;
                 document.getElementById("deepBtn").disabled = false;
                 document.getElementById("breakBtn").disabled = false;

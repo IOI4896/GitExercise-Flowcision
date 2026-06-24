@@ -385,7 +385,7 @@ def inject_user():
 
 #Login
 @app.route('/login/', methods = ['GET', 'POST'])
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 def login():
     if request.method == "POST":
         username = request.form.get('username')
@@ -610,13 +610,7 @@ def index():
 
     return render_template("index.html", predicted_focus = predicted_focus, predicted_stress = predicted_stress, predicted_study = predicted_study, predicted_sleep = predicted_sleep)
 
-#Game
-@app.route('/game')
-def game():
-    if 'user' not in session:
-        return redirect('/login')
-    
-    return render_template("game.html")
+
 
 #Dashboard
 @app.route('/dashboard')
@@ -794,6 +788,8 @@ def planner():
     if 'user' not in session:
         return redirect('/login')
     
+    import json
+    
     conn = get_db()
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
@@ -802,92 +798,50 @@ def planner():
     default_presets = ["Lecture", "Self Study", "Rest", "Revision", "Assignment", "Examination"]
 
     try:
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS planner_24h (
+                username TEXT PRIMARY KEY,
+                planner_data TEXT
+            )
+        """)
+        conn.commit()
+
         if request.method == 'POST':
-            for day in days:
-                morning = request.form.get(f"{day}_morning")
-                if morning == "CUSTOM":
-                    morning = request.form.get(f"{day}_morning_custom")
-
-                afternoon = request.form.get(f"{day}_afternoon")
-                if afternoon == "CUSTOM":
-                    afternoon = request.form.get(f"{day}_afternoon_custom")
-                    
-                night = request.form.get(f"{day}_night")
-                if night == "CUSTOM":
-                    night = request.form.get(f"{day}_night_custom")
-                
-                #Save Custom Preset
-                for task in [morning, afternoon, night]:
-                    if task and task not in default_presets:
-                        c.execute("""
-                            SELECT * FROM planner_presets
-                            WHERE username=? AND task=?
-                        """, (session['user'], task))
-
-                        existing_task = c.fetchone()
-
-                        if not existing_task:
-                            c.execute("""
-                                INSERT INTO planner_presets
-                                (username, task)
-                                VALUES (?,?)
-                            """, (session['user'], task))
-
-                #Save Planner Table
-                c.execute("""
-                    SELECT id FROM planner
-                    WHERE username=? AND day=?
-                """, (session['user'], day))
-
-                existing = c.fetchone()
-
-                if existing:
-                    c.execute("""
-                        UPDATE planner
-                        SET morning=?, afternoon=?, night=?
-                        WHERE username=? AND day=?
-                    """, (morning, afternoon, night, session['user'], day))
-                
-                else:
-                    c.execute("""
-                        INSERT INTO planner
-                        (username, day, morning, afternoon, night)
-                        VALUES(?,?,?,?,?)
-                    """, (session['user'], day, morning, afternoon, night))
+            form_data = request.form.to_dict()
             
+            for key, task in list(form_data.items()):
+                if task == "Custom":
+                    custom_val = form_data.get(f"{key}_custom")
+                    if custom_val:
+                        form_data[key] = custom_val
+                        task = custom_val
+                
+                if task and task not in default_presets and task != "Custom" and not key.endswith("_custom"):
+                    c.execute("SELECT * FROM planner_presets WHERE username=? AND task=?", (session['user'], task))
+                    if not c.fetchone():
+                        c.execute("INSERT INTO planner_presets (username, task) VALUES (?,?)", (session['user'], task))
+
+            planner_json = json.dumps(form_data)
+            c.execute("SELECT username FROM planner_24h WHERE username=?", (session['user'],))
+            if c.fetchone():
+                c.execute("UPDATE planner_24h SET planner_data=? WHERE username=?", (planner_json, session['user']))
+            else:
+                c.execute("INSERT INTO planner_24h (username, planner_data) VALUES (?,?)", (session['user'], planner_json))
             conn.commit()
         
-        #Load Preset Data
-        c.execute("""
-            SELECT * FROM planner WHERE username=?
-        """, (session['user'],))
+        c.execute("SELECT planner_data FROM planner_24h WHERE username=?", (session['user'],))
+        row = c.fetchone()
+        planner_data = json.loads(row['planner_data']) if row and row['planner_data'] else {}
 
-        rows = c.fetchall()
-
-        #Custom Preset
-        planner_data = {}
-
-        for row in rows:
-            planner_data[row['day']] = {
-                'morning': row['morning'],
-                'afternoon': row['afternoon'],
-                'night': row['night']
-            }
-
-        c.execute("""
-            SELECT task FROM planner_presets WHERE username=?
-        """, (session['user'],))
-
-        custom_rows = c.fetchall()
-
-        custom_presets = [row['task'] for row in custom_rows]
+        c.execute("SELECT task FROM planner_presets WHERE username=?", (session['user'],))
+        custom_presets = [r['task'] for r in c.fetchall()]
         all_presets = list(set(default_presets + custom_presets))
 
-        all_tasks = []
-        for day in planner_data.values():
-            all_tasks.extend([day["morning"], day["afternoon"], day["night"]])
+        all_tasks_raw = [task for key, task in planner_data.items() if task and not key.endswith('_custom') and task != "Custom"]
+        unique_tasks = list(set(all_tasks_raw))
+        task_category_map = {t: classify_task(t) for t in unique_tasks}
         
-        categories = [classify_task(task) for task in all_tasks]
+        categories = [task_category_map[t] for t in all_tasks_raw]
         recognition_rate, analysis_confidence, planner_suggestion = generate_planner_suggestion(categories)
 
         current_task = get_current_task(session['user'])
@@ -896,7 +850,6 @@ def planner():
         conn.close()
 
     return render_template("planner.html", days = days, planner_data = planner_data, all_presets = all_presets, planner_suggestion = planner_suggestion, analysis_confidence = analysis_confidence, recognition_rate = recognition_rate, current_task = current_task)
-
 #Pomodoro
 @app.route('/pomodoro')
 def pomodoro():
