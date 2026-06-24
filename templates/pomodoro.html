@@ -70,15 +70,15 @@
             .nav-btn { width: 100%; margin-top: 1rem; background: transparent; color: #888; border: 1px solid #ddd; }
             body.dark-mode .nav-btn { border-color: #444; }
             .theme-btn { position: absolute; top: 1rem; right: 1rem; width: auto; background: rgba(255,255,255,0.1); backdrop-filter: blur(4px); }
-            .leave-btn { position: absolute; top: 1rem; left: 1rem; width: auto; background: rgba(255, 0, 0, 0.1); border: 1px solid rgba(255, 0, 0, 0.3); color: #ff5252; padding: 6px 10px; font-size: 0.75rem; }
+            .leave-btn { position: absolute; top: 1rem; left: 1rem; background: rgba(255, 0, 0, 0.1); border: 1px solid rgba(255, 0, 0, 0.3); color: #ff5252; padding: 4px 8px; font-size: 0.7rem; border-radius: 6px; cursor: pointer; z-index: 100; }
         </style>
     </head>
     <body class="state-focus">
         <button class="theme-btn" id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
-        <button class="leave-btn" onclick="window.location.href='/'">Leave Anyway</button>
+        {% extends "base.html" %}
+        {% block content %}
         <div class="container">
-            {% extends "base.html" %}
-            {% block content %}
+            <button class="leave-btn" onclick="window.location.href='/'">Leave Anyway</button>
             <div id="cmdbar" class="hidden"><input id="commandInput" type="'text" placeholder="type command..."></div>
             <h2>Pomodoro</h2>
             {% if current_task %}
@@ -113,7 +113,7 @@
                 <span>User: <strong>{{user}}</strong></span>
                 <span>Points: <strong>{{points}}</strong></span>
             </div>
-            {% endblock %}
+            <a href="/"><button class="nav-btn" id="navBtn">Exit</button></a>
         </div>
         <form id="completeForm" action="/completed_pomodoro" method="POST" style="display:none;"><input type="hidden" name="duration" id="durationInput" value="25"></form>
         <script>
@@ -169,6 +169,7 @@
                 document.getElementById("fcustomBtn").disabled = true;
                 document.getElementById("bcustomBtn").disabled = true;
                 document.getElementById("stopBtn").disabled = true;
+                document.getElementById("navBtn").disabled = true; // 确保计时中禁用 Exit
                 document.getElementById("pauseBtn").innerText = "Pause";
                 updateVisuals();
                 timer = setInterval(() => {
@@ -196,6 +197,7 @@
             function resetTimer() {
                 clearInterval(timer); timer = null; timeLeft = totalTime;
                 document.getElementById("startBtn").disabled = false;
+                document.getElementById("navBtn").disabled = false; // 恢复 Exit
                 document.getElementById("focusBtn").disabled = false;
                 document.getElementById("deepBtn").disabled = false;
                 document.getElementById("breakBtn").disabled = false;
@@ -205,5 +207,6 @@
                 updateVisuals();
             }
         </script>
+        {% endblock %}
     </body>
 </html>
