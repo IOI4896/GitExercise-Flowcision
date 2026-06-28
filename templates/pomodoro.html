@@ -1,212 +1,410 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Flowcision - Pomodoro</title>
-        <style>
-            :root {
-                --focus-color: #ff5252;
-                --break-color: #4CAF50;
-                --pause-color: #ff9800;
-                --bg-focus: #1a237e;
-                --bg-break: #1b5e20;
-                --bg-pause: #e65100;
-                --card-bg: #ffffff;
-                --text-main: #333333;
-            }
-            body {
-                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-                background: var(--bg-focus);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                min-height: 100vh;
-                margin: 0;
-                color: var(--text-main);
-                transition: background 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            }
-            body.state-focus:not(.rain):not(.ocean):not(.white_noise) { background: var(--bg-focus); }
-            body.state-break:not(.rain):not(.ocean):not(.white_noise) { background: var(--bg-break); }
-            body.state-pause:not(.rain):not(.ocean):not(.white_noise) { background: var(--bg-pause); }
-            body.dark-mode { --card-bg: #1e1e1e; --text-main: #e0e0e0; }
-            body.dark-mode.state-focus:not(.rain):not(.ocean):not(.white_noise) { background: #0a0e29; }
-            body.dark-mode.state-break:not(.rain):not(.ocean):not(.white_noise) { background: #0d1f0e; }
-            body.dark-mode.state-pause:not(.rain):not(.ocean):not(.white_noise) { background: #2e1000; }
-            .container {
-                position: relative;
-                background: var(--card-bg);
-                padding: 2rem;
-                border-radius: 24px;
-                box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-                width: 90%;
-                max-width: 420px;
-                text-align: center;
-                transition: all 0.3s ease;
-            }
-            h2 { font-weight: 700; margin-bottom: 0.5rem; color: var(--text-main); }
-            h3 { font-weight: 500; margin-bottom: 0.5rem; color: var(--text-main); }
-            .timer-wrapper { position: relative; width: 200px; height: 200px; margin: 1.5rem auto; }
-            .progress-ring { transform: rotate(-90deg); }
-            .progress-ring__circle { stroke-dasharray: 565.48; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear, stroke 0.6s ease; }
-            #timer { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 3.5rem; font-weight: 800; margin: 0; transition: color 0.6s ease; }
-            .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
-            .custom-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-            input[type="number"] { padding: 12px 8px; border: 1px solid rgba(0,0,0,0.1); border-radius: 12px; font-size: 0.9rem; text-align: center; outline: none; background: rgba(0,0,0,0.03); color: var(--text-main); font-weight: 600; width: 100%; box-sizing: border-box; }
-            body.dark-mode input[type="number"] { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); color: #e0e0e0; }
-            button { padding: 12px 8px; border: none; border-radius: 12px; cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: 0.2s; color: white; }
-            button:active { transform: scale(0.96); }
-            button:disabled { opacity: 0.4; cursor: not-allowed; }
-            .mode-btn { background: rgba(33, 150, 243, 0.15); color: #2196F3; }
-            body.dark-mode .mode-btn { background: rgba(33, 150, 243, 0.3); color: #90caf9; }
-            .custom-btn { background: rgba(156, 39, 176, 0.15); color: #9c27b0; }
-            body.dark-mode .custom-btn { background: rgba(156, 39, 176, 0.3); color: #ce93d8; }
-            .start-btn { background: #4CAF50; }
-            .pause-btn { background: #ff9800; }
-            .stop-btn { background: #f44336; }
-            .action-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-            .info { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(0,0,0,0.05); font-size: 0.85rem; color: #888; }
-            body.dark-mode .info { border-top-color: rgba(255,255,255,0.05); }
-            .nav-btn { width: 100%; margin-top: 1rem; background: transparent; color: #888; border: 1px solid #ddd; }
-            body.dark-mode .nav-btn { border-color: #444; }
-            .theme-btn { position: absolute; top: 1rem; right: 1rem; width: auto; background: rgba(255,255,255,0.1); backdrop-filter: blur(4px); }
-            .leave-btn { position: absolute; top: 1rem; left: 1rem; background: rgba(255, 0, 0, 0.1); border: 1px solid rgba(255, 0, 0, 0.3); color: #ff5252; padding: 4px 8px; font-size: 0.7rem; border-radius: 6px; cursor: pointer; z-index: 100; }
-        </style>
-    </head>
-    <body class="state-focus">
-        <button class="theme-btn" id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
-        {% extends "base.html" %}
-        {% block content %}
-        <div class="container">
-            <button class="leave-btn" onclick="window.location.href='/'">Leave Anyway</button>
-            <div id="cmdbar" class="hidden"><input id="commandInput" type="'text" placeholder="type command..."></div>
-            <h2>Pomodoro</h2>
-            {% if current_task %}
-                <h3>Current Task: <strong>{{current_task}}</strong></h3>
-            {% else %}
-                <h3>Current Task: <strong>None</strong></h3>
-            {% endif %}
-            <div class="timer-wrapper">
-                <svg class="progress-ring" width="200" height="200">
-                    <circle stroke="rgba(0,0,0,0.05)" stroke-width="8" fill="transparent" r="90" cx="100" cy="100"/>
-                    <circle class="progress-ring__circle" stroke-width="8" stroke-linecap="round" fill="transparent" r="90" cx="100" cy="100"/>
-                </svg>
-                <div id="timer">25:00</div>
-            </div>
-            <div class="btn-group">
-                <button class="mode-btn" id="focusBtn" onclick="setMode(25, 'focus')">25m Focus</button>
-                <button class="mode-btn" id="deepBtn" onclick="setMode(50, 'focus')">50m Focus</button>
-                <button class="mode-btn" id="breakBtn" onclick="setMode(5, 'break')">5m Break</button>
-                <button class="mode-btn" onclick="setMode('test', 'focus')">Test 5s</button>
-            </div>
-            <div class="custom-group">
-                <input type="number" id="customInput" placeholder="Min" min="1" max="180">
-                <button class="custom-btn" id="fcustomBtn" onclick="applyCustom('focus')">Set Focus</button>
-                <button class="custom-btn" id="bcustomBtn" onclick="applyCustom('break')">Set Break</button>
-            </div>
-            <div class="action-group">
-                <button class="start-btn" id="startBtn" onclick="startTimer()">Start</button>
-                <button class="pause-btn" id="pauseBtn" onclick="pauseTimer()">Pause</button>
-                <button class="stop-btn" id="stopBtn" onclick="resetTimer()">Reset</button>
-            </div>
-            <div class="info">
-                <span>User: <strong>{{user}}</strong></span>
-                <span>Points: <strong>{{points}}</strong></span>
-            </div>
-            <a href="/"><button class="nav-btn" id="navBtn">Exit</button></a>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flowcision - Focus Timer</title>
+    <style>
+        :root {
+            --focus-color: #ff5252;
+            --break-color: #4CAF50;
+            --pause-color: #ff9800;
+            --bg-focus: #1a237e;
+            --bg-break: #1b5e20;
+            --bg-pause: #e65100;
+            --card-bg: #ffffff;
+            --text-main: #333333;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-focus);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: var(--text-main);
+            transition: background 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.state-focus:not(.rain):not(.ocean):not(.white_noise) {
+            background: var(--bg-focus);
+        }
+
+        body.state-break:not(.rain):not(.ocean):not(.white_noise) {
+            background: var(--bg-break);
+        }
+
+        body.state-pause:not(.rain):not(.ocean):not(.white_noise) {
+            background: var(--bg-pause);
+        }
+
+        body.dark-mode {
+            --card-bg: #1e1e1e;
+            --text-main: #e0e0e0;
+        }
+
+        body.dark-mode.state-focus:not(.rain):not(.ocean):not(.white_noise) {
+            background: #0a0e29;
+        }
+
+        body.dark-mode.state-break:not(.rain):not(.ocean):not(.white_noise) {
+            background: #0d1f0e;
+        }
+
+        body.dark-mode.state-pause:not(.rain):not(.ocean):not(.white_noise) {
+            background: #2e1000;
+        }
+
+        .container {
+            position: relative;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 420px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        h2 {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        h3 {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        .timer-wrapper {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 1.5rem auto;
+        }
+
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring__circle {
+            stroke-dasharray: 565.48;
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 1s linear, stroke 0.6s ease;
+        }
+
+        #timer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin: 0;
+            transition: color 0.6s ease;
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .custom-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        input[type="number"] {
+            padding: 12px 8px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            text-align: center;
+            outline: none;
+            background: rgba(0, 0, 0, 0.03);
+            color: var(--text-main);
+            font-weight: 600;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        body.dark-mode input[type="number"] {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
+        }
+
+        button {
+            padding: 12px 8px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: 0.2s;
+            color: white;
+        }
+
+        button:active {
+            transform: scale(0.96);
+        }
+
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .mode-btn {
+            background: rgba(33, 150, 243, 0.15);
+            color: #2196F3;
+        }
+
+        body.dark-mode .mode-btn {
+            background: rgba(33, 150, 243, 0.3);
+            color: #90caf9;
+        }
+
+        .custom-btn {
+            background: rgba(156, 39, 176, 0.15);
+            color: #9c27b0;
+        }
+
+        body.dark-mode .custom-btn {
+            background: rgba(156, 39, 176, 0.3);
+            color: #ce93d8;
+        }
+
+        .start-btn {
+            background: #4CAF50;
+        }
+
+        .pause-btn {
+            background: #ff9800;
+        }
+
+        .stop-btn {
+            background: #f44336;
+        }
+
+        .action-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+        }
+
+        .info {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        body.dark-mode .info {
+            border-top-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-btn {
+            width: 100%;
+            margin-top: 1rem;
+            background: transparent;
+            color: #888;
+            border: 1px solid #ddd;
+        }
+
+        body.dark-mode .nav-btn {
+            border-color: #444;
+        }
+
+        .theme-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(4px);
+        }
+
+        .leave-btn {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: #ff5252;
+            padding: 4px 8px;
+            font-size: 0.7rem;
+            border-radius: 6px;
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        body.dark-mode #live-clock-container {
+            background: rgba(34, 37, 75, 0.8) !important;
+            color: #ffffff !important;
+            border: 2px solid rgba(255, 255, 255, 0.1) !important;
+        }
+    </style>
+</head>
+
+<body class="state-focus">
+    <button class="theme-btn" id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
+    {% extends "base.html" %}
+    {% block content %}
+    <div class="container">
+        <button class="leave-btn" id="navBtn" onclick="window.location.href='/'">Leave Anyway</button>
+        <div id="cmdbar" class="hidden"><input id="commandInput" type="'text" placeholder="type command..."></div>
+        <h2>Focus Timer</h2>
+        {% if current_task %}
+        <h3>Current Task: <strong>{{current_task}}</strong></h3>
+        {% else %}
+        <h3>Current Task: <strong>None</strong></h3>
+        {% endif %}
+        <div class="timer-wrapper">
+            <svg class="progress-ring" width="200" height="200">
+                <circle stroke="rgba(0,0,0,0.05)" stroke-width="8" fill="transparent" r="90" cx="100" cy="100" />
+                <circle class="progress-ring__circle" stroke-width="8" stroke-linecap="round" fill="transparent" r="90"
+                    cx="100" cy="100" />
+            </svg>
+            <div id="timer">25:00</div>
         </div>
-        <form id="completeForm" action="/completed_pomodoro" method="POST" style="display:none;"><input type="hidden" name="duration" id="durationInput" value="25"></form>
-        <script>
-            let timer = null, selectedDuration = 25, totalTime = 25 * 60, timeLeft = totalTime, currentState = 'focus';
-            const circle = document.querySelector('.progress-ring__circle'), circumference = 2 * Math.PI * 90;
-            document.addEventListener("DOMContentLoaded", () => {
-                if (localStorage.getItem("flowcision-theme") === "dark") {
-                    document.body.classList.add("dark-mode");
-                    document.getElementById("themeToggle").innerText = "☀️ Light";
-                }
-                updateVisuals();
-            });
-            function toggleTheme() {
-                document.body.classList.toggle("dark-mode");
-                const isDark = document.body.classList.contains("dark-mode");
-                localStorage.setItem("flowcision-theme", isDark ? "dark" : "light");
-                document.getElementById("themeToggle").innerText = isDark ? "☀️ Light" : "🌙 Dark";
+        <div class="btn-group">
+            <button class="mode-btn" id="focusBtn" onclick="setMode(25, 'focus')">25m Focus</button>
+            <button class="mode-btn" id="deepBtn" onclick="setMode(50, 'focus')">50m Focus</button>
+            <button class="mode-btn" id="breakBtn" onclick="setMode(5, 'break')">5m Break</button>
+            <button class="mode-btn" onclick="setMode('test', 'focus')">Test 5s</button>
+        </div>
+        <div class="custom-group">
+            <input type="number" id="customInput" placeholder="Min" min="1" max="180">
+            <button class="custom-btn" id="fcustomBtn" onclick="applyCustom('focus')">Set Focus</button>
+            <button class="custom-btn" id="bcustomBtn" onclick="applyCustom('break')">Set Break</button>
+        </div>
+        <div class="action-group">
+            <button class="start-btn" id="startBtn" onclick="startTimer()">Start</button>
+            <button class="pause-btn" id="pauseBtn" onclick="pauseTimer()">Pause</button>
+            <button class="stop-btn" id="stopBtn" onclick="resetTimer()">Reset</button>
+        </div>
+        <div class="info">
+            <span>User: <strong>{{user}}</strong></span>
+            <span>Points: <strong>{{points}}</strong></span>
+        </div>
+        <a href="/"><button class="nav-btn" id="navBtn">Exit</button></a>
+    </div>
+
+    <div id="live-clock-container"
+        style="position: fixed; top: 20px; left: 20px; z-index: 9999; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(8px); padding: 10px 18px; border-radius: 30px; font-weight: bold; font-family: sans-serif; color: #333; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 2px solid rgba(102, 126, 234, 0.3); display: flex; align-items: center; gap: 8px; transition: all 0.3s ease;">
+        <span style="font-size: 1.1em;">🕰️</span> <span id="clock-time">00:00:00</span>
+    </div>
+    <form id="completeForm" action="/completed_pomodoro" method="POST" style="display:none;"><input type="hidden"
+            name="duration" id="durationInput" value="25"></form>
+    <script>
+        function updateClock() {
+            document.getElementById('clock-time').innerText = new Date().toLocaleTimeString();
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        let timer = null, selectedDuration = 25, totalTime = 25 * 60, timeLeft = totalTime, currentState = 'focus';
+        const circle = document.querySelector('.progress-ring__circle'), circumference = 2 * Math.PI * 90;
+        document.addEventListener("DOMContentLoaded", () => {
+            if (localStorage.getItem("flowcision-theme") === "dark") {
+                document.body.classList.add("dark-mode");
+                document.getElementById("themeToggle").innerText = "☀️ Light";
             }
-            function setMode(value, state) {
-                selectedDuration = value === 'test' ? 5 : value;
-                totalTime = value === 'test' ? 5 : value * 60;
-                currentState = state;
-                document.getElementById("durationInput").value = selectedDuration;
-                resetTimer();
-            }
-            function applyCustom(state) {
-                let val = parseInt(document.getElementById("customInput").value);
-                if (isNaN(val) || val <= 0) { alert("Please enter a valid number of minutes."); return; }
-                setMode(val, state);
-            }
-            function updateVisuals() {
-                let m = Math.floor(timeLeft / 60), s = timeLeft % 60;
-                let timeString = `${m}:${s < 10 ? '0' : ''}${s}`;
-                document.getElementById("timer").innerText = timeString;
-                let stateName = currentState === 'focus' ? 'Focus' : currentState === 'break' ? 'Break' : 'Pause';
-                document.title = `(${timeString}) ${stateName} - Flowcision`;
-                circle.style.strokeDashoffset = circumference - (timeLeft / totalTime) * circumference;
-                document.body.classList.remove('state-focus', 'state-break', 'state-pause');
-                let color;
-                if (currentState === 'pause') { document.body.classList.add('state-pause'); color = '#ff9800'; }
-                else if (currentState === 'break') { document.body.classList.add('state-break'); color = '#4CAF50'; }
-                else { document.body.classList.add('state-focus'); color = '#ff5252'; }
-                circle.style.stroke = color;
-                document.getElementById("timer").style.color = color;
-            }
-            function startTimer() {
-                if (timer) return;
-                if (currentState === 'pause') currentState = selectedDuration === 5 && totalTime !== 5 ? 'break' : 'focus';
-                document.getElementById("startBtn").disabled = true;
-                document.getElementById("focusBtn").disabled = true;
-                document.getElementById("deepBtn").disabled = true;
-                document.getElementById("breakBtn").disabled = true;
-                document.getElementById("fcustomBtn").disabled = true;
-                document.getElementById("bcustomBtn").disabled = true;
-                document.getElementById("stopBtn").disabled = true;
-                document.getElementById("navBtn").disabled = true; // 确保计时中禁用 Exit
-                document.getElementById("pauseBtn").innerText = "Pause";
-                updateVisuals();
-                timer = setInterval(() => {
-                    timeLeft--; updateVisuals();
-                    if (timeLeft <= 0) {
-                        clearInterval(timer); timer = null;
-                        const desktopEnabled = "{{desktop_notification or 0}}";
-                        const pomodoroEnabled = "{{pomodoro_notification or 0}}";
-                        if(desktopEnabled === "1" && pomodoroEnabled === "1" && Notification.permission === "granted"){
-                            new Notification("Pomodoro Complete", { body: "Time for a short break!" });
-                        }
-                        if (currentState === 'break') { alert("Break over!"); setMode(25, 'focus'); }
-                        else document.getElementById("completeForm").submit();
+            updateVisuals();
+        });
+        function toggleTheme() {
+            document.body.classList.toggle("dark-mode");
+            const isDark = document.body.classList.contains("dark-mode");
+            localStorage.setItem("flowcision-theme", isDark ? "dark" : "light");
+            document.getElementById("themeToggle").innerText = isDark ? "☀️ Light" : "🌙 Dark";
+        }
+        function setMode(value, state) {
+            selectedDuration = value === 'test' ? 5 : value;
+            totalTime = value === 'test' ? 5 : value * 60;
+            currentState = state;
+            document.getElementById("durationInput").value = selectedDuration;
+            resetTimer();
+        }
+        function applyCustom(state) {
+            let val = parseInt(document.getElementById("customInput").value);
+            if (isNaN(val) || val <= 0) { alert("Please enter a valid number of minutes."); return; }
+            setMode(val, state);
+        }
+        function updateVisuals() {
+            let m = Math.floor(timeLeft / 60), s = timeLeft % 60;
+            let timeString = `${m}:${s < 10 ? '0' : ''}${s}`;
+            document.getElementById("timer").innerText = timeString;
+            let stateName = currentState === 'focus' ? 'Focus' : currentState === 'break' ? 'Break' : 'Pause';
+            document.title = `(${timeString}) ${stateName} - Flowcision`;
+            circle.style.strokeDashoffset = circumference - (timeLeft / totalTime) * circumference;
+            document.body.classList.remove('state-focus', 'state-break', 'state-pause');
+            let color;
+            if (currentState === 'pause') { document.body.classList.add('state-pause'); color = '#ff9800'; }
+            else if (currentState === 'break') { document.body.classList.add('state-break'); color = '#4CAF50'; }
+            else { document.body.classList.add('state-focus'); color = '#ff5252'; }
+            circle.style.stroke = color;
+            document.getElementById("timer").style.color = color;
+        }
+        function startTimer() {
+            if (timer) return;
+            if (currentState === 'pause') currentState = selectedDuration === 5 && totalTime !== 5 ? 'break' : 'focus';
+            document.getElementById("startBtn").disabled = true;
+            document.getElementById("focusBtn").disabled = true;
+            document.getElementById("deepBtn").disabled = true;
+            document.getElementById("breakBtn").disabled = true;
+            document.getElementById("fcustomBtn").disabled = true;
+            document.getElementById("bcustomBtn").disabled = true;
+            document.getElementById("stopBtn").disabled = true;
+            document.getElementById("navBtn").disabled = true; // 确保计时中禁用 Exit
+            document.getElementById("pauseBtn").innerText = "Pause";
+            updateVisuals();
+            timer = setInterval(() => {
+                timeLeft--; updateVisuals();
+                if (timeLeft <= 0) {
+                    clearInterval(timer); timer = null;
+                    const desktopEnabled = "{{desktop_notification or 0}}";
+                    const pomodoroEnabled = "{{pomodoro_notification or 0}}";
+                    if (desktopEnabled === "1" && pomodoroEnabled === "1" && Notification.permission === "granted") {
+                        new Notification("Pomodoro Complete", { body: "Time for a short break!" });
                     }
-                }, 1000);
-            }
-            function pauseTimer() {
-                if (timer) {
-                    clearInterval(timer); timer = null; currentState = 'pause'; updateVisuals();
-                    document.getElementById("pauseBtn").innerText = "Resume";
-                    document.getElementById("startBtn").disabled = false;
-                    document.getElementById("stopBtn").disabled = false;
-                } else if (document.getElementById("pauseBtn").innerText === "Resume") startTimer();
-            }
-            function resetTimer() {
-                clearInterval(timer); timer = null; timeLeft = totalTime;
+                    if (currentState === 'break') { alert("Break over!"); setMode(25, 'focus'); }
+                    else document.getElementById("completeForm").submit();
+                }
+            }, 1000);
+        }
+        function pauseTimer() {
+            if (timer) {
+                clearInterval(timer); timer = null; currentState = 'pause'; updateVisuals();
+                document.getElementById("pauseBtn").innerText = "Resume";
                 document.getElementById("startBtn").disabled = false;
-                document.getElementById("navBtn").disabled = false; // 恢复 Exit
-                document.getElementById("focusBtn").disabled = false;
-                document.getElementById("deepBtn").disabled = false;
-                document.getElementById("breakBtn").disabled = false;
-                document.getElementById("fcustomBtn").disabled = false;
-                document.getElementById("bcustomBtn").disabled = false;
-                document.getElementById("pauseBtn").innerText = "Pause";
-                updateVisuals();
-            }
-        </script>
-        {% endblock %}
-    </body>
+                document.getElementById("stopBtn").disabled = false;
+            } else if (document.getElementById("pauseBtn").innerText === "Resume") startTimer();
+        }
+        function resetTimer() {
+            clearInterval(timer); timer = null; timeLeft = totalTime;
+            document.getElementById("startBtn").disabled = false;
+            document.getElementById("navBtn").disabled = false; // 恢复 Exit
+            document.getElementById("focusBtn").disabled = false;
+            document.getElementById("deepBtn").disabled = false;
+            document.getElementById("breakBtn").disabled = false;
+            document.getElementById("fcustomBtn").disabled = false;
+            document.getElementById("bcustomBtn").disabled = false;
+            document.getElementById("pauseBtn").innerText = "Pause";
+            updateVisuals();
+        }
+    </script>
+    {% endblock %}
+</body>
+
 </html>
