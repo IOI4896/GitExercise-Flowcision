@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Flowcision - Study Analyzer</title>
+        <title>Flowcision - Performance Assessment Analyzer</title>
         <style>
         
             body {
@@ -113,62 +113,30 @@
                 <div id="error-toast" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #ff4d4f; color: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); font-weight: bold; z-index: 1000; transition: opacity 0.5s;">
                     {{ messages[0] }}
                 </div>
-                <script>
-                    setTimeout(() => {
-                        let toast = document.getElementById("error-toast");
-                        if (toast) {
-                            toast.style.opacity = "0";
-                            setTimeout(() => toast.remove(), 500);
-                        }
-                    }, 3000);
-                </script>
             {% endif %}
+
         {% endwith %}
         <div class="container">
-            {% if user and (predicted_focus is not none or predicted_study is not none) %}
-                <div style = "background: #eef7ff; padding: 20px; border-radius: 10px; margin-bottom: 20px; ">
-                    <h1>Smart Prediction</h1>
-                    <p>Based on your recent Pomodoro, History, and Planner: </p>
-                    {% if predicted_study is not none %}
+            <h1>Performance Assessment Analyzer</h1>
+            <p>This assessment is generated automatically using your Planner, Timeboxing and History records.</p>
+
+            <div style = "background: #eef7ff; padding: 20px; border-radius: 10px; margin-bottom: 20px; ">
+                <h2>Current Academic Profile</h2>
+                {% if user and predicted_focus is not none %}
                         <p>Predicted Study: <strong>{{predicted_study}}</strong></p>
-                    {% endif %}
-
-                    {% if predicted_focus is not none %}
                         <p>Predicted Sleep: <strong>{{predicted_sleep}}</strong></p>
-                        <p>Predicted Focus: <strong>{{predicted_focus}}</strong></p>
-                        <p>Predicted Stress: <strong>{{predicted_stress}}</strong></p>
-                    {% endif %}
-                    <button type = "button" onclick = "usePrediction()">Use Smart Prediction</button>
-                </div>
-            {% endif %}
+                        <p>Predicted Focus (0-10): <strong>{{predicted_focus}}</strong></p>
+                        <p>Predicted Stress (0-10): <strong>{{predicted_stress}}</strong></p>
 
-            <form action="/result" method="POST">
-                <h1>Scenario Context</h1>
+                        <form action="/result" method="POST">
+                            <button type="submit">Generate Assessment</button>
+                        </form>
 
-                <label>Student Type: </label>
-                <select name="student_type">
-                    <option value="default">Default</option>
-                    <option value="foundation">Foundation</option>
-                    <option value="diploma">Diploma</option>
-                    <option value="degree">Degree</option>
-                </select>
+                {% else %}
+                    <p>Complete your Planner and Timeboxing to unlock Performance Assessment Analyzer.</p>
 
-                <h2>Enter Your Daily Data</h2>
-            
-                <label>Study Hours:</label>
-                <input type="number" id = "study" name="study" min="0" max="24">
-
-                <label>Sleep Hours:</label>
-                <input type="number" id = "sleep" name="sleep" min="0" max="24">
-
-                <label>Focus (0-10):</label>
-                <input type="number" id = "focus" name="focus" min="0" max="10">
-
-                <label>Stress (0-10):</label>
-                <input type="number" id = "stress" name="stress" min="0" max="10">
-
-                <button type="submit">Analyzer</button>
-            </form>
+                {% endif %}
+            </div>
 
             <nav>
                 <a href = "/">
@@ -178,6 +146,14 @@
         </div>
 
         <script>
+            setTimeout(() => {
+                        let toast = document.getElementById("error-toast");
+                        if (toast) {
+                            toast.style.opacity = "0";
+                            setTimeout(() => toast.remove(), 500);
+                        }
+                    }, 3000);
+
             function usePrediction() {
                 document.getElementById("focus").value = "{{predicted_focus}}";
 
