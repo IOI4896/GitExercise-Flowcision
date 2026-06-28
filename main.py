@@ -14,7 +14,7 @@ check_dependencies()
 
 #render_template = server to browser
 #request = browser to server
-from flask import Flask, render_template, request, redirect, session, send_from_directory, flash
+from flask import Flask, Response, render_template, request, redirect, session, send_from_directory, flash
 import sqlite3
 import os
 from simulation import *
@@ -27,12 +27,11 @@ from flask_limiter.util import get_remote_address
 import hashlib
 import csv
 import io
-from flask import Response
+import json
+import logging
 
 app = Flask(__name__)
 app.secret_key = "secret123"
-
-import logging
 
 # Initialize Security Audit Logging
 log_format = '%(asctime)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s'
@@ -182,9 +181,9 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT,
             day TEXT,
-            morning TEXT,
-            afternoon TEXT,
-            night TEXT
+            hour INTEGER,
+            task TEXT,
+            UNIQUE(username, day, hour)
         )
         """)
 
@@ -234,39 +233,6 @@ def get_user_timezone(username):
     finally:
         conn.close()
 
-def get_current_task(username):
-    conn = get_db()
-    conn.row_factory = sqlite3.Row
-    c = conn.cursor()
-
-    try:
-        user_timezone = get_user_timezone(username)
-
-        now = datetime.now(ZoneInfo(user_timezone))
-        current_day = now.strftime("%A")
-        current_hour = now.hour
-
-        if 5 <= current_hour < 12: #5am - Before 12pm
-            period = "morning"
-        elif current_hour < 18: #12pm - Before 6pm
-            period = "afternoon"
-        else: 
-            period = "night"
-
-        c.execute(f"""
-            SELECT {period} FROM planner WHERE username=? AND day=?
-        """, (username, current_day))
-
-        planner_data = c.fetchone()
-
-        if planner_data:
-            return planner_data[period]
-        
-        return None
-    
-    finally:
-        conn.close()
-
 @app.route('/save_timezone', methods = ["POST"])
 def save_timezone():
     data = request.get_json()
@@ -292,14 +258,17 @@ def register():
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
         conn = get_db()
         c = conn.cursor()
+
         try:
             c.execute("INSERT INTO users (username, password) VALUES (?,?)", (username, hashed_password))
             conn.commit()
             logger.info(f"SUCCESS: Account '{username}' successfully created.")
+
         except Exception as e:
             logger.warning(f"SECURITY ALERT: Failed registration for '{username}' from IP {ip_address}. Reason: Username exists.")
             flash("Username already exists")
             return redirect('/register')
+        
         finally:
             conn.close()
 
@@ -414,7 +383,6 @@ def login():
             return redirect('/login/')
         
     return render_template('login.html')
-
 
 @app.errorhandler(429)
 def ratelimit_handler(e):
@@ -538,87 +506,99 @@ def settings():
     
     return render_template("settings.html", settings_data = settings_data)
 
-#Simulation
+#Performance Assessment Analyzer
 @app.route('/index')
 def index():
     if 'user' not in session:
-        return render_template("index.html")
+        return redirect('/login')
     
     conn = get_db()
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
 
     try:
+        predicted_study = None
+        predicted_sleep = None
+        predicted_focus = None
+        predicted_stress = None
+
         c.execute("""
-            SELECT focus, stress FROM history WHERE username=? ORDER BY timestamp_utc DESC LIMIT 5
+            SELECT sleep FROM history WHERE username=? ORDER BY timestamp_utc DESC LIMIT 5
         """, (session['user'],))
 
-        history = c.fetchall()
-
-        c.execute("""
-            SELECT sleep FROM history WHERE username=? 
-        """, (session['user'],))
-
-        sleep_row = c.fetchone()
+        sleep_history = c.fetchall()
 
         today = datetime.now().strftime("%A")
 
         c.execute("""
-            SELECT morning, afternoon, night
+            SELECT hour, task
             FROM planner WHERE username=? AND day=?
         """, (session['user'], today))
 
-        planner_rows = c.fetchone()
+        planner_rows = c.fetchall()
+
+        planner_tasks = [row["task"] for row in planner_rows if row["task"]]
+        planner_categories = [classify_task(t) for t in planner_tasks]
+
+        stress_adjustment = 0
+        focus_adjustment = 0
 
         if planner_rows:
-            morning_category = classify_task(planner_rows["morning"])
-            afternoon_category = classify_task(planner_rows["afternoon"])
-            night_category = classify_task(planner_rows["night"])
-
-            predicted_study, e = study_pattern(sleep_row["sleep"], morning_category, afternoon_category, night_category)
+            predicted_study, _ = study_pattern(planner_categories)
         
-        if history:
-            predicted_sleep = sleep_row["sleep"]
+            planned_sleep = calculate_planned_sleep(planner_rows)
 
-            history_record = [
-                {
-                    "focus_level": h["focus"],
-                    "stress_level": h["stress"]
-                }
-                for h in history
-            ]
+            previous_sleep = [row["sleep"] for row in sleep_history if row["sleep"] is not None]
+            predicted_sleep = predict_sleep(planned_sleep, previous_sleep)
 
-            c.execute("""
-                SELECT COUNT(*) FROM pomodoro WHERE username=? AND timestamp_utc >= datetime('now', '-1 day')
-            """,(session['user'],))
-
-            pomodoro_count = c.fetchone()[0]
-
-            predicted_focus, predicted_stress = predict_base_state(history_record, pomodoro_count)
+            all_tasks = []
+            for row in planner_rows:
+                if row["task"]:
+                    all_tasks.append(row["task"])
         
-        if not planner_rows and not history:
-            return render_template("index.html", predicted_focus = None, predicted_stress = None, predicted_study = None, predicted_sleep = None)
+            categories = [classify_task(task) for task in all_tasks]
+            stress_adjustment = planner_stress(categories)
+            focus_adjustment = planner_focus(categories)
+
+        c.execute("""
+            SELECT COUNT(*) FROM pomodoro WHERE username=? AND timestamp_utc >= datetime('now', '-1 day')
+        """,(session['user'],))
+
+        pomodoro_count = c.fetchone()[0]
+
+        if planner_tasks:
+            predicted_focus, predicted_stress = predict_base_state(pomodoro_count, stress_adjustment, focus_adjustment)
         
-        elif not history:
-            return render_template("index.html", predicted_focus = None, predicted_stress = None, predicted_study = predicted_study, predicted_sleep = None)
-        
-        elif not planner_rows:
-            return render_template("index.html", predicted_focus = predicted_focus, predicted_stress = predicted_stress, predicted_study = None, predicted_sleep = predicted_sleep)
+        if not planner_rows:
+            predicted_focus = None
+            predicted_stress = None
 
     finally:
         conn.close()
 
-    return render_template("index.html", predicted_focus = predicted_focus, predicted_stress = predicted_stress, predicted_study = predicted_study, predicted_sleep = predicted_sleep)
+    if any(x is None for x in [predicted_study, predicted_sleep, predicted_focus, predicted_stress]):
+        return render_template("index.html",
+            predicted_focus = None,
+            predicted_stress = None,
+            predicted_study = None,
+            predicted_sleep = None)
+    
+    session["predicted_focus"] = predicted_focus
+    session["predicted_stress"] = predicted_stress
+    session["predicted_study"] = predicted_study
+    session["predicted_sleep"] = predicted_sleep
 
-
+    return render_template("index.html", 
+        predicted_focus = round(predicted_focus), 
+        predicted_stress = round(predicted_stress), 
+        predicted_study = round(predicted_study), 
+        predicted_sleep = round(predicted_sleep))
 
 #Dashboard
 @app.route('/dashboard')
 def dashboard():
     if 'user'not in session:
         return redirect('/login')
-    
-    task = session.get('current_task')
     
     conn = get_db()
     conn.row_factory = sqlite3.Row
@@ -661,7 +641,7 @@ def dashboard():
 
         #Planner Analytics
         c.execute("""
-            SELECT morning, afternoon, night
+            SELECT task
             FROM planner WHERE username=?
         """, (session['user'],))
 
@@ -669,7 +649,8 @@ def dashboard():
 
         all_tasks = []
         for row in planner_rows:
-            all_tasks.extend([row["morning"], row["afternoon"], row["night"]])
+            if row["task"]:
+                all_tasks.append(row["task"])
         
         categories = [classify_task(task) for task in all_tasks]
         study_count, academic_count, rest_count, exercise_count, work_count, other_count = task_count(categories)
@@ -765,7 +746,6 @@ def export_csv():
     conn = get_db()
     c = conn.cursor()
     
-    
     c.execute("SELECT study, sleep, focus, stress, score, timestamp_utc FROM history WHERE username=?", (username,))
     records = c.fetchall()
     conn.close()
@@ -787,76 +767,133 @@ def export_csv():
 def planner():
     if 'user' not in session:
         return redirect('/login')
-    
-    import json
-    
+
     conn = get_db()
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
 
     days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-    default_presets = ["Lecture", "Self Study", "Rest", "Revision", "Assignment", "Examination"]
+    default_presets = ["Lecture", "Self Study", "Rest", "Sleep", "Revision", "Assignment", "Examination"]
 
     try:
-        c.execute("""
-            CREATE TABLE IF NOT EXISTS planner_24h (
-                username TEXT PRIMARY KEY,
-                planner_data TEXT
-            )
-        """)
-        conn.commit()
-
         if request.method == 'POST':
-            form_data = request.form.to_dict()
-            
-            for key, task in list(form_data.items()):
-                if task == "Custom":
-                    custom_val = form_data.get(f"{key}_custom")
-                    if custom_val:
-                        form_data[key] = custom_val
-                        task = custom_val
-                
-                if task and task not in default_presets and task != "Custom" and not key.endswith("_custom"):
-                    c.execute("SELECT * FROM planner_presets WHERE username=? AND task=?", (session['user'], task))
-                    if not c.fetchone():
-                        c.execute("INSERT INTO planner_presets (username, task) VALUES (?,?)", (session['user'], task))
+            for day in days:
+                for hour in range(24):
+                    task = request.form.get(f"{day}_h{hour}")
 
-            planner_json = json.dumps(form_data)
-            c.execute("SELECT username FROM planner_24h WHERE username=?", (session['user'],))
-            if c.fetchone():
-                c.execute("UPDATE planner_24h SET planner_data=? WHERE username=?", (planner_json, session['user']))
-            else:
-                c.execute("INSERT INTO planner_24h (username, planner_data) VALUES (?,?)", (session['user'], planner_json))
+                    if task == "Custom":
+                        custom_task = request.form.get(f"{day}_h{hour}_custom")
+                        task = custom_task.strip() if task else ""
+                    else:
+                        task = task.strip() if task else ""
+                    
+                    if not task:
+                        task = None
+
+                    c.execute("""
+                        INSERT INTO planner
+                        (username, day, hour, task)
+                        VALUES(?,?,?,?)
+                        ON CONFLICT(username, day, hour)
+                        DO UPDATE SET task=excluded.task
+                    """, (session['user'], day, hour, task))
+
+                    #Save Custom Preset
+                    if task and task not in default_presets:
+                        c.execute("""
+                            SELECT * FROM planner_presets
+                            WHERE username=? AND task=?
+                        """, (session['user'], task))
+
+                        if not c.fetchone():
+                            c.execute("""
+                                INSERT INTO planner_presets
+                                (username, task)
+                                VALUES (?,?)
+                            """, (session['user'], task))
+
             conn.commit()
-        
-        c.execute("SELECT planner_data FROM planner_24h WHERE username=?", (session['user'],))
-        row = c.fetchone()
-        planner_data = json.loads(row['planner_data']) if row and row['planner_data'] else {}
 
-        c.execute("SELECT task FROM planner_presets WHERE username=?", (session['user'],))
-        custom_presets = [r['task'] for r in c.fetchall()]
-        all_presets = list(set(default_presets + custom_presets))
+        #Load Preset Data
+        c.execute("""
+            SELECT day, hour, task FROM planner WHERE username=?
+        """, (session['user'],))
 
-        all_tasks_raw = [task for key, task in planner_data.items() if task and not key.endswith('_custom') and task != "Custom"]
-        unique_tasks = list(set(all_tasks_raw))
-        task_category_map = {t: classify_task(t) for t in unique_tasks}
-        
-        categories = [task_category_map[t] for t in all_tasks_raw]
+        rows = c.fetchall()
+
+        #Custom Preset
+        planner_data = {}
+
+        for row in rows:
+            day = row["day"]
+            hour = row["hour"]
+            task = row["task"]
+
+            if day not in planner_data:
+                planner_data[day] = {}
+            
+            if task:
+                planner_data[day][hour] = task
+
+        c.execute("""
+            SELECT task FROM planner_presets WHERE username=?
+        """, (session['user'],))
+
+        custom_rows = c.fetchall()
+
+        custom_presets = [row['task'] for row in custom_rows]
+        all_presets = default_presets + [p for p in custom_presets if p not in default_presets]
+
+        all_tasks = []
+        for day in planner_data.values():
+            for task in day.values():
+                if task and task != "Empty":
+                    all_tasks.append(task)
+
+        categories = [classify_task(task) for task in all_tasks]
         recognition_rate, analysis_confidence, planner_suggestion = generate_planner_suggestion(categories)
 
-        current_task = get_current_task(session['user'])
-    
+        day = datetime.now().strftime("%A")
+        hour = datetime.now().hour
+
+        c.execute("""
+            SELECT task FROM planner
+            WHERE username=? AND day=? AND hour=?
+        """, (session['user'], day, hour))
+
+        current_task_rows = c.fetchone()
+        current_task = current_task_rows["task"]
+
+        planner_json = json.dumps(planner_data)
+
     finally:
         conn.close()
 
-    return render_template("planner.html", days = days, planner_data = planner_data, all_presets = all_presets, planner_suggestion = planner_suggestion, analysis_confidence = analysis_confidence, recognition_rate = recognition_rate, current_task = current_task)
+    return render_template("planner.html", days = days, planner_data = planner_data, planner_json = planner_json, all_presets = all_presets, planner_suggestion = planner_suggestion, analysis_confidence = analysis_confidence, recognition_rate = recognition_rate, current_task = current_task)
+
 #Pomodoro
 @app.route('/pomodoro')
 def pomodoro():
     if 'user' not in session:
         return redirect('/login')
     
-    current_task = get_current_task(session['user'])
+    conn = get_db()
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+    try:
+        day = datetime.now().strftime("%A")
+        hour = datetime.now().hour
+
+        c.execute("""
+            SELECT task FROM planner
+            WHERE username=? AND day=? AND hour=?
+        """, (session['user'], day, hour))
+
+        current_task_rows = c.fetchone()
+        current_task = current_task_rows["task"]
+    
+    finally:
+        conn.close()
 
     return render_template('pomodoro.html', current_task = current_task)
 
@@ -934,33 +971,20 @@ def backrooms():
     
     return render_template("backrooms.html", user = session['user'], points= points, timezone = user_timezone)
 
-#Market Research
-@app.route('/market_research')
-def market_research():
-    return render_template("market_research.html")
-
 #Result
 @app.route('/result', methods = ['POST'])
 def result():
-    student_type = request.form['student_type']
-
-    try:
-        study = int(request.form['study'])
-        sleep = int(request.form['sleep'])
-        focus = int(request.form['focus'])
-        stress = int(request.form['stress'])
-    except (ValueError, KeyError):
-        flash("Please enter valid numbers")
-        return redirect('/index')
-        
-    if not check_valid_input(study, sleep, focus, stress):
-        flash("Invalid input")
-        return redirect('/index')
+    study = session.get("predicted_study")
+    sleep = session.get("predicted_sleep")
+    focus = session.get("predicted_focus")
+    stress = session.get("predicted_stress")
+    
+    if any(x is None for x in [study, sleep, focus, stress]):
+        flash("Assessment data unavailable")
+        return redirect("/index")
     
     #timestamp_utc = Change time record to UTC (EX: Malaysia is UTC +8)
     timestamp_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-    
-    behavior_msg = "Login any account and try our Pomodoro Technique for more accurate result"
 
     if 'user' in session:
         conn = get_db()
@@ -978,11 +1002,11 @@ def result():
             today = datetime.now().strftime("%A")
 
             c.execute("""
-                SELECT morning, afternoon, night
+                SELECT hour, task
                 FROM planner WHERE username=? AND day=?
             """, (session['user'], today))
 
-            planner_rows = c.fetchone()
+            planner_rows = c.fetchall()
 
             study_count = "None"
             academic_count = "None"
@@ -990,25 +1014,14 @@ def result():
             work_count = "None"
 
             if planner_rows:
-                morning_category = classify_task(planner_rows["morning"])
-                afternoon_category = classify_task(planner_rows["afternoon"])
-                night_category = classify_task(planner_rows["night"])
-
-                planner_msg = planner_feedback(study, sleep, morning_category, afternoon_category, night_category)
-
-                c.execute("""
-                    SELECT morning, afternoon, night
-                    FROM planner WHERE username=?
-                """, (session['user'],))
-
-                planner_rows = c.fetchall()
-
-                all_tasks = []
+                categories = []
                 for row in planner_rows:
-                    all_tasks.extend([row["morning"], row["afternoon"], row["night"]])
-        
-                categories = [classify_task(task) for task in all_tasks]
+                    if row["task"]:
+                        categories.append(classify_task(row["task"]))
+
                 study_count, academic_count, rest_count, e0, work_count, e1 = task_count(categories)
+                planner_msg = planner_feedback(study, categories)
+
             else:
                 planner_msg = ["Create your weekly schedule to receive smart planner suggestions."]
 
@@ -1016,10 +1029,8 @@ def result():
             conn.close()
 
         behavior_msg = behavior_analysis(pomodoro_count, music_theme)
-        focus, stress = apply_pomodoro_effects(focus, stress, pomodoro_count)
 
-    analysis, recommendation, potential_strengths, potential_risks = analyze_factors(study, sleep, focus, stress, study_count, academic_count, work_count, rest_count, pomodoro_count)
-    recommendation = apply_scenario_context(student_type, recommendation)
+    analysis, recommendation, potential_strengths, potential_risks, interviewer_note = analyze_factors(study, sleep, focus, stress, study_count, academic_count, work_count, rest_count, pomodoro_count)
 
     score = calculate_score(study, sleep, focus, stress)
 
@@ -1038,7 +1049,7 @@ def result():
         c = conn.cursor()
 
         try:
-            #Save history if user had login
+            #Save history
             c.execute("""
                 INSERT INTO history (username, study, sleep, focus, stress, score, timestamp_utc) VALUES (?,?,?,?,?,?,?)
             """, (session['user'], study, sleep, focus, stress, score, timestamp_utc))
@@ -1055,14 +1066,13 @@ def result():
         recommendation = recommendation,
         potential_strengths = potential_strengths,
         potential_risks = potential_risks,
+        interviewer_note = interviewer_note,
         main_issue = main_issue,
         recs = recs,
         behavior_msg = behavior_msg,
         planner_msg = planner_msg,
         plot_url = plot_url
     )
-
-
 
 if __name__ == "__main__":
     #Prevent Flask auto-reload that turn off socket
