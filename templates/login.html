@@ -104,16 +104,6 @@
                     <div style="font-weight: bold; font-size: 16px; margin-bottom: 4px;">Login Failed</div>
                     <div style="font-size: 14px; opacity: 0.9;">{{ messages[0] }}</div>
                 </div>
-                <script>
-                    setTimeout(() => {
-                        let toast = document.getElementById("error-toast");
-                        if (toast) {
-                            toast.style.opacity = "0";
-                            toast.style.transform = "translate(-50%, 20px)";
-                            setTimeout(() => toast.remove(), 400);
-                        }
-                    }, 3000);
-                </script>
             {% endif %}
         {% endwith %}
 
@@ -134,13 +124,22 @@
             <br><br>
             <div class="encourage-card">
                 <h3>Start Your productivity Journey</h3>
-                <p>Every study session, simulation, and Pomodoro completion contributes to your progress.</p>
+                <p>Every study session, simulation, and focus timer completion contributes to your progress.</p>
                 <p>Create an account to save your achievements, earn points, and watch your virtual companion grow alongside your productivity journey.</p>
             </div>
         
         </div>
 
         <script>
+            setTimeout(() => {
+                let toast = document.getElementById("error-toast");
+                if (toast) {
+                    toast.style.opacity = "0";
+                    toast.style.transform = "translate(-50%, 20px)";
+                    setTimeout(() => toast.remove(), 400);
+                }
+            }, 3000);
+            
             function applyTheme(theme) {
                 const btn = document.getElementById('dark-mode-btn');
                 const icon = document.getElementById('theme-icon');
