@@ -2,8 +2,7 @@
 <html>
     <head>
         <title>Flowcision - Settings</title>
-<style>
-            
+        <style> 
             body {
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -155,7 +154,7 @@
                     {% if settings_data['pomodoro_notification'] %}
                     checked
                     {% endif %}>
-                    Pomodoro Notification
+                    Focus Timer Notification
                 </label>
 
                 <hr>
@@ -208,7 +207,7 @@
                     </tr>
 
                     <tr>
-                        <td>Pomodoro Hotkey: </td>
+                        <td>Focus Timer Hotkey: </td>
                         <td><input class="hotkey-input" name="pomodoro_hotkey" value="{{pomodoro_hotkey}}"></td>
                     </tr>
 
@@ -256,10 +255,10 @@
                     <option value="white_noise">White Noise</option>
                 </select>
 
-                <br><br>
+                <p style="margin-bottom: 20px;"></p>
 
-                <label>Volume</label>
-                <input type="range" name="music_volume" min="0" max="100" value="{{settings_data['music_volume']}}">
+                <label><p style="margin-right: 40px;">Volume</p>
+                <input type="range" name="music_volume" min="0" max="100" value="{{settings_data['music_volume']}}"></label>
 
                 <button type="submit">Save Settings</button>
             </form>
