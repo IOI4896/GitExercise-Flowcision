@@ -42,18 +42,13 @@ def calculate_score(study, sleep, focus ,stress):
 
     return round(base * penalty * 100, 2)
 
-#Double check input
-def check_valid_input(study, sleep, focus, stress):
-    if study + sleep > 24 or focus > 10 or stress > 10:
-        return False
-    return True
-
 #Analysis Data
 def analyze_factors(study, sleep, focus, stress, study_count, academic_count, work_count, rest_count, pomodoro_streak):
     analysis = []
     recommendation = []
     strengths = []
     risks = []
+    interviewer_note = []
 
     #Study
     if study <= 2:
@@ -87,16 +82,28 @@ def analyze_factors(study, sleep, focus, stress, study_count, academic_count, wo
     if stress >= 7:
         analysis.append("Your stress level is too high.")
         recommendation.append("Consider relaxation or breaks, the world waits for no one, but you can wait for yourself.")
-        risks.append("Elevated stress level detected.")
+        risks.append("High stress levels may impact productivity.")
 
     #Planner
-    if study_count != "None":
-        if study_count + academic_count + work_count < rest_count * 3:
-            strengths.append("Maintains a structured overall routine.")
+    if study_count + academic_count + work_count < rest_count * 3:
+        strengths.append("Maintains a structured overall routine.")
+        
+    if rest_count < study_count:
+        risks.append("Limited recovery time detected.")
 
     #Pomodoro
     if pomodoro_streak >= 5:
         strengths.append("Shows consistent focus discipline.")
+
+    #Interviewer's Note
+    if study >= 5 and focus >= 7:
+        interviewer_note.append("Appears academically disciplined and capable of sustained concentration.")
+    
+    if work_count > 0:
+        interviewer_note.append("Shows ability to balance academic and external responsibilities.")
+    
+    if stress >= 7:
+        interviewer_note.append("Would benefits from stronger stress management strategies.")
 
     #Reasonable Daily Routine (No schedule issue and many potential)
     if analysis == [] and recommendation == [] and risks == [] and len(strengths) >= 3:
@@ -112,8 +119,11 @@ def analyze_factors(study, sleep, focus, stress, study_count, academic_count, wo
     
     if strengths == []:
         strengths.append("Potential strengths become more accurate as additional simulations and activity records are collected.")
+    
+    if interviewer_note == []:
+        interviewer_note.append("There is still a lot of room for improvement.")
 
-    return analysis, recommendation, strengths, risks
+    return analysis, recommendation, strengths, risks, interviewer_note
 
 def get_main_issue(score, study, sleep, focus, stress):
     scores = {
@@ -140,20 +150,6 @@ def issue_message(issue):
     }
 
     return messages.get(issue, "")
-
-def apply_scenario_context(student_type, recommendation):
-    context_recs = []
-
-    if student_type == "foundation":
-        context_recs.append("As a foundation student, focus on building strong fundamentals as they will impact future subjects.")
-    
-    elif student_type == "diploma":
-        context_recs.append("As a diploma student, balancing coursework and practical skills is important for consistent performance.")
-    
-    elif student_type == "degree":
-        context_recs.append("As a degree student, deeper understanding and independent learning are critical for success.")
-
-    return context_recs + recommendation
 
 def get_recommendation(score):
     if score < 40:
@@ -189,45 +185,91 @@ def calculate_pomodoro_points(duration):
     
     return 0
 
-def apply_pomodoro_effects(base_focus, base_stress, pomodoro_count):
-    bonus = min(pomodoro_count, 5)
-
-    focus = min(10, base_focus + round(bonus / 2))
-    stress = max(0, base_stress - round(bonus / 2))
-
-    return focus, stress
-
 #Predict System
-def predict_base_state(history_records, pomodoro_count):
-    if not history_records:
-        return None, None
-    
-    avg_focus = sum(r['focus_level'] for r in history_records) / len(history_records)
-    avg_stress = sum(r['stress_level'] for r in history_records) / len(history_records)
-
-    predicted_focus = avg_focus + round(min(5, pomodoro_count) / 2)
-    predicted_stress = avg_stress - round(min(5, pomodoro_count) / 2)
+def predict_base_state(pomodoro_count, stress_adjustment, focus_adjustment):
+    base_focus = 5
+    base_stress = 5
+    pomodoro_effect = round(min(5, pomodoro_count) / 2)
+    predicted_focus = base_focus + focus_adjustment + pomodoro_effect
+    predicted_stress = base_stress + stress_adjustment - pomodoro_effect
 
     predicted_focus = max(0, min(10, round(predicted_focus)))
     predicted_stress = max(0, min(10, round(predicted_stress)))
     
     return predicted_focus, predicted_stress
 
-def study_pattern(sleep, morning_category, afternoon_category, night_category):
+def calculate_planned_sleep(planner_rows):
+    sleep_hours = 0
+
+    for row in planner_rows:
+        task = row["task"]
+        if not task:
+            continue
+
+        task = task.lower()
+        if "sleep" in task:
+            sleep_hours += 1
+    
+    return sleep_hours
+
+def predict_sleep(planned_sleep, sleep_history):
+    if not sleep_history:
+        return planned_sleep
+    
+    average_sleep = sum(sleep_history) / len(sleep_history)
+    predict_sleep = (planned_sleep * 0.4) + (average_sleep * 0.6)
+
+    return round(predict_sleep, 1)
+
+def planner_focus(categories):
+    study_hours = categories.count("study")
+    academic_hours = categories.count("academic")
+    work_hours = categories.count("work")
+    rest_hours = categories.count("rest")
+    exercise_hours = categories.count("exercise")
+
+    focus_adjustment = 0
+
+    #Planned productive time increases focus readiness
+    focus_adjustment += min(3, study_hours * 0.4)
+
+    #Recovery helps focus
+    focus_adjustment += min(1, rest_hours * 0.15)
+    focus_adjustment += min(1, exercise_hours * 0.3)
+
+    #Too much obligation can reduce focus
+    focus_adjustment -= min(2, (work_hours + academic_hours) * 0.15)
+    
+    return max(-3, min(3, round(focus_adjustment, 1)))
+
+def planner_stress(categories):
+    study_hours = categories.count("study")
+    academic_hours = categories.count("academic")
+    work_hours = categories.count("work")
+    rest_hours = categories.count("rest")
+    exercise_hours = categories.count("exercise")
+
+    stress_adjustment = 0
+
+    #Workload increases stress
+    stress_adjustment += min(3, study_hours * 0.25)
+    stress_adjustment += min(2.5, academic_hours * 0.25)
+    stress_adjustment += min(3, work_hours * 0.35)
+
+    #Recovery reduces stress
+    stress_adjustment -= min(2, rest_hours * 0.2)
+    stress_adjustment -= min(1.5, exercise_hours * 0.4)
+    
+    return max(-3, min(4, round(stress_adjustment, 1)))
+
+def study_pattern(planner_categories):
     planned_study = 0
     study_slots = 0
 
-    if morning_category == "study":
-        planned_study += 7
-        study_slots += 1
-
-    if afternoon_category == "study":
-        planned_study += 6
-        study_slots += 1
-
-    if night_category == "study":
-        planned_study += (11 - sleep)
-        study_slots += 1
+    for cat in planner_categories:
+        if cat == "study":
+            planned_study += 1
+            study_slots += 1
     
     return round(planned_study), study_slots
 
@@ -363,6 +405,10 @@ def generate_planner_suggestion(categories):
     elif recognition_rate < 80:
         analysis_confidence = "Medium"
 
+    if total_count < 168:
+        analysis_confidence = "Low"
+        suggestions.append("Complete your weekly schedule to receive smart suggestions more accurately.")
+
     if recognized_count == 0:
         if other_count > 0:
             suggestions.append("Add recognizable tasks such as Study, Lecture, Assignment, Rest, Exercise or any of default presets that we given for more accurate recommendations.")
@@ -398,7 +444,7 @@ def generate_planner_suggestion(categories):
 def behavior_analysis(pomodoro_count, music_theme):
     behavior_msg = []
 
-    behavior_msg.append(f"You completed {pomodoro_count} Pomodoro sessions today.")
+    behavior_msg.append(f"You completed {pomodoro_count} focus sessions helped improve your focus and reduce stress today.")
 
     if music_theme == "rain":
         behavior_msg.append("Rain ambience may provide a calming environment for focused work.")
@@ -412,9 +458,9 @@ def behavior_analysis(pomodoro_count, music_theme):
     return behavior_msg
 
 #Planner Feedback (Result)
-def planner_feedback(study, sleep, morning_category, afternoon_category, night_category):
+def planner_feedback(study, planner_categories):
     planner_feedback = []
-    planned_study, study_slots = study_pattern(sleep, morning_category, afternoon_category, night_category)
+    planned_study, study_slots = study_pattern(planner_categories)
     
     if study_slots >= 2:
         planner_feedback.append("Your planner suggests a balanced day with significant study activities")
