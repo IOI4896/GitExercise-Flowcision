@@ -1,397 +1,799 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Flowcision - Weekly Planner</title>
-        <style>
-            body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                min-height: 100vh;
-                margin: 0;
-                color: #333;
-            }
-            .container {
-                background: white;
-                padding: 40px;
-                border-radius: 20px;
-                box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-                width: 100%;
-                max-width: 900px;
-                text-align: center;
-            }
-            h1 { color: #4a4a4a; font-size: 30px; text-align: center; margin-bottom: 10px; }
-            h2 { color: #4a4a4a; font-size: 25px; text-align: center; margin-bottom: 10px; }
-            p { color: #667eea; font-size: 24px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px; margin-top: 20px; }
-            tr, td { color: #4a4a4a; font-size: 20px; text-align: center; margin-bottom: 10px; }
-            .custom-input {
-                display: none;
-                text-align: center;
-            }
-            input, select {
+
+<head>
+    <title>Flowcision - Weekly Planner</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 900px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #4a4a4a;
+            font-size: 30px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: #4a4a4a;
+            font-size: 25px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #667eea;
+            font-size: 24px;
+            border-bottom: 2px solid #f0f2f5;
+            padding-bottom: 10px;
+            margin-top: 20px;
+        }
+
+        tr,
+        td {
+            color: #4a4a4a;
+            font-size: 20px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .custom-input {
+            display: none;
+            text-align: center;
+        }
+
+        input,
+        select {
             width: 100%;
             padding: 12px;
             margin-top: 5px;
             border: 1px solid #ddd;
             border-radius: 8px;
-            box-sizing: border-box; 
+            box-sizing: border-box;
             background-color: #f9f9f9;
             font-size: 15px;
-            } 
-            .planner-scroll {
-                width: 100%; 
-                overflow-x: auto; 
-                -webkit-overflow-scrolling: touch;
-            }
+        }
+
+        .planner-scroll {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .planner-scroll::after {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
             .planner-scroll::after {
-                display: none;
+                content: "<- Swipe to view ->";
+                display: block;
+                text-align: center;
+                font-size: 12px;
+                color: #667eea;
+                margin-top: 6px;
             }
-            @media (max-width: 768px) {
-                .planner-scroll::after {
-                    content: "<- Swipe to view ->";
-                    display: block;
-                    text-align: center;
-                    font-size: 12px;
-                    color: #667eea;
-                    margin-top: 6px;
-                }
-            }
-            .planner-scroll::-webkit-scrollbar {
-                display: none;
-            }
-            button {
-                width: 100%;
-                padding: 15px;
-                background-color: #667eea;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                cursor: pointer;
-                font-size: 16px;
-                font-weight: bold;
-                margin-top: 25px;
-                transition: 0.3s;
-            }
-            button:hover { background-color: #5a67d8; transform: translateY(-2px); }
+        }
 
-            body.dark-mode:not(.rain):not(.ocean):not(.white_noise) {
-                background: linear-gradient(135deg, #111324 0%, #1a1a2e 100%) !important;
-                background-color: #1a1a2e !important;
-                color: #ffffff !important;
-            }
+        .planner-scroll::-webkit-scrollbar {
+            display: none;
+        }
 
-            body.dark-mode .container, 
-            body.dark-mode .card, 
-            body.dark-mode div[class*="card"], 
-            body.dark-mode div[style*="background-color: white"],
-            body.dark-mode div[style*="background: white"],
-            body.dark-mode div[style*="background: #eef7ff"] {
-                background-color: #22254b !important;
-                background: #22254b !important;
-                box-shadow: 0 15px 35px rgba(0,0,0,0.6) !important;
-            }
-            body.dark-mode table {
-                background-color: #22254b !important;
-                color: #ffffff !important;
-                border-collapse: collapse !important;
-                box-shadow: none !important;
-            }
-            body.dark-mode th, body.dark-mode td {
-                background-color: transparent !important;
-                border: 1px solid #4a5199 !important;
-                color: #ffffff !important;
-                box-shadow: none !important;
-            }
-            body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4,
-            body.dark-mode p, body.dark-mode label, body.dark-mode span, 
-            body.dark-mode b, body.dark-mode li {
-                color: #ffffff !important;
-            }
-            body.dark-mode input, body.dark-mode select, body.dark-mode textarea, body.dark-mode option {
-                background-color: #2c305e !important;
-                color: #ffffff !important;
-                border: 1px solid #4a5199 !important;
-            }
-            body.dark-mode button, body.dark-mode .btn {
-                background-color: #4f46e5 !important;
-                color: white !important;
-                border: none !important;
-            }
-            body.dark-mode button:hover, body.dark-mode .btn:hover {
-                background-color: #4338ca !important;
-            }
-        </style>
-    </head>
+        .planner-assistant {
 
-    <body>
-        <div class = "container">
-            {% extends "base.html" %}
-            {% block content %}
-            <div id="cmdbar" class="hidden">
-                <input id="commandInput" type="'text" placeholder="type command...">
-            </div>
+            background: #eef7ff;
 
-            <h1>Weekly Planner</h1>
-            <div style = "background: #eef7ff; padding: 20px; border-radius: 10px; margin-bottom: 20px; ">
-                <h2>Smart Planner Suggestions</h2>
-                <ul>{% for suggestion in planner_suggestion %}
-                    <p>{{suggestion}}</p>
+            padding: 20px;
+
+            border-radius: 10px;
+
+            margin-bottom: 20px;
+
+        }
+
+        .planner-assistant label {
+
+            display: block;
+
+            margin-top: 12px;
+
+            font-weight: bold;
+
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 25px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        label input[type="checkbox"] {
+            margin-right: 15px;
+            transform: scale(1.3);
+            cursor: pointer;
+        }
+
+        .planner-table td,
+        .planner-table select,
+        .planner-table input {
+            transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+        }
+
+        .task-study {
+            background-color: #dbeafe !important;
+            border-color: #93c5fd !important;
+            color: #1e3a8a !important;
+        }
+
+        .task-academic {
+            background-color: #ede9fe !important;
+            border-color: #a78bfa !important;
+            color: #5b21b6 !important;
+        }
+
+        .task-rest {
+            background-color: #dcfce7 !important;
+            border-color: #86efac !important;
+            color: #166534 !important;
+        }
+
+        .task-exercise {
+            background-color: #fef3c7 !important;
+            border-color: #fcd34d !important;
+            color: #92400e !important;
+        }
+
+        .task-work {
+            background-color: #fee2e2 !important;
+            border-color: #fca5a5 !important;
+            color: #991b1b !important;
+        }
+
+        .task-other {
+            background-color: #f3f4f6 !important;
+            border-color: #d1d5db !important;
+            color: #374151 !important;
+        }
+
+        body.dark-mode .task-study {
+            background-color: #1e3a8a !important;
+            border-color: #60a5fa !important;
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .task-academic {
+            background-color: #5b21b6 !important;
+            border-color: #c4b5fd !important;
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .task-rest {
+            background-color: #166534 !important;
+            border-color: #86efac !important;
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .task-exercise {
+            background-color: #92400e !important;
+            border-color: #fcd34d !important;
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .task-work {
+            background-color: #991b1b !important;
+            border-color: #fca5a5 !important;
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .task-other {
+            background-color: #374151 !important;
+            border-color: #9ca3af !important;
+            color: #ffffff !important;
+        }
+
+        body.dark-mode:not(.rain):not(.ocean):not(.white_noise) {
+            background: linear-gradient(135deg, #111324 0%, #1a1a2e 100%) !important;
+            background-color: #1a1a2e !important;
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .container,
+        body.dark-mode .card,
+        body.dark-mode div[class*="card"],
+        body.dark-mode div[style*="background-color: white"],
+        body.dark-mode div[style*="background: white"],
+        body.dark-mode div[style*="background: #eef7ff"] {
+            background-color: #22254b !important;
+            background: #22254b !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6) !important;
+        }
+
+        body.dark-mode table {
+            background-color: #22254b !important;
+            color: #ffffff !important;
+            border-collapse: collapse !important;
+            box-shadow: none !important;
+        }
+
+        body.dark-mode th,
+        body.dark-mode td {
+            background-color: transparent !important;
+            border: 1px solid #4a5199 !important;
+            color: #ffffff !important;
+            box-shadow: none !important;
+        }
+
+        body.dark-mode h1,
+        body.dark-mode h2,
+        body.dark-mode h3,
+        body.dark-mode h4,
+        body.dark-mode p,
+        body.dark-mode label,
+        body.dark-mode span,
+        body.dark-mode b,
+        body.dark-mode li {
+            color: #ffffff !important;
+        }
+
+        body.dark-mode input,
+        body.dark-mode select,
+        body.dark-mode textarea,
+        body.dark-mode option {
+            background-color: #2c305e !important;
+            color: #ffffff !important;
+            border: 1px solid #4a5199 !important;
+        }
+
+        body.dark-mode button,
+        body.dark-mode .btn {
+            background-color: #4f46e5 !important;
+            color: white !important;
+            border: none !important;
+        }
+
+        body.dark-mode button:hover,
+        body.dark-mode .btn:hover {
+            background-color: #4338ca !important;
+        }
+
+        body.dark-mode label {
+            background: #2a2a2a;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode label:hover {
+            background: #333;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        {% extends "base.html" %}
+        {% block content %}
+
+        <h1>Weekly Planner</h1>
+
+        <div style="background: #eef7ff; padding: 20px; border-radius: 10px; margin-bottom: 20px; ">
+            <h2>Smart Planner Suggestions</h2>
+            <ul>{% for suggestion in planner_suggestion %}
+                <p>{{suggestion}}</p>
                 {% endfor %}
-                </ul>
-                <h2>Planner Intelligence Report</h2>
-                <p>Recognition Rate: <b>{{recognition_rate}}%</b></p>
-                <p>Analysis Confidence: <b>{{analysis_confidence}}</b></p>
-            </div>
-
-            <form method = "POST">
-                <div class = "planner-scroll">
-<style>
-    
-    .planner-wrapper {
-        position: relative;
-        width: 95%; 
-        margin: 0 auto;
-        border: 2px solid #ccc;
-        border-radius: 8px;
-        background: white;
-        overflow: hidden; 
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-
-    
-    .planner-wrapper.maximized {
-        position: fixed;
-        top: 5vh; 
-        left: 5vw;
-        width: 90vw; 
-        height: 90vh;
-        z-index: 9999;
-        box-shadow: 0 0 30px rgba(0,0,0,0.6);
-        border-radius: 12px;
-    }
-
-    
-    .table-scroll-container {
-        max-height: 65vh; 
-        overflow-y: auto; 
-        overflow-x: hidden; 
-    }
-
-    .planner-wrapper.maximized .table-scroll-container {
-        max-height: calc(90vh - 2px); 
-    }
-
-    
-    .planner-table {
-        width: 100%;
-        table-layout: fixed; 
-        border-collapse: separate;
-        border-spacing: 0;
-        text-align: center;
-    }
-
-    
-    .planner-table th, .planner-table td {
-        width: 12.5%; 
-        padding: 8px 4px;
-        border-right: 1px solid #ddd;
-        border-bottom: 1px solid #ddd;
-        box-sizing: border-box;
-    }
-
-   
-    .planner-table thead th {
-        position: sticky;
-        top: 0; 
-        background-color: #3b4252; 
-        color: white;
-        font-weight: bold;
-        z-index: 10;
-        box-shadow: 0 3px 6px rgba(0,0,0,0.3); 
-        border-bottom: none;
-    }
-
-    
-    .planner-table select, 
-    .planner-table input {
-        width: 100%;
-        box-sizing: border-box;
-        padding: 5px 2px;
-        border-radius: 4px;
-        border: 1px solid #ccc;
-        font-size: 13px;
-    }
-
-    
-    .planner-table tbody td:first-child {
-        background-color: #f8fafc;
-        font-weight: bold;
-        color: #333;
-    }
-
-    
-    .resize-btn {
-        background: #eceff4;
-        color: #2e3440;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: bold;
-        margin-left: 5px;
-        padding: 2px 6px;
-        transition: 0.2s;
-    }
-    .resize-btn:hover { background: #d8dee9; }
-</style>
-
-<div id="planner-wrapper" class="planner-wrapper">
-    <div class="table-scroll-container">
-        <table class="planner-table">
-            <thead>
-                <tr>
-                    <th>
-                        Time 
-                        <button type="button" class="resize-btn" onclick="togglePlannerSize()" title="Zoom in/out">⛶</button>
-                    </th>
-                    <th>Monday</th>
-                    <th>Tuesday</th>
-                    <th>Wednesday</th>
-                    <th>Thursday</th>
-                    <th>Friday</th>
-                    <th>Saturday</th>
-                    <th>Sunday</th>
-                </tr>
-            </thead>
-            <tbody id="planner-body"></tbody>
-        </table>
-    </div>
-</div>
-
-<script>
-    const plannerBody = document.getElementById("planner-body");
-    const options = ["Self Study", "Lecture", "Rest", "Exercise", "Entertainment", "Custom"];
-    const days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
-    
-    let rowsHTML = "";
-    
-    for (let i = 0; i < 24; i++) {
-        let hourStart = i.toString().padStart(2, '0') + ":00";
-        let hourEnd = ((i+1)%24).toString().padStart(2, '0') + ":00";
-        
-        rowsHTML += `<tr><td>${hourStart}<br>|<br>${hourEnd}</td>`;
-        
-        for (let j = 0; j < 7; j++) {
-            let inputName = `${days[j]}_${hourStart}`;
-            rowsHTML += `<td>
-                <select name="${inputName}" onchange="handleCustom(this)">
-                    <option value="" disabled selected>Select</option>
-                    ${options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
-                </select>
-                <input type="text" name="${inputName}_custom" placeholder="Type..." style="display:none;" class="custom-input">
-            </td>`;
-        }
-        rowsHTML += `</tr>`;
-    }
-    plannerBody.innerHTML = rowsHTML;
-
-   
-    function handleCustom(selectElem) {
-        let inputElem = selectElem.nextElementSibling;
-        if (selectElem.value === "Custom") {
-            inputElem.style.display = "block";
-            selectElem.style.display = "none"; 
-            inputElem.focus();
-        } else {
-            inputElem.style.display = "none";
-            inputElem.value = ""; 
-        }
-    }
-
-    
-    function togglePlannerSize() {
-        let wrapper = document.getElementById('planner-wrapper');
-        let scrollContainer = document.querySelector('.table-scroll-container');
-        
-        wrapper.classList.toggle('maximized');
-        
-        
-        scrollContainer.scrollTop = 0;
-    }
-
-    
-    document.addEventListener("DOMContentLoaded", function() {
-        const savedData = {{ planner_data | tojson | safe }};
-        if (!savedData) return;
-        
-        for (const [key, value] of Object.entries(savedData)) {
-            const el = document.querySelector(`[name="${key}"]`);
-            if(el && value && value !== "Custom" && !key.includes("_custom")) {
-                let optionExists = Array.from(el.options).some(opt => opt.value === value);
-                if(!optionExists) {
-                    el.value = "Custom";
-                    const customInput = document.querySelector(`[name="${key}_custom"]`);
-                    if(customInput) {
-                        el.style.display = "none";
-                        customInput.style.display = "block";
-                        customInput.value = value;
-                    }
-                } else {
-                    el.value = value;
-                }
-            }
-        }
-    });
-</script>
-                </div>
-
-                <button type = "submit">Save Planner</button>
-            </form>
-
-            <nav>
-                <a href = "/">
-                    <button>Go Back</button>
-                </a>
-            </nav>
+            </ul>
+            <h2>Planner Intelligence Report</h2>
+            <p>Recognition Rate: <b>{{recognition_rate}}%</b></p>
+            <p>Analysis Confidence: <b>{{analysis_confidence}}</b></p>
         </div>
 
-        <script>
-            window.onload = function(){
-                const task = "{{current_task or ''}}";
-                const desktopEnabled = "{{desktop_notification or 0}}";
-                const plannerEnabled = "{{planner_notification or 0}}";
-                if(desktopEnabled === "1" && plannerEnabled === "1" && task && Notification.permission === "granted"){
-                    new Notification(
-                        "Current Task", 
-                        {
-                            body: "Current Task: " + task
-                        }
-                    );
-                }
+        <div class="planner-assistant">
+            <h2>Planner Assistant</h2>
+            <table class="planner-table" style="text-align: center; margin: 0 auto;">
+                <thead>
+                    <tr>
+                        <th>Task</th>
+                        <th>
+                            <select id="assistantTask" onchange="toggleAssistantCustom()">
+                                {% for task in all_presets %}
+                                <option value="{{task}}">{{task}}</option>
+                                {% endfor %}
+                                <option value="__CUSTOM__">Custom</option>
+                            </select>
+
+                            <input type="text" id="assistantCustomTask" placeholder="Enter Custom task"
+                                style="display: none;">
+                        </th>
+                    </tr>
+
+                    <tr>
+                        <th>Day</th>
+                        <th>
+                            <select id="assistantDay">
+                                <option value="Every Day">Every Day</option>
+                                {% for day in days %}
+                                <option value="{{day}}">{{day}}</option>
+                                {% endfor %}
+                            </select>
+                        </th>
+                    </tr>
+
+                    <tr>
+                        <th>From</th>
+                        <th>
+                            <select id="assistantStart">
+                                {% for h in range(24) %}
+                                <option value="{{h}}">
+                                    {% if h == 0 %}
+                                        12 AM
+                                    {% elif h < 12 %}
+                                        {{h}} AM
+                                    {% elif h == 12 %}
+                                        12 PM
+                                    {% else %}
+                                        {{h - 12}} PM
+                                    {% endif %}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </th>
+                    </tr>
+
+                    <tr>
+                        <th>To</th>
+                        <th>
+                            <select id="assistantEnd">
+                                {% for h in range(24) %}
+                                <option value="{{h}}">
+                                    {% if h == 0 %}
+                                        12 AM
+                                    {% elif h < 12 %}
+                                        {{h}} AM
+                                    {% elif h == 12 %}
+                                        12 PM
+                                    {% else %}
+                                        {{h - 12}} PM
+                                    {% endif %}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </th>
+                    </tr>
+
+                </thead>
+            </table>
+
+            <p style="font-size: 20px; color: #667eea; border-bottom: none;">
+            Example: From 9 AM to 10 AM fills both 9 AM and 10 AM slots.</p>
+
+            <label><input type="checkbox" id="overwrite" checked>Overwrite Existing Tasks</label>
+
+            <button type="button" onclick="applyPlannerAssistant()">
+                Apply
+            </button>
+
+        </div>
+
+        <form method="POST">
+
+            <div class="planner-scroll">
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Mon</th>
+                            <th>Tue</th>
+                            <th>Wed</th>
+                            <th>Thu</th>
+                            <th>Fri</th>
+                            <th>Sat</th>
+                            <th>Sun</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="planner-body"></tbody>
+                </table>
+
+            </div>
+
+            <button type="submit">Save Planner</button>
+        </form>
+
+        <a href="/">
+            <button>Go Back</button>
+        </a>
+    </div>
+
+    <script>
+
+        const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+        const optionsHtml = `
+            <option value="">Select</option>
+            {% for task in all_presets %}
+                <option value="{{task}}">{{task}}</option>
+            {% endfor %}
+            <option value="Custom">Custom</option>
+        `
+        function applyPlannerAssistant() {
+            const task = getAssistantTask();
+            if (!task) {
+                return;
             }
 
-            function toggleCustom(select, inputId) {
-                let input = document.getElementById(inputId);
+            const day = document.getElementById("assistantDay").value;
+            const start =
+                parseInt(
+                    document.getElementById("assistantStart").value
+                );
 
-                if (select.value === "CUSTOM") {
-                    input.style.display = "block"; 
-                    input.style.margin = '0 auto'
-                    input.focus(); 
-                } else {
-                    input.style.display = "none"; 
-                    input.value = ""; 
-                }
+            const end =
+                parseInt(
+                    document.getElementById("assistantEnd").value
+                );
+
+            let targetDays;
+
+            if (day === "Every Day") {
+                targetDays = days;
             }
-            
-            if (localStorage.getItem('theme') === 'dark') {
-                document.body.classList.add('dark-mode');
+
+            else {
+                targetDays = [day];
+            }
+
+            targetDays.forEach(d => {
+                if (start <= end) {
+                    for (let h = start; h <= end; h++) {
+                        fillPlanner(d, h, task);
+                    }
+                }
+
+                else {
+                    for (let h = start; h < 24; h++) {
+                        fillPlanner(d, h, task);
+                    }
+
+                    for (let h = 0; h <= end; h++) {
+                        fillPlanner(d, h, task);
+                    }
+                }
+            });
+        }
+
+        function toggleAssistantCustom() {
+            const taskSelect = document.getElementById("assistantTask");
+            const customInput = document.getElementById("assistantCustomTask");
+
+            if (taskSelect.value === "__CUSTOM__") {
+                customInput.style.display = "block";
+                customInput.focus();
             } else {
-                document.body.classList.remove('dark-mode');
+                customInput.style.display = "none";
+                customInput.value = "";
             }
-        </script>
-        {% endblock %}
-    </body>
+        }
+
+        function getAssistantTask() {
+            const taskSelect = document.getElementById("assistantTask");
+
+            if (taskSelect.value === "__CUSTOM__") {
+                const customTask = document.getElementById("assistantCustomTask").value.trim();
+
+                if (!customTask) {
+                    alert("Please enter a custom task.");
+                    return null;
+                }
+
+                return customTask;
+            }
+
+            return taskSelect.value;
+        }
+
+        function fillPlanner(day, hour, task) {
+            const key = `${day}_h${hour}`;
+            const select = document.querySelector(`[name="${key}"]`);
+
+            if (!select) return;
+
+            if (select.value !== "" && !document.getElementById("overwrite").checked) {
+                return;
+            }
+
+            const input = document.querySelector(`[name="${key}_custom"]`);
+            const optionExists = [...select.options].some(o => o.value === task);
+
+            if (optionExists) {
+                select.value = task;
+
+                if (input) {
+                    input.style.display = "none";
+                    input.value = "";
+                }
+            } else {
+                select.value = "Custom";
+
+                if (input) {
+                    input.style.display = "block";
+                    input.value = task;
+                }
+            }
+
+            applyTaskColor(select);
+        }
+        
+        function formatHour(hour) {
+            if (hour === 0){
+                return "12 AM"
+            }
+
+            if (hour < 12){
+                return hour + " AM"
+            }
+
+            if (hour === 12){
+                return "12 PM"
+            }
+
+            return (hour - 12) + " PM"
+        }
+        const tbody = document.getElementById("planner-body");
+
+        for (let h = 0; h < 24; h++) {
+
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${formatHour(h)}</td>
+            `;
+
+            days.forEach(day => {
+
+                const key = `${day}_h${h}`;
+
+                const td = document.createElement("td");
+
+                td.innerHTML = `
+                    <select name="${key}" onchange="handleCustom(this)">
+                        ${optionsHtml}
+                    </select>
+
+                    <input type="text"
+                    name="${key}_custom"
+                    class="custom-input"
+                    placeholder="Custom task"
+                    style="display:none;">
+                `;
+
+                row.appendChild(td);
+                
+                for (let h = 0; h < 24; h++) {
+                    document.addEventListener("input", function(e){
+                        if(e.target.matches('.custom-input')){
+                            const select = e.target.parentElement.querySelector("select");
+                            applyTaskColor(select);
+                        }
+                    });
+                }
+            });
+
+            tbody.appendChild(row);
+        }
+
+        function getTaskCategory(task) {
+            if (!task) return "other";
+
+            task = task.toLowerCase().trim();
+
+            const studyKeywords = [
+                "study", "self study", "revision", "research",
+                "coding", "code", "practice", "assignment",
+                "project", "homework"
+            ];
+
+            const academicKeywords = [
+                "lecture", "class", "tutorial", "lab",
+                "quiz", "test", "exam", "examination",
+                "presentation"
+            ];
+
+            const restKeywords = [
+                "sleep", "rest", "break", "breakfast",
+                "lunch", "dinner", "nap"
+            ];
+
+            const exerciseKeywords = [
+                "gym", "gymnasium", "exercise",
+                "workout", "football", "basketball"
+            ];
+
+            const workKeywords = [
+                "job", "meeting", "internship", "intern", "work"
+            ];
+
+            for (let keyword of studyKeywords) {
+                if (task.includes(keyword)) return "study";
+            }
+
+            for (let keyword of academicKeywords) {
+                if (task.includes(keyword)) return "academic";
+            }
+
+            for (let keyword of restKeywords) {
+                if (task.includes(keyword)) return "rest";
+            }
+
+            for (let keyword of exerciseKeywords) {
+                if (task.includes(keyword)) return "exercise";
+            }
+
+            for (let keyword of workKeywords) {
+                if (task.includes(keyword)) return "work";
+            }
+
+            return "other";
+        }
+
+        function clearTaskClasses(element) {
+            element.classList.remove(
+                "task-study",
+                "task-academic",
+                "task-rest",
+                "task-exercise",
+                "task-work",
+                "task-other"
+            );
+        }
+
+        function applyTaskColor(select) {
+            const td = select.closest("td");
+            const input = td.querySelector("input");
+
+            let taskValue = select.value;
+
+            if (taskValue === "Custom" && input && input.value.trim() !== "") {
+                taskValue = input.value.trim();
+            }
+
+            const category = getTaskCategory(taskValue);
+
+            clearTaskClasses(td);
+            clearTaskClasses(select);
+
+            if (input) {
+                clearTaskClasses(input);
+            }
+
+            td.classList.add(`task-${category}`);
+            select.classList.add(`task-${category}`);
+
+            if (input && input.style.display !== "none") {
+                input.classList.add(`task-${category}`);
+            }
+        }
+
+        function handleCustom(select) {
+            const input = select.parentElement.querySelector("input");
+
+            if (select.value === "Custom") {
+                input.style.display = "block";
+                input.focus()
+            } else {
+                input.style.display = "none";
+                input.value = "";
+            }
+
+            applyTaskColor(select);
+        }
+
+        const saved = JSON.parse('{{planner_json | safe}}');
+
+        window.addEventListener("load", function () {
+            for (const day in saved) {
+                for (const hour in saved[day]) {
+
+                    const key = `${day}_h${hour}`;
+                    const value = saved[day][hour];
+
+                    const select = document.querySelector(`[name="${key}"]`);
+                    if (!select) continue;
+
+                    const exists = [...select.options].some(o => o.value === value);
+
+                    if (exists) {
+
+                        select.value = value;
+
+                        const input = document.querySelector(`[name="${key}_custom"]`);
+
+                        if (input) {
+                            input.style.display = "none";
+                            input.value = "";
+                        }
+                    } else {
+                        select.value = "Custom";
+
+                        const input = document.querySelector(`[name="${key}_custom"]`);
+
+                        if (input) {
+                            input.style.display = "block";
+                            input.value = value;
+                        }
+                    }
+
+                    applyTaskColor(select)
+                }
+            }
+        });
+
+        window.addEventListener("load", function () {
+            const task = "{{current_task or ''}}";
+            const desktopEnabled = "{{desktop_notification or 0}}";
+            const plannerEnabled = "{{planner_notification or 0}}";
+            if (desktopEnabled === "1" && plannerEnabled === "1" && task && Notification.permission === "granted") {
+                new Notification(
+                    "Current Task",
+                    {
+                        body: "Current Task: " + task
+                    }
+                );
+            }
+        });
+    </script>
+
+</body>
+
 </html>
+
+{% endblock %}
